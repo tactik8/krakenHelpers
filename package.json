@@ -1,0 +1,25 @@
+{
+  "devDependencies": {
+    "@babel/core": "^7.24.3",
+    "@babel/preset-env": "^7.24.3",
+    "babel-jest": "^29.7.0",
+    "jest": "^29.7.0",
+    "parcel": "^2.12.0"
+  },
+  "source": "src/index.js",
+  "main": "dist/main.js",
+  "type": "module",
+  "babel": {
+    "plugins": [
+      "@babel/plugin-syntax-import-attributes"
+    ]
+  },
+  "name": "krakenhelper",
+  "description": "Helper methods",
+  "version": "0.0.1",
+  "dependencies": {
+   
+  },
+  "author": "Tactik8",
+  "license": "ISC"
+}
