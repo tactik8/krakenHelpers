@@ -3,15 +3,19 @@
 
 export const krakenDateHelpers = {
 
-    isDate: validateDate,
-    validateDate: validateDate,
-    toText: toText,
-    toDate: toDate,
-    duration: getDuration,
+    // Base
     getDuration: getDuration,
-    durationRecord: getDurationRecord,
-    getDurationRecord: getDurationRecord
+    getDurationRecord: getDurationRecord,
+    toDate: toDate,
+    toText: toText,
+    validateDate: validateDate,
     
+    // Shortcuts
+    isDate: validateDate,
+    getDate: toDate,
+    duration: getDuration,
+    durationRecord: getDurationRecord,
+
 }
 
 
@@ -33,14 +37,24 @@ function toText(value){
 
 
 function toDate(value){
-
-    if(validateDate(value) == true){ return value }
     
-    try{
-        var d = new Date(value);
+    if(validateDate(value) == true){ return value }
+
+    try {
+        if (typeof value !== 'string') {
+            return undefined;
+        }
+
+        const date = new Date(value);
+
         
-        if(d.month && d.month != null){ return d } else { return undefined }
-    } catch (error){
+        if (isNaN(date.getTime())) {
+            return undefined;
+        }
+
+        return date;
+        
+    } catch (error) {
         return undefined
     }
 }
@@ -48,6 +62,10 @@ function toDate(value){
 
 function getDuration(date1, date2){
 
+    date1 = toDate(date1)
+    date2 = toDate(date2)
+
+    
     if(validateDate(date1) == false){ return undefined }
     if(validateDate(date2) == false){ return undefined }
 

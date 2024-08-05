@@ -16,7 +16,7 @@ function $135f0c356f6f593e$var$toNumber(value) {
 }
 function $135f0c356f6f593e$var$toText(value, rounding) {
     value = $135f0c356f6f593e$var$toNumber(value);
-    if (!value || value == null) return undefined;
+    if ((!value || value == null) && value != 0) return undefined;
     if (rounding | rounding != null) value = Math.round(value);
     return String(value);
 }
@@ -25,7 +25,8 @@ function $135f0c356f6f593e$var$toText(value, rounding) {
 const $1fd01b1ecffa6019$export$42f247ccf9267abd = {
     isObject: $1fd01b1ecffa6019$var$isObject,
     getKeys: $1fd01b1ecffa6019$var$getKeys,
-    keys: $1fd01b1ecffa6019$var$getKeys
+    keys: $1fd01b1ecffa6019$var$getKeys,
+    toText: $1fd01b1ecffa6019$var$toText
 };
 function $1fd01b1ecffa6019$var$isObject(value) {
     return typeof value === "object" && !Array.isArray(value) && value !== null;
@@ -35,6 +36,15 @@ function $1fd01b1ecffa6019$var$getKeys(value) {
     let keys = Object.keys(value);
     keys.sort();
     return keys;
+}
+function $1fd01b1ecffa6019$var$toText(value) {
+    if ($1fd01b1ecffa6019$var$isObject(value) == false) return undefined;
+    if (value["@type"]) return `${value["@type"]}/${value["@id"]}`;
+    else {
+        let keys = Object.keys(value);
+        if (keys.length == 0) return "{}";
+        return `{"${keys[0]}": "${value[keys[0]]}", ... }`;
+    }
 }
 
 
@@ -50,6 +60,7 @@ const $9fc8b212f324f9e3$export$4736c2d1b0001d00 = {
     getMax: $9fc8b212f324f9e3$var$getMax,
     getMin: $9fc8b212f324f9e3$var$getMin,
     getN: $9fc8b212f324f9e3$var$getN,
+    getNull: $9fc8b212f324f9e3$var$getNull,
     getSum: $9fc8b212f324f9e3$var$getSum,
     getAverage: $9fc8b212f324f9e3$var$getAverage,
     getStandardDeviation: $9fc8b212f324f9e3$var$getStandardDeviation,
@@ -60,7 +71,8 @@ const $9fc8b212f324f9e3$export$4736c2d1b0001d00 = {
     getSumRecord: $9fc8b212f324f9e3$var$getSum,
     getAverageRecord: $9fc8b212f324f9e3$var$getAverage,
     getStandardDeviationRecord: $9fc8b212f324f9e3$var$getStandardDeviation,
-    getStatsRecord: $9fc8b212f324f9e3$var$getStatsRecord
+    getStatsRecord: $9fc8b212f324f9e3$var$getStatsRecord,
+    getUniqueN: $9fc8b212f324f9e3$var$getUniqueN
 };
 function $9fc8b212f324f9e3$var$validateArray(value) {
     if (Array.isArray(value)) return true;
@@ -216,6 +228,22 @@ function $9fc8b212f324f9e3$var$getStandardDeviationRecord(value, key) {
     let unitCode = $9fc8b212f324f9e3$var$getUnitCodesForKey(value, key);
     return $9fc8b212f324f9e3$var$getStatsRecord("marginOfError", key, result, unitCode);
 }
+function $9fc8b212f324f9e3$var$getNull(value, key) {
+    value = $9fc8b212f324f9e3$var$ensureArray(value);
+    if ($9fc8b212f324f9e3$var$validateArray(value) == false) return undefined;
+    let nullValues = 0;
+    for (let v of value)if ((!v || v == null || v == "" || v == {} || v == []) && v !== 0) nullValues;
+    return nullValues;
+}
+function $9fc8b212f324f9e3$var$getUniqueN(value, key) {
+    value = $9fc8b212f324f9e3$var$ensureArray(value);
+    if ($9fc8b212f324f9e3$var$validateArray(value) == false) return undefined;
+    let uniqueValues = [
+        ...new Set(value)
+    ];
+    let result = uniqueValues.length;
+    return result;
+}
 // -----------------------------------------------------
 //  Statistical record 
 // -----------------------------------------------------
@@ -246,15 +274,19 @@ function $9fc8b212f324f9e3$var$getStatsRecord(statType, property, value, unitCod
 }
 
 
+
 const $18d56086b081e2cc$export$15c85b69ec02b47c = {
-    isDate: $18d56086b081e2cc$var$validateDate,
-    validateDate: $18d56086b081e2cc$var$validateDate,
-    toText: $18d56086b081e2cc$var$toText,
-    toDate: $18d56086b081e2cc$var$toDate,
-    duration: $18d56086b081e2cc$var$getDuration,
+    // Base
     getDuration: $18d56086b081e2cc$var$getDuration,
-    durationRecord: $18d56086b081e2cc$var$getDurationRecord,
-    getDurationRecord: $18d56086b081e2cc$var$getDurationRecord
+    getDurationRecord: $18d56086b081e2cc$var$getDurationRecord,
+    toDate: $18d56086b081e2cc$var$toDate,
+    toText: $18d56086b081e2cc$var$toText,
+    validateDate: $18d56086b081e2cc$var$validateDate,
+    // Shortcuts
+    isDate: $18d56086b081e2cc$var$validateDate,
+    getDate: $18d56086b081e2cc$var$toDate,
+    duration: $18d56086b081e2cc$var$getDuration,
+    durationRecord: $18d56086b081e2cc$var$getDurationRecord
 };
 function $18d56086b081e2cc$var$validateDate(value) {
     if (value instanceof Date) return true;
@@ -269,14 +301,17 @@ function $18d56086b081e2cc$var$toText(value) {
 function $18d56086b081e2cc$var$toDate(value) {
     if ($18d56086b081e2cc$var$validateDate(value) == true) return value;
     try {
-        var d = new Date(value);
-        if (d.month && d.month != null) return d;
-        else return undefined;
+        if (typeof value !== "string") return undefined;
+        const date = new Date(value);
+        if (isNaN(date.getTime())) return undefined;
+        return date;
     } catch (error) {
         return undefined;
     }
 }
 function $18d56086b081e2cc$var$getDuration(date1, date2) {
+    date1 = $18d56086b081e2cc$var$toDate(date1);
+    date2 = $18d56086b081e2cc$var$toDate(date2);
     if ($18d56086b081e2cc$var$validateDate(date1) == false) return undefined;
     if ($18d56086b081e2cc$var$validateDate(date2) == false) return undefined;
     let startDate;
@@ -332,6 +367,10 @@ function $9a2a3d97de4234f5$var$toText(value) {
         let result = `${value["value"]} ${value["unitText"] || value["unitCode"] || ""}`;
         return result;
     }
+    if (record_type == "DefinedTerm") {
+        if (value.name && value.name != null) return value.name;
+        if (value.termCode && value.termCode != null) return value.termCode;
+    }
     if (record_type == "Person") {
         if (value["givenName"] && value["familyName"]) return `${value["givenName"]} ${value["familyName"]}`;
     }
@@ -343,21 +382,66 @@ function $9a2a3d97de4234f5$var$toText(value) {
 
 
 
-
+const $2974f6a85c45961a$export$b881b526c33ee854 = {
+    getDomain: $2974f6a85c45961a$var$getDomain,
+    domain: $2974f6a85c45961a$var$getDomain,
+    getUrl: $2974f6a85c45961a$var$getUrl,
+    toUrl: $2974f6a85c45961a$var$getUrl
+};
+function $2974f6a85c45961a$var$isUrl(value) {
+    if (!value || value == null) return false;
+    if (value instanceof URL) return true;
+}
+function $2974f6a85c45961a$var$getUrl(baseUrl, path, params) {
+    try {
+        if (!baseUrl || typeof baseUrl !== "string") throw new Error("Invalid base URL");
+        if (!path) path = "";
+        if (typeof path !== "string") throw new Error("Invalid path");
+        if (params && typeof params !== "object") throw new Error("Invalid params");
+        let url = new URL(path, baseUrl);
+        if (params) Object.keys(params).forEach((key)=>{
+            if (params[key] !== undefined && params[key] !== null) url.searchParams.append(key, params[key]);
+        });
+        return url.toString();
+    } catch (error) {
+        //console.error('Error building URL:', error.message);
+        return null;
+    }
+}
+function $2974f6a85c45961a$var$getDomain(value) {
+    try {
+        if (!value || value == null) return undefined;
+        if (!(value instanceof URL)) {
+            if (typeof value != "string") return undefined;
+            value = new URL(value);
+        }
+        let domain = value.hostname;
+        console.log("d", domain);
+        domain = domain.replace("www.", "");
+        if (domain == "wrong.protocol") return undefined;
+        // Use URL constructor to parse the URL
+        return domain;
+    } catch (error) {
+        // If an error occurs, return an appropriate error message
+        return undefined;
+    }
+}
 
 
 const $5abff2bf4ee17cbb$export$da17952f31714a6e = {
     toText: $5abff2bf4ee17cbb$var$toText,
     getType: $5abff2bf4ee17cbb$var$getType,
+    getTypeSchemaOrg: $5abff2bf4ee17cbb$var$getTypeSchemaOrg,
     innerValuesToText: $5abff2bf4ee17cbb$var$innerValuesToText,
     valuesToText: $5abff2bf4ee17cbb$var$innerValuesToText
 };
 function $5abff2bf4ee17cbb$var$toText(value) {
-    if (!value || value == null || value == [] || value == {}) return "";
+    if ((!value || value == null || value == [] || value == {}) && value != 0) return "";
     if ((0, $9a2a3d97de4234f5$export$c24b4489b93ad8cb).isThing(value)) return (0, $9a2a3d97de4234f5$export$c24b4489b93ad8cb).toText(value);
     else if ((0, $18d56086b081e2cc$export$15c85b69ec02b47c).isDate(value)) return (0, $18d56086b081e2cc$export$15c85b69ec02b47c).toText(value);
     else if ((0, $9fc8b212f324f9e3$export$4736c2d1b0001d00).isArray(value)) return (0, $9fc8b212f324f9e3$export$4736c2d1b0001d00).toText(value);
     else if ((0, $135f0c356f6f593e$export$96be39e8128f5891).isNumber(value)) return (0, $135f0c356f6f593e$export$96be39e8128f5891).toText(value);
+    else if ((0, $1fd01b1ecffa6019$export$42f247ccf9267abd).isObject(value)) return (0, $1fd01b1ecffa6019$export$42f247ccf9267abd).toText(value);
     else return String(value);
 }
 function $5abff2bf4ee17cbb$var$innerValuesToText(value) {
@@ -380,6 +464,240 @@ function $5abff2bf4ee17cbb$var$getType(value) {
     else if ((0, $135f0c356f6f593e$export$96be39e8128f5891).isNumber(value)) return "number";
     else return "string";
 }
+function $5abff2bf4ee17cbb$var$getTypeSchemaOrg(value) {
+    let t = $5abff2bf4ee17cbb$var$getType(value);
+    if (t == "thing") return value["@type"];
+    if (t == "string") {
+        if ((0, $2974f6a85c45961a$export$b881b526c33ee854).toUrl(value)) return "url";
+    }
+    return t;
+}
+
+
+const $336c234775b67d62$export$35d3dd03f0194c3a = {
+    analyzeValues: $336c234775b67d62$var$analyzeValues,
+    analyze: $336c234775b67d62$var$analyze
+};
+function $336c234775b67d62$var$analyze(value) {
+    value = (0, $9fc8b212f324f9e3$export$4736c2d1b0001d00).ensureArray(value);
+    let keys = (0, $9fc8b212f324f9e3$export$4736c2d1b0001d00).getKeys(value);
+    let analysis = {};
+    for (let k of keys)analysis[k] = $336c234775b67d62$var$analyzeValues(value, k);
+    return analysis;
+}
+function $336c234775b67d62$var$analyzeValues(value, key) {
+    let analysis = {
+        type: null,
+        types: {},
+        typeSchemaOrg: null,
+        typesSchemaOrg: {},
+        values: {},
+        N: null,
+        nullN: null,
+        uniqueN: null,
+        min: null,
+        max: null,
+        stddev: null
+    };
+    let values = (0, $9fc8b212f324f9e3$export$4736c2d1b0001d00).getValuesForKey(value, key);
+    for (let v of values){
+        // Get type
+        let t = (0, $5abff2bf4ee17cbb$export$da17952f31714a6e).getType(v);
+        analysis.types[t] = (analysis.types[t] || 0) + 1;
+        if (t && t != null) {
+            let s = analysis.type;
+            if (s && s != null && s != t) analysis.type = "na";
+            else analysis.type = t;
+        }
+        // Get schema type
+        let tt = (0, $5abff2bf4ee17cbb$export$da17952f31714a6e).getTypeSchemaOrg(v);
+        analysis.typesSchemaOrg[tt] = (analysis.typesSchemaOrg[tt] || 0) + 1;
+        if (tt && tt != null) {
+            let s = analysis.typeSchemaOrg;
+            if (s && s != null && s != tt) analysis.typeSchemaOrg = "na";
+            else analysis.typeSchemaOrg = tt;
+        }
+        // Get value
+        let newV = v;
+        if (newV["@type"]) newV = `${newV["@type"]}/${newV["@id"]}`;
+        analysis.values[newV] = (analysis.values[newV] || 0) + 1;
+        // get min / max
+        analysis.N = (0, $9fc8b212f324f9e3$export$4736c2d1b0001d00).getN(value, key);
+        analysis.nullN = (0, $9fc8b212f324f9e3$export$4736c2d1b0001d00).getNull(value, key);
+        analysis.uniqueN = (0, $9fc8b212f324f9e3$export$4736c2d1b0001d00).getUniqueN(value, key);
+        analysis.min = (0, $9fc8b212f324f9e3$export$4736c2d1b0001d00).getMin(value, key);
+        analysis.max = (0, $9fc8b212f324f9e3$export$4736c2d1b0001d00).getMax(value, key);
+        analysis.stddev = (0, $9fc8b212f324f9e3$export$4736c2d1b0001d00).getStandardDeviation(value, key);
+    }
+    return analysis;
+}
+
+
+
+
+const $03899943a5d4eab2$export$94a70d284fcdf065 = {
+    get: $03899943a5d4eab2$var$getPropertyValueFromDot,
+    getPropertyValueFromDot: $03899943a5d4eab2$var$getPropertyValueFromDot,
+    set: $03899943a5d4eab2$var$setPropertyValueFromDot,
+    setPropertyValueFromDot: $03899943a5d4eab2$var$setPropertyValueFromDot,
+    flatten: $03899943a5d4eab2$var$objectToDotNotation,
+    objectToDotNotation: $03899943a5d4eab2$var$objectToDotNotation,
+    simplify: $03899943a5d4eab2$var$simplify
+};
+function $03899943a5d4eab2$var$getPropertyValueFromDot(key, value) {
+    // Retrieves value by following dot notation
+    var items = key.split(".");
+    for(let t = 0; t < items.length; t++)value = value[items[t]];
+    return value;
+}
+function $03899943a5d4eab2$var$setPropertyValueFromDot(key, record, value) {
+    // Retrieves value by following dot notation
+    var items = key.split(".");
+    let item = items[0];
+    if (items.length > 1) {
+        if (!record[item]) record[item] = {};
+        $03899943a5d4eab2$var$setPropertyValueFromDot(items.slice(1).join("."), record[item], value);
+    } else record[item] = value;
+    return record;
+}
+function $03899943a5d4eab2$var$objectToDotNotation(obj, parentPrefix = "") {
+    let result = {};
+    // Helper function to handle recursion and path building
+    function recurse(o, path) {
+        for(let key in o)if (o.hasOwnProperty(key)) {
+            const newPath = path ? `${path}.${key}` : key;
+            // If the property is an object or array, recurse further
+            if (typeof o[key] === "object" && o[key] !== null) recurse(o[key], newPath);
+            else // Otherwise, add the property to the result
+            result[newPath] = o[key];
+        }
+    }
+    recurse(obj, parentPrefix);
+    return result;
+}
+function $03899943a5d4eab2$var$simplify(data) {
+    // Remove arrays of 1
+    if (Array.isArray(data)) {
+        // If the array has exactly one element, return that element
+        if (data.length === 1) return $03899943a5d4eab2$var$simplify(data[0]);
+        else // Otherwise, process each element in the array
+        return data.map($03899943a5d4eab2$var$simplify);
+    } else if (data !== null && typeof data === "object") {
+        // If the data is an object, process each key
+        const newData = {};
+        for(const key in data)if (data.hasOwnProperty(key)) newData[key] = $03899943a5d4eab2$var$simplify(data[key]);
+        return newData;
+    } else // If the data is neither an array nor an object, return it as is
+    return data;
+}
+
+
+
+
+
+const $6955f32358295148$export$efeacd8e2fafd6a1 = {
+    extractMentions: $6955f32358295148$var$extractMentions,
+    extractNames: $6955f32358295148$var$extractNames,
+    extractValueAndUnit: $6955f32358295148$var$extractValueAndUnit,
+    extractUrls: $6955f32358295148$var$extractUrls,
+    extractNumbers: $6955f32358295148$var$extractNumbers,
+    extractPhoneNumbers: $6955f32358295148$var$extractPhoneNumbers,
+    extractDates: $6955f32358295148$var$extractDates,
+    extractEmails: $6955f32358295148$var$extractEmails
+};
+function $6955f32358295148$var$extractMentions(text) {
+    // Error handling for invalid input
+    if (typeof text !== "string") throw new Error("Input must be a string");
+    // Regular expression to match mentions
+    const mentionRegex = /\B@\w+/g;
+    const mentions = text.match(mentionRegex);
+    // Return an empty array if no mentions found
+    return mentions ? mentions : [];
+}
+function $6955f32358295148$var$extractNames(inputString) {
+    if (typeof inputString !== "string") throw new TypeError("Input must be a string");
+    const namePattern = /\b[A-Z][a-z]*\b/g;
+    const names = inputString.match(namePattern);
+    return names || [];
+}
+function $6955f32358295148$var$extractValueAndUnit(input) {
+    if (typeof input !== "string") throw new Error("Input must be a string");
+    const regex = /(-?\d+\.?\d*)\s*([a-zA-Z]+)/;
+    const match = input.match(regex);
+    if (!match) throw new Error("No value and unit found in the input string");
+    const value = parseFloat(match[1]);
+    const unit = match[2];
+    return {
+        value: value,
+        unit: unit
+    };
+}
+function $6955f32358295148$var$extractNumbers(input) {
+    if (typeof input !== "string") throw new Error("Input must be a string");
+    const numbers = input.match(/\d+/g);
+    if (numbers === null) return [];
+    return numbers.map(Number);
+}
+function $6955f32358295148$var$extractPhoneNumbers(input) {
+    // Error handling: check if input is a string
+    if (typeof input !== "string") throw new Error("Input must be a string");
+    // Regular expression to match different telephone number formats
+    //const phoneRegex = /(\+?\d{1,2}[-.\s]?)?(\(?\d{3}\)?[-.\s]?)?\d{3}[-.\s]?\d{4}/g;
+    const phoneRegex = /(?:([+]\d{1,4})[-.\s]?)?(?:[(](\d{1,3})[)][-.\s]?)?(\d{1,4})[-.\s]?(\d{1,4})[-.\s]?(\d{1,9})/g;
+    // Extract phone numbers
+    const phoneNumbers = input.match(phoneRegex);
+    // If no phone numbers are found, return an empty array
+    if (!phoneNumbers) return [];
+    return phoneNumbers;
+}
+function $6955f32358295148$var$extractDates(input) {
+    try {
+        if (typeof input !== "string") return [];
+        // Regular expression to match dates in YYYY-MM-DD, DD/MM/YYYY, or MM-DD-YYYY format
+        const datePattern = /\b(\d{4}-\d{2}-\d{2}|\d{2}\/\d{2}\/\d{4}|\d{2}-\d{2}-\d{4})\b/g;
+        const dates = input.match(datePattern);
+        if (!dates) return [];
+        let validDates = [];
+        for (let date of dates){
+            let d = (0, $18d56086b081e2cc$export$15c85b69ec02b47c).toDate(date);
+            if (d && d != null) validDates.push(d);
+        }
+        return validDates;
+    } catch (error) {
+        return [];
+    }
+}
+function $6955f32358295148$var$extractEmails(text) {
+    try {
+        // Check if the input is a string
+        if (typeof text !== "string") throw new Error("Input must be a string");
+        // Regular expression for matching email addresses
+        const emailRegex = /\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,7}\b/g;
+        const emails = text.match(emailRegex);
+        // Check if any emails were found
+        if (emails === null) throw new Error("No email addresses found");
+        return emails;
+    } catch (error) {
+        return `Error: ${error.message}`;
+    }
+}
+function $6955f32358295148$var$extractUrls(text) {
+    try {
+        if (typeof text !== "string") throw new Error("Input must be a string");
+        const urlRegex = /https?:\/\/[^\s/$.?#].[^\s]*/g;
+        const urls = text.match(urlRegex);
+        if (!urls) return [];
+        return urls;
+    } catch (error) {
+        console.error("An error occurred:", error.message);
+        return [];
+    }
+}
+
+
+
+
+
 
 
 let $c34dce0368b8abc6$var$MAX_WIDTH = 30;
@@ -387,8 +705,19 @@ function $c34dce0368b8abc6$export$7642ec6da7b10b(records, keys, headers) {
     let content = "";
     // Duplicate records
     records = JSON.parse(JSON.stringify(records));
-    // Ensure array
-    records = (0, $9fc8b212f324f9e3$export$4736c2d1b0001d00).toArray(records);
+    // If record, convert properties to array
+    if ((0, $9fc8b212f324f9e3$export$4736c2d1b0001d00).isArray(records) == false) {
+        if ((0, $1fd01b1ecffa6019$export$42f247ccf9267abd).isObject(records) == true) {
+            let values = [];
+            let keys = Object.keys(records);
+            for (let k of keys){
+                let v = records[k];
+                v.propertyID = k;
+                values.push(v);
+            }
+            records = values;
+        }
+    }
     // Build keys from records keys if missing
     if (!keys || keys == null) keys = (0, $9fc8b212f324f9e3$export$4736c2d1b0001d00).getKeys(records);
     // Build headers from keys if missing
@@ -425,7 +754,7 @@ function $c34dce0368b8abc6$export$7642ec6da7b10b(records, keys, headers) {
     // Build table rows
     for (let record of records){
         for (let key of keys){
-            let c = record?.[key] || "";
+            let c = String(record?.[key]) || "";
             if (c.length > $c34dce0368b8abc6$var$MAX_WIDTH) c = c.slice(0, $c34dce0368b8abc6$var$MAX_WIDTH - 3) + "... ";
             c = c.padEnd(keysLength[key] + 2, " ");
             content += `${c}`;
@@ -436,6 +765,10 @@ function $c34dce0368b8abc6$export$7642ec6da7b10b(records, keys, headers) {
     content += "\n";
     return content;
 }
+
+
+
+
 
 
 class $6e423e9502adc63f$export$7729b59bd32e7982 {
@@ -545,72 +878,19 @@ class $6e423e9502adc63f$export$7729b59bd32e7982 {
 }
 
 
-
-
-
-
-
-const $2974f6a85c45961a$export$b881b526c33ee854 = {
-    getDomain: $2974f6a85c45961a$var$getDomain,
-    domain: $2974f6a85c45961a$var$getDomain
-};
-function $2974f6a85c45961a$var$isUrl(value) {
-    if (!value || value == null) return false;
-}
-function $2974f6a85c45961a$var$getDomain(value) {}
-
-
-const $03899943a5d4eab2$export$94a70d284fcdf065 = {
-    get: $03899943a5d4eab2$var$getPropertyValueFromDot,
-    getPropertyValueFromDot: $03899943a5d4eab2$var$getPropertyValueFromDot,
-    set: $03899943a5d4eab2$var$setPropertyValueFromDot,
-    setPropertyValueFromDot: $03899943a5d4eab2$var$setPropertyValueFromDot,
-    flatten: $03899943a5d4eab2$var$objectToDotNotation,
-    objectToDotNotation: $03899943a5d4eab2$var$objectToDotNotation
-};
-function $03899943a5d4eab2$var$getPropertyValueFromDot(key, value) {
-    // Retrieves value by following dot notation
-    var items = key.split(".");
-    for(let t = 0; t < items.length; t++)value = value[items[t]];
-    return value;
-}
-function $03899943a5d4eab2$var$setPropertyValueFromDot(key, record, value) {
-    // Retrieves value by following dot notation
-    var items = key.split(".");
-    let item = items[0];
-    if (items.length > 1) {
-        if (!record[item]) record[item] = {};
-        $03899943a5d4eab2$var$setPropertyValueFromDot(items.slice(1).join("."), record[item], value);
-    } else record[item] = value;
-    return record;
-}
-function $03899943a5d4eab2$var$objectToDotNotation(obj, parentPrefix = "") {
-    let result = {};
-    // Helper function to handle recursion and path building
-    function recurse(o, path) {
-        for(let key in o)if (o.hasOwnProperty(key)) {
-            const newPath = path ? `${path}.${key}` : key;
-            // If the property is an object or array, recurse further
-            if (typeof o[key] === "object" && o[key] !== null) recurse(o[key], newPath);
-            else // Otherwise, add the property to the result
-            result[newPath] = o[key];
-        }
-    }
-    recurse(obj, parentPrefix);
-    return result;
-}
-
-
-0, $03899943a5d4eab2$export$94a70d284fcdf065;
 const $53bcb33ef2023ce8$export$f936470337fdc8d0 = {
+    analysis: (0, $336c234775b67d62$export$35d3dd03f0194c3a),
     array: (0, $9fc8b212f324f9e3$export$4736c2d1b0001d00),
     date: (0, $18d56086b081e2cc$export$15c85b69ec02b47c),
     json: (0, $03899943a5d4eab2$export$94a70d284fcdf065),
+    number: (0, $135f0c356f6f593e$export$96be39e8128f5891),
     object: (0, $1fd01b1ecffa6019$export$42f247ccf9267abd),
+    string: (0, $6955f32358295148$export$efeacd8e2fafd6a1),
     textTable: (0, $c34dce0368b8abc6$export$7642ec6da7b10b),
     thing: (0, $9a2a3d97de4234f5$export$c24b4489b93ad8cb),
     Timer: (0, $6e423e9502adc63f$export$7729b59bd32e7982),
-    url: (0, $2974f6a85c45961a$export$b881b526c33ee854)
+    url: (0, $2974f6a85c45961a$export$b881b526c33ee854),
+    value: (0, $5abff2bf4ee17cbb$export$da17952f31714a6e)
 };
 
 

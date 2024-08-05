@@ -8,7 +8,8 @@ export const krakenJsonHelpers = {
     set: setPropertyValueFromDot,
     setPropertyValueFromDot:setPropertyValueFromDot,
     flatten: objectToDotNotation,
-    objectToDotNotation: objectToDotNotation
+    objectToDotNotation: objectToDotNotation,
+    simplify: simplify
 
 }
 
@@ -74,4 +75,32 @@ function objectToDotNotation(obj, parentPrefix = '') {
 
     recurse(obj, parentPrefix);
     return result;
+}
+
+
+
+
+function simplify(data) {
+    // Remove arrays of 1
+    if (Array.isArray(data)) {
+        // If the array has exactly one element, return that element
+        if (data.length === 1) {
+            return simplify(data[0]);
+        } else {
+            // Otherwise, process each element in the array
+            return data.map(simplify);
+        }
+    } else if (data !== null && typeof data === 'object') {
+        // If the data is an object, process each key
+        const newData = {};
+        for (const key in data) {
+            if (data.hasOwnProperty(key)) {
+                newData[key] = simplify(data[key]);
+            }
+        }
+        return newData;
+    } else {
+        // If the data is neither an array nor an object, return it as is
+        return data;
+    }
 }

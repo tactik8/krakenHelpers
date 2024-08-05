@@ -16,6 +16,7 @@ export const krakenArrayHelpers = {
     getMax: getMax,
     getMin: getMin,
     getN: getN,
+    getNull: getNull,
     getSum: getSum,
     getAverage: getAverage,
     getStandardDeviation: getStandardDeviation,
@@ -26,7 +27,8 @@ export const krakenArrayHelpers = {
     getSumRecord: getSum,
     getAverageRecord: getAverage,
     getStandardDeviationRecord: getStandardDeviation,
-    getStatsRecord: getStatsRecord
+    getStatsRecord: getStatsRecord,
+    getUniqueN: getUniqueN
     
 }
 
@@ -62,6 +64,7 @@ function toText(value) {
 
 function getKeys(value){
     if(validateArray(value) == false){ return undefined }
+
     let keys = []
     for(let v of value){
         for(let k of Object.keys(v)){
@@ -78,6 +81,7 @@ function getKeys(value){
 // -----------------------------------------------------
 //  Columns focused methods 
 // -----------------------------------------------------
+
 
 
 function getValuesForKey(value, key){
@@ -293,6 +297,39 @@ function getStandardDeviationRecord(value, key){
     let unitCode = getUnitCodesForKey(value, key)
 
     return getStatsRecord('marginOfError', key, result, unitCode)
+
+}
+
+function getNull(value, key){
+
+    value = ensureArray(value)
+    if(validateArray(value) == false){ return undefined }
+
+    let nullValues = 0
+    for(let v of value){
+
+        
+        if ((!v || v == null || v == "" || v == {} || v == []) && v!== 0){
+            nullValues + 1
+        }
+    }
+
+    return nullValues
+
+}
+
+function getUniqueN(value, key){
+
+    value = ensureArray(value)
+    if(validateArray(value) == false){ return undefined }
+
+
+    let uniqueValues = [...new Set(value)];
+
+    let result = uniqueValues.length
+    
+
+    return result
 
 }
 

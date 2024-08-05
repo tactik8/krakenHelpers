@@ -4,7 +4,8 @@ export const krakenObjectHelpers = {
 
     isObject: isObject,
     getKeys: getKeys,
-    keys: getKeys
+    keys: getKeys,
+    toText: toText
     
 }
 
@@ -23,4 +24,23 @@ function getKeys(value){
     return keys
 }
 
+
+function toText(value){
+
+    if(isObject(value) == false) { return undefined }
+
+    if(value['@type']){
+
+        return `${value["@type"]}/${value['@id']}`
+    } else {
+
+        let keys = Object.keys(value)
+        if(keys.length == 0){ return '{}'}
+
+        return `{"${keys[0]}": "${value[keys[0]]}", ... }`
+        
+    }
+
+    
+}
 

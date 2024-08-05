@@ -4,6 +4,7 @@ import { krakenArrayHelpers } from './krakenArrayHelpers.js'
 import { krakenDateHelpers } from './krakenDateHelpers.js'
 import { krakenThingHelpers } from './krakenThingHelpers.js'
 import { krakenValueHelpers } from './krakenValueHelpers.js'
+import { krakenObjectHelpers } from './krakenObjectHelpers.js'
 
 
 
@@ -17,8 +18,22 @@ export function krakenTextTable(records, keys, headers){
     // Duplicate records
     records = JSON.parse(JSON.stringify(records))
 
-    // Ensure array
-    records = krakenArrayHelpers.toArray(records)
+    // If record, convert properties to array
+    if(krakenArrayHelpers.isArray(records) == false){
+        if(krakenObjectHelpers.isObject(records) == true){
+
+            let values = []
+            let keys = Object.keys(records)
+            for(let k of keys){
+                let v = records[k]
+                v.propertyID = k
+                values.push(v)
+            }
+            records = values
+        } 
+    }
+    
+
     
     // Build keys from records keys if missing
     if(!keys || keys == null){
@@ -80,7 +95,8 @@ export function krakenTextTable(records, keys, headers){
     // Build table rows
     for(let record of records){
         for(let key of keys){
-            let c = record?.[key] || ''
+            
+            let c = String(record?.[key]) || ''
             if(c.length > MAX_WIDTH){ c = c.slice(0, MAX_WIDTH -3) + '... '}
             c = c.padEnd(keysLength[key] + 2, ' ')
             content += `${c}`

@@ -4,20 +4,24 @@ import { krakenDateHelpers } from './krakenDateHelpers.js'
 import { krakenThingHelpers } from './krakenThingHelpers.js'
 import { krakenNumberHelpers } from './krakenNumberHelpers.js'
 import { krakenObjectHelpers } from './krakenObjectHelpers.js'
+import { krakenUrlHelpers } from './krakenUrlHelpers.js'
 
 
 export const krakenValueHelpers = {
 
     toText: toText,
     getType: getType,
+    getTypeSchemaOrg: getTypeSchemaOrg,
     innerValuesToText: innerValuesToText,
     valuesToText: innerValuesToText
 }
 
 function toText(value) {
     
-    if (!value || value == null || value == [] || value == {}) { return '' }
+    if ((!value || value == null || value == [] || value == {}) && value != 0) { return '' }
 
+
+    
     if (krakenThingHelpers.isThing(value)) {
         return krakenThingHelpers.toText(value)
     } else if (krakenDateHelpers.isDate(value)) {
@@ -26,6 +30,8 @@ function toText(value) {
         return krakenArrayHelpers.toText(value)
     } else if (krakenNumberHelpers.isNumber(value)) {
         return krakenNumberHelpers.toText(value)
+    } else if (krakenObjectHelpers.isObject(value)) {
+        return krakenObjectHelpers.toText(value)
     } else {
         return String(value)
     }
@@ -69,3 +75,26 @@ function getType(value) {
     }
 
 }
+
+
+function getTypeSchemaOrg(value){
+
+    let t = getType(value)
+
+
+    if(t == "thing"){
+        return value['@type']
+    }
+    
+    if(t == "string"){
+        if(krakenUrlHelpers.toUrl(value)){
+            return 'url'
+        }
+        
+    }
+
+    return t
+
+    
+}
+

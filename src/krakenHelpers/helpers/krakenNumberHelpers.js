@@ -33,7 +33,7 @@ function toText(value, rounding){
 
     value = toNumber(value)
 
-    if(!value || value == null) { return undefined }
+    if((!value || value == null) && value != 0) { return undefined }
 
     if(rounding | rounding != null){
         value = Math.round(value)

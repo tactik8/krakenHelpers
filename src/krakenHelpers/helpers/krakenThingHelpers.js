@@ -44,6 +44,13 @@ function toText(value){
         return result
     }
 
+    if(record_type == "DefinedTerm"){
+
+        if(value.name && value.name != null){ return value.name }
+        if(value.termCode && value.termCode != null){ return value.termCode }
+        
+    }
+
     if(record_type == 'Person'){
 
         if(value['givenName'] && value['familyName']){
