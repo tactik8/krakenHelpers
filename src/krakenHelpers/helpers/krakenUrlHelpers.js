@@ -19,8 +19,11 @@ function isUrl(value){
     
 }
 
+/**
+ * Returns url string with path and params
+ */
 function getUrl(baseUrl, path, params) {
-    
+    // Returns url string
     try {
         if (!baseUrl || typeof baseUrl !== 'string') {
             throw new Error('Invalid base URL');
@@ -50,7 +53,7 @@ function getUrl(baseUrl, path, params) {
         
     } catch (error) {
         //console.error('Error building URL:', error.message);
-        return null;
+        return undefined;
     }
 }
 
@@ -77,7 +80,6 @@ function getDomain(value){
 
         let domain = value.hostname
 
-        console.log('d', domain)
         domain = domain.replace('www.', '')
 
         if (domain == 'wrong.protocol'){ return undefined }

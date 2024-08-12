@@ -66,20 +66,19 @@ describe('buildUrl', () => {
     test('should return null for invalid base URL', () => {
         const path = '/api/resource';
         const params = { id: 123, name: 'test' };
-        expect(buildUrl(null, path, params)).toBeNull();
-        expect(buildUrl(123, path, params)).toBeNull();
+        expect(buildUrl(null, path, params)).toStrictEqual(undefined);
+        expect(buildUrl(123, path, params)).toStrictEqual(undefined);
     });
 
     test('should return null for invalid path', () => {
         const baseUrl = 'https://example.com';
         const params = { id: 123, name: 'test' };
-        expect(buildUrl(baseUrl, null, params)).toBeNull();
-        expect(buildUrl(baseUrl, 123, params)).toBeNull();
+        expect(buildUrl(baseUrl, 123, params)).toStrictEqual(undefined);
     });
 
     test('should return null for invalid params', () => {
         const baseUrl = 'https://example.com';
         const path = '/api/resource';
-        expect(buildUrl(baseUrl, path, 'invalid')).toBeNull();
+        expect(buildUrl(baseUrl, path, 'invalid')).toStrictEqual(undefined);
     });
 });

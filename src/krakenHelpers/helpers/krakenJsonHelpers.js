@@ -5,15 +5,28 @@ export const krakenJsonHelpers = {
 
     get: getPropertyValueFromDot,
     getPropertyValueFromDot: getPropertyValueFromDot,
+    isJson: isJson,
     set: setPropertyValueFromDot,
     setPropertyValueFromDot:setPropertyValueFromDot,
     flatten: objectToDotNotation,
     objectToDotNotation: objectToDotNotation,
-    simplify: simplify
-
+    simplify: simplify,
+    toPropertiesList: jsonToPropertiesSingle,
+    toPropertiesSingle: jsonToPropertiesList
+    
 }
 
+function isJson(value){
 
+    try{
+        let l = JSON.parse(value)
+        return true
+    } catch {
+        return false
+    }
+
+    
+}
 
 function getPropertyValueFromDot(key, value){
     // Retrieves value by following dot notation
@@ -24,8 +37,6 @@ function getPropertyValueFromDot(key, value){
     };
     return value;
 }
-
-
 
 
 function setPropertyValueFromDot(key, record, value){
@@ -49,7 +60,6 @@ function setPropertyValueFromDot(key, record, value){
 
     return record;
 }
-
 
 
 
@@ -103,4 +113,42 @@ function simplify(data) {
         // If the data is neither an array nor an object, return it as is
         return data;
     }
+}
+
+
+function jsonToPropertiesSingle(record){
+    // Converts lists to single item(the first item)
+
+
+    if(Array.isArray(record)){
+        if(record.length == 0) { return null }
+        record = record[0]
+    }
+
+    if(Object.keys(record)){
+        for(let k of Object.jeys(record)){
+            record[k] = jsonWithoutList(record[k])
+        }
+    }
+    return record
+}
+
+function jsonToPropertiesList(record){
+    // Converts single items to lists
+
+
+    if(Array.isArray(record)){
+        let newArray = []
+        for(let r of record){
+            newArray.push(jsonToLists(r))
+        }
+        record = newArray
+    }
+
+    if(Object.keys(record)){
+        for(let k of Object.jeys(record)){
+            record[k] = [record[k]]
+        }
+    }
+    return record
 }

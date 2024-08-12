@@ -49,6 +49,7 @@ function $1fd01b1ecffa6019$var$toText(value) {
 
 
 const $9fc8b212f324f9e3$export$4736c2d1b0001d00 = {
+    toText: $9fc8b212f324f9e3$var$toText,
     isArray: $9fc8b212f324f9e3$var$validateArray,
     validateArray: $9fc8b212f324f9e3$var$validateArray,
     toArray: $9fc8b212f324f9e3$var$ensureArray,
@@ -56,28 +57,18 @@ const $9fc8b212f324f9e3$export$4736c2d1b0001d00 = {
     getKeys: $9fc8b212f324f9e3$var$getKeys,
     keys: $9fc8b212f324f9e3$var$getKeys,
     getValuesForKey: $9fc8b212f324f9e3$var$getValuesForKey,
-    getNumbersForKey: $9fc8b212f324f9e3$var$getNumbersForKey,
-    getMax: $9fc8b212f324f9e3$var$getMax,
-    getMin: $9fc8b212f324f9e3$var$getMin,
-    getN: $9fc8b212f324f9e3$var$getN,
-    getNull: $9fc8b212f324f9e3$var$getNull,
-    getSum: $9fc8b212f324f9e3$var$getSum,
-    getAverage: $9fc8b212f324f9e3$var$getAverage,
-    getStandardDeviation: $9fc8b212f324f9e3$var$getStandardDeviation,
-    stddev: $9fc8b212f324f9e3$var$getStandardDeviation,
-    getMaxRecord: $9fc8b212f324f9e3$var$getMax,
-    getMinRecord: $9fc8b212f324f9e3$var$getMin,
-    getNRecord: $9fc8b212f324f9e3$var$getN,
-    getSumRecord: $9fc8b212f324f9e3$var$getSum,
-    getAverageRecord: $9fc8b212f324f9e3$var$getAverage,
-    getStandardDeviationRecord: $9fc8b212f324f9e3$var$getStandardDeviation,
-    getStatsRecord: $9fc8b212f324f9e3$var$getStatsRecord,
-    getUniqueN: $9fc8b212f324f9e3$var$getUniqueN
+    getNumbersForKey: $9fc8b212f324f9e3$var$getNumbersForKey
 };
+// -----------------------------------------------------
+//  Validation 
+// -----------------------------------------------------
 function $9fc8b212f324f9e3$var$validateArray(value) {
     if (Array.isArray(value)) return true;
     return false;
 }
+// -----------------------------------------------------
+//  Transformation 
+// -----------------------------------------------------
 function $9fc8b212f324f9e3$var$ensureArray(value) {
     if (!value || value == null || value == {}) return [];
     if ($9fc8b212f324f9e3$var$validateArray(value)) return value;
@@ -90,6 +81,9 @@ function $9fc8b212f324f9e3$var$toText(value) {
     let result = `[${value.length}]`;
     return result;
 }
+// -----------------------------------------------------
+//  Query 
+// -----------------------------------------------------
 function $9fc8b212f324f9e3$var$getKeys(value) {
     if ($9fc8b212f324f9e3$var$validateArray(value) == false) return undefined;
     let keys = [];
@@ -99,9 +93,6 @@ function $9fc8b212f324f9e3$var$getKeys(value) {
     keys.sort();
     return keys;
 }
-// -----------------------------------------------------
-//  Columns focused methods 
-// -----------------------------------------------------
 function $9fc8b212f324f9e3$var$getValuesForKey(value, key) {
     value = $9fc8b212f324f9e3$var$ensureArray(value);
     if ($9fc8b212f324f9e3$var$validateArray(value) == false) return undefined;
@@ -134,161 +125,32 @@ function $9fc8b212f324f9e3$var$getUnitCodesForKey(value, key) {
     for (let item of items)if (item?.["@type"] && item?.["@type"] == "QuantitativeValue") results.push(item.unitCode);
     return results;
 }
-function $9fc8b212f324f9e3$var$getMax(value, key) {
-    value = $9fc8b212f324f9e3$var$ensureArray(value);
-    if ($9fc8b212f324f9e3$var$validateArray(value) == false) return undefined;
-    let items = $9fc8b212f324f9e3$var$getNumbersForKey(value, key);
-    let result = Math.max(...items);
-    return result;
-}
-function $9fc8b212f324f9e3$var$getMaxRecord(value, key) {
-    value = $9fc8b212f324f9e3$var$ensureArray(value);
-    if ($9fc8b212f324f9e3$var$validateArray(value) == false) return undefined;
-    let result = $9fc8b212f324f9e3$var$getMax(value, key);
-    let unitCode = $9fc8b212f324f9e3$var$getUnitCodesForKey(value, key);
-    return $9fc8b212f324f9e3$var$getStatsRecord("maxValue", key, result, unitCode);
-//count, median, marginOfError, maxValue, minValue
-}
-function $9fc8b212f324f9e3$var$getMin(value, key) {
-    value = $9fc8b212f324f9e3$var$ensureArray(value);
-    if ($9fc8b212f324f9e3$var$validateArray(value) == false) return undefined;
-    let items = $9fc8b212f324f9e3$var$getNumbersForKey(value, key);
-    let result = Math.min(...items);
-    return result;
-}
-function $9fc8b212f324f9e3$var$getMinRecord(value, key) {
-    value = $9fc8b212f324f9e3$var$ensureArray(value);
-    if ($9fc8b212f324f9e3$var$validateArray(value) == false) return undefined;
-    let result = $9fc8b212f324f9e3$var$getMin(value, key);
-    let unitCode = $9fc8b212f324f9e3$var$getUnitCodesForKey(value, key);
-    return $9fc8b212f324f9e3$var$getStatsRecord("minValue", key, result, unitCode);
-//count, median, marginOfError, maxValue, minValue
-}
-function $9fc8b212f324f9e3$var$getN(value, key) {
-    value = $9fc8b212f324f9e3$var$ensureArray(value);
-    if ($9fc8b212f324f9e3$var$validateArray(value) == false) return undefined;
-    let items = $9fc8b212f324f9e3$var$getNumbersForKey(value, key);
-    let result = items.length;
-    return result;
-}
-function $9fc8b212f324f9e3$var$getNRecord(value, key) {
-    value = $9fc8b212f324f9e3$var$ensureArray(value);
-    if ($9fc8b212f324f9e3$var$validateArray(value) == false) return undefined;
-    let result = $9fc8b212f324f9e3$var$getN(value, key);
-    let unitCode = $9fc8b212f324f9e3$var$getUnitCodesForKey(value, key);
-    return $9fc8b212f324f9e3$var$getStatsRecord("count", key, result, unitCode);
-//count, median, marginOfError, maxValue, minValue
-}
-function $9fc8b212f324f9e3$var$getSum(value, key) {
-    value = $9fc8b212f324f9e3$var$ensureArray(value);
-    if ($9fc8b212f324f9e3$var$validateArray(value) == false) return undefined;
-    let items = $9fc8b212f324f9e3$var$getNumbersForKey(value, key);
-    let result = items.reduce((partialSum, a)=>partialSum + a, 0);
-    return result;
-}
-function $9fc8b212f324f9e3$var$getSumRecord(value, key) {
-    value = $9fc8b212f324f9e3$var$ensureArray(value);
-    if ($9fc8b212f324f9e3$var$validateArray(value) == false) return undefined;
-    let result = $9fc8b212f324f9e3$var$getSum(value, key);
-    let unitCode = $9fc8b212f324f9e3$var$getUnitCodesForKey(value, key);
-    return $9fc8b212f324f9e3$var$getStatsRecord("sum", key, result, unitCode);
-//count, median, marginOfError, maxValue, minValue
-}
-function $9fc8b212f324f9e3$var$getAverage(value, key) {
-    value = $9fc8b212f324f9e3$var$ensureArray(value);
-    if ($9fc8b212f324f9e3$var$validateArray(value) == false) return undefined;
-    let items = $9fc8b212f324f9e3$var$getNumbersForKey(value, key);
-    if (items.length == 0) return 0;
-    let sumAll = items.reduce((partialSum, a)=>partialSum + a, 0);
-    let result = sumAll / items.length;
-    return result;
-}
-function $9fc8b212f324f9e3$var$getAverageRecord(value, key) {
-    value = $9fc8b212f324f9e3$var$ensureArray(value);
-    if ($9fc8b212f324f9e3$var$validateArray(value) == false) return undefined;
-    let result = $9fc8b212f324f9e3$var$getAverage(value, key);
-    let unitCode = $9fc8b212f324f9e3$var$getUnitCodesForKey(value, key);
-    return $9fc8b212f324f9e3$var$getStatsRecord("average", key, result, unitCode);
-//count, median, marginOfError, maxValue, minValue
-}
-function $9fc8b212f324f9e3$var$getStandardDeviation(value, key) {
-    value = $9fc8b212f324f9e3$var$ensureArray(value);
-    if ($9fc8b212f324f9e3$var$validateArray(value) == false) return undefined;
-    let items = $9fc8b212f324f9e3$var$getNumbersForKey(value, key);
-    if (items.length == 0) return 0;
-    let n = items.length;
-    let mean = items.reduce((a, b)=>a + b) / n;
-    let result = Math.sqrt(items.map((x)=>Math.pow(x - mean, 2)).reduce((a, b)=>a + b) / n);
-    return result;
-}
-function $9fc8b212f324f9e3$var$getStandardDeviationRecord(value, key) {
-    value = $9fc8b212f324f9e3$var$ensureArray(value);
-    if ($9fc8b212f324f9e3$var$validateArray(value) == false) return undefined;
-    let result = $9fc8b212f324f9e3$var$getStandardDeviation(value, key);
-    let unitCode = $9fc8b212f324f9e3$var$getUnitCodesForKey(value, key);
-    return $9fc8b212f324f9e3$var$getStatsRecord("marginOfError", key, result, unitCode);
-}
-function $9fc8b212f324f9e3$var$getNull(value, key) {
-    value = $9fc8b212f324f9e3$var$ensureArray(value);
-    if ($9fc8b212f324f9e3$var$validateArray(value) == false) return undefined;
-    let nullValues = 0;
-    for (let v of value)if ((!v || v == null || v == "" || v == {} || v == []) && v !== 0) nullValues;
-    return nullValues;
-}
-function $9fc8b212f324f9e3$var$getUniqueN(value, key) {
-    value = $9fc8b212f324f9e3$var$ensureArray(value);
-    if ($9fc8b212f324f9e3$var$validateArray(value) == false) return undefined;
-    let uniqueValues = [
-        ...new Set(value)
-    ];
-    let result = uniqueValues.length;
-    return result;
-}
-// -----------------------------------------------------
-//  Statistical record 
-// -----------------------------------------------------
-function $9fc8b212f324f9e3$var$getStatsRecord(statType, property, value, unitCode) {
-    let record = {
-        "@context": "https://schema.org/",
-        "@id": "Observation_Median_Age_Person_Female_SanAntonio_TX_2014",
-        "@type": "Observation",
-        "name": name,
-        "variableMeasured": {
-            "@context": "https://schema.org/",
-            "@type": "StatisticalVariable",
-            "@id": "Median_Height_Person_Female",
-            "name": statType,
-            "measuredProperty": {
-                "@id": property
-            },
-            "statType": {
-                "@id": statType
-            },
-            "constrainingProperty": []
-        },
-        "observationAbout": {},
-        "value": value,
-        "unitCode": unit
-    };
-    return record;
-}
 
 
 
-const $18d56086b081e2cc$export$15c85b69ec02b47c = {
+/** @const {Object}  krakenDateHelpers
+ * - isDate: Determiens if value is of type Date
+ * - toDate: Converts a value (string, etc.) to Date
+ * - getDuration: Returns duration between two dates
+ * - getDurationRecord: Returns duration in schema.org QuantitativeValue record
+ */ const $18d56086b081e2cc$export$15c85b69ec02b47c = {
     // Base
+    isDate: $18d56086b081e2cc$var$validateDate,
     getDuration: $18d56086b081e2cc$var$getDuration,
     getDurationRecord: $18d56086b081e2cc$var$getDurationRecord,
     toDate: $18d56086b081e2cc$var$toDate,
     toText: $18d56086b081e2cc$var$toText,
-    validateDate: $18d56086b081e2cc$var$validateDate,
     // Shortcuts
-    isDate: $18d56086b081e2cc$var$validateDate,
+    validateDate: $18d56086b081e2cc$var$validateDate,
     getDate: $18d56086b081e2cc$var$toDate,
     duration: $18d56086b081e2cc$var$getDuration,
     durationRecord: $18d56086b081e2cc$var$getDurationRecord
 };
-function $18d56086b081e2cc$var$validateDate(value) {
+/**
+ * Returns true if value if a Date object
+ * @param {String | Date | object} value
+ * @return {bool} isDate True if date object
+ */ function $18d56086b081e2cc$var$validateDate(value) {
     if (value instanceof Date) return true;
     return false;
 }
@@ -392,7 +254,10 @@ function $2974f6a85c45961a$var$isUrl(value) {
     if (!value || value == null) return false;
     if (value instanceof URL) return true;
 }
-function $2974f6a85c45961a$var$getUrl(baseUrl, path, params) {
+/**
+ * Returns url string with path and params
+ */ function $2974f6a85c45961a$var$getUrl(baseUrl, path, params) {
+    // Returns url string
     try {
         if (!baseUrl || typeof baseUrl !== "string") throw new Error("Invalid base URL");
         if (!path) path = "";
@@ -405,7 +270,7 @@ function $2974f6a85c45961a$var$getUrl(baseUrl, path, params) {
         return url.toString();
     } catch (error) {
         //console.error('Error building URL:', error.message);
-        return null;
+        return undefined;
     }
 }
 function $2974f6a85c45961a$var$getDomain(value) {
@@ -416,7 +281,6 @@ function $2974f6a85c45961a$var$getDomain(value) {
             value = new URL(value);
         }
         let domain = value.hostname;
-        console.log("d", domain);
         domain = domain.replace("www.", "");
         if (domain == "wrong.protocol") return undefined;
         // Use URL constructor to parse the URL
@@ -479,7 +343,7 @@ const $336c234775b67d62$export$35d3dd03f0194c3a = {
     analyze: $336c234775b67d62$var$analyze
 };
 function $336c234775b67d62$var$analyze(value) {
-    value = (0, $9fc8b212f324f9e3$export$4736c2d1b0001d00).ensureArray(value);
+    value = (0, $9fc8b212f324f9e3$export$4736c2d1b0001d00).ka.ensureArray(value);
     let keys = (0, $9fc8b212f324f9e3$export$4736c2d1b0001d00).getKeys(value);
     let analysis = {};
     for (let k of keys)analysis[k] = $336c234775b67d62$var$analyzeValues(value, k);
@@ -522,28 +386,188 @@ function $336c234775b67d62$var$analyzeValues(value, key) {
         if (newV["@type"]) newV = `${newV["@type"]}/${newV["@id"]}`;
         analysis.values[newV] = (analysis.values[newV] || 0) + 1;
         // get min / max
-        analysis.N = (0, $9fc8b212f324f9e3$export$4736c2d1b0001d00).getN(value, key);
-        analysis.nullN = (0, $9fc8b212f324f9e3$export$4736c2d1b0001d00).getNull(value, key);
+        analysis.N = $336c234775b67d62$var$getN(value, key);
+        analysis.nullN = $336c234775b67d62$var$getNull(value, key);
         analysis.uniqueN = (0, $9fc8b212f324f9e3$export$4736c2d1b0001d00).getUniqueN(value, key);
-        analysis.min = (0, $9fc8b212f324f9e3$export$4736c2d1b0001d00).getMin(value, key);
-        analysis.max = (0, $9fc8b212f324f9e3$export$4736c2d1b0001d00).getMax(value, key);
-        analysis.stddev = (0, $9fc8b212f324f9e3$export$4736c2d1b0001d00).getStandardDeviation(value, key);
+        analysis.min = $336c234775b67d62$var$getMin(value, key);
+        analysis.max = $336c234775b67d62$var$getMax(value, key);
+        analysis.stddev = $336c234775b67d62$var$getStandardDeviation(value, key);
     }
     return analysis;
+}
+function $336c234775b67d62$var$getMax(value, key) {
+    value = (0, $9fc8b212f324f9e3$export$4736c2d1b0001d00).ensureArray(value);
+    if ((0, $9fc8b212f324f9e3$export$4736c2d1b0001d00).validateArray(value) == false) return undefined;
+    let items = (0, $9fc8b212f324f9e3$export$4736c2d1b0001d00).getNumbersForKey(value, key);
+    let result = Math.max(...items);
+    return result;
+}
+function $336c234775b67d62$var$getMaxRecord(value, key) {
+    value = (0, $9fc8b212f324f9e3$export$4736c2d1b0001d00).ensureArray(value);
+    if ((0, $9fc8b212f324f9e3$export$4736c2d1b0001d00).validateArray(value) == false) return undefined;
+    let result = $336c234775b67d62$var$getMax(value, key);
+    let unitCode = (0, $9fc8b212f324f9e3$export$4736c2d1b0001d00).getUnitCodesForKey(value, key);
+    return $336c234775b67d62$var$getStatsRecord("maxValue", key, result, unitCode);
+//count, median, marginOfError, maxValue, minValue
+}
+function $336c234775b67d62$var$getMin(value, key) {
+    value = (0, $9fc8b212f324f9e3$export$4736c2d1b0001d00).ensureArray(value);
+    if ((0, $9fc8b212f324f9e3$export$4736c2d1b0001d00).validateArray(value) == false) return undefined;
+    let items = (0, $9fc8b212f324f9e3$export$4736c2d1b0001d00).getNumbersForKey(value, key);
+    let result = Math.min(...items);
+    return result;
+}
+function $336c234775b67d62$var$getMinRecord(value, key) {
+    value = (0, $9fc8b212f324f9e3$export$4736c2d1b0001d00).ensureArray(value);
+    if ((0, $9fc8b212f324f9e3$export$4736c2d1b0001d00).validateArray(value) == false) return undefined;
+    let result = $336c234775b67d62$var$getMin(value, key);
+    let unitCode = (0, $9fc8b212f324f9e3$export$4736c2d1b0001d00).getUnitCodesForKey(value, key);
+    return $336c234775b67d62$var$getStatsRecord("minValue", key, result, unitCode);
+//count, median, marginOfError, maxValue, minValue
+}
+function $336c234775b67d62$var$getN(value, key) {
+    value = (0, $9fc8b212f324f9e3$export$4736c2d1b0001d00).ensureArray(value);
+    if ((0, $9fc8b212f324f9e3$export$4736c2d1b0001d00).validateArray(value) == false) return undefined;
+    let items = (0, $9fc8b212f324f9e3$export$4736c2d1b0001d00).getNumbersForKey(value, key);
+    let result = items.length;
+    return result;
+}
+function $336c234775b67d62$var$getNRecord(value, key) {
+    value = (0, $9fc8b212f324f9e3$export$4736c2d1b0001d00).ensureArray(value);
+    if ((0, $9fc8b212f324f9e3$export$4736c2d1b0001d00).validateArray(value) == false) return undefined;
+    let result = $336c234775b67d62$var$getN(value, key);
+    let unitCode = (0, $9fc8b212f324f9e3$export$4736c2d1b0001d00).getUnitCodesForKey(value, key);
+    return $336c234775b67d62$var$getStatsRecord("count", key, result, unitCode);
+//count, median, marginOfError, maxValue, minValue
+}
+function $336c234775b67d62$var$getSum(value, key) {
+    value = (0, $9fc8b212f324f9e3$export$4736c2d1b0001d00).ensureArray(value);
+    if ((0, $9fc8b212f324f9e3$export$4736c2d1b0001d00).validateArray(value) == false) return undefined;
+    let items = (0, $9fc8b212f324f9e3$export$4736c2d1b0001d00).getNumbersForKey(value, key);
+    let result = items.reduce((partialSum, a)=>partialSum + a, 0);
+    return result;
+}
+function $336c234775b67d62$var$getSumRecord(value, key) {
+    value = (0, $9fc8b212f324f9e3$export$4736c2d1b0001d00).ensureArray(value);
+    if ((0, $9fc8b212f324f9e3$export$4736c2d1b0001d00).validateArray(value) == false) return undefined;
+    let result = $336c234775b67d62$var$getSum(value, key);
+    let unitCode = (0, $9fc8b212f324f9e3$export$4736c2d1b0001d00).getUnitCodesForKey(value, key);
+    return $336c234775b67d62$var$getStatsRecord("sum", key, result, unitCode);
+//count, median, marginOfError, maxValue, minValue
+}
+function $336c234775b67d62$var$getAverage(value, key) {
+    value = (0, $9fc8b212f324f9e3$export$4736c2d1b0001d00).ensureArray(value);
+    if ((0, $9fc8b212f324f9e3$export$4736c2d1b0001d00).validateArray(value) == false) return undefined;
+    let items = (0, $9fc8b212f324f9e3$export$4736c2d1b0001d00).getNumbersForKey(value, key);
+    if (items.length == 0) return 0;
+    let sumAll = items.reduce((partialSum, a)=>partialSum + a, 0);
+    let result = sumAll / items.length;
+    return result;
+}
+function $336c234775b67d62$var$getAverageRecord(value, key) {
+    value = (0, $9fc8b212f324f9e3$export$4736c2d1b0001d00).ensureArray(value);
+    if ((0, $9fc8b212f324f9e3$export$4736c2d1b0001d00).validateArray(value) == false) return undefined;
+    let result = $336c234775b67d62$var$getAverage(value, key);
+    let unitCode = (0, $9fc8b212f324f9e3$export$4736c2d1b0001d00).getUnitCodesForKey(value, key);
+    return $336c234775b67d62$var$getStatsRecord("average", key, result, unitCode);
+//count, median, marginOfError, maxValue, minValue
+}
+function $336c234775b67d62$var$getStandardDeviation(value, key) {
+    value = (0, $9fc8b212f324f9e3$export$4736c2d1b0001d00).ensureArray(value);
+    if ((0, $9fc8b212f324f9e3$export$4736c2d1b0001d00).validateArray(value) == false) return undefined;
+    let items = (0, $9fc8b212f324f9e3$export$4736c2d1b0001d00).getNumbersForKey(value, key);
+    if (items.length == 0) return 0;
+    let n = items.length;
+    let mean = items.reduce((a, b)=>a + b) / n;
+    let result = Math.sqrt(items.map((x)=>Math.pow(x - mean, 2)).reduce((a, b)=>a + b) / n);
+    return result;
+}
+function $336c234775b67d62$var$getStandardDeviationRecord(value, key) {
+    value = (0, $9fc8b212f324f9e3$export$4736c2d1b0001d00).ensureArray(value);
+    if ((0, $9fc8b212f324f9e3$export$4736c2d1b0001d00).validateArray(value) == false) return undefined;
+    let result = $336c234775b67d62$var$getStandardDeviation(value, key);
+    let unitCode = (0, $9fc8b212f324f9e3$export$4736c2d1b0001d00).getUnitCodesForKey(value, key);
+    return $336c234775b67d62$var$getStatsRecord("marginOfError", key, result, unitCode);
+}
+function $336c234775b67d62$var$getNull(value, key) {
+    value = (0, $9fc8b212f324f9e3$export$4736c2d1b0001d00).ensureArray(value);
+    if ((0, $9fc8b212f324f9e3$export$4736c2d1b0001d00).validateArray(value) == false) return undefined;
+    let nullValues = 0;
+    for (let v of value)if ((!v || v == null || v == "" || v == {} || v == []) && v !== 0) nullValues;
+    return nullValues;
+}
+function $336c234775b67d62$var$getUniqueN(value, key) {
+    value = (0, $9fc8b212f324f9e3$export$4736c2d1b0001d00).ensureArray(value);
+    if ((0, $9fc8b212f324f9e3$export$4736c2d1b0001d00).validateArray(value) == false) return undefined;
+    let uniqueValues = [
+        ...new Set(value)
+    ];
+    let result = uniqueValues.length;
+    return result;
+}
+// -----------------------------------------------------
+//  Statistical record 
+// -----------------------------------------------------
+function $336c234775b67d62$var$getStatsRecord(statType, property, value, unitCode) {
+    let record = {
+        "@context": "https://schema.org/",
+        "@id": "Observation_Median_Age_Person_Female_SanAntonio_TX_2014",
+        "@type": "Observation",
+        "name": name,
+        "variableMeasured": {
+            "@context": "https://schema.org/",
+            "@type": "StatisticalVariable",
+            "@id": "Median_Height_Person_Female",
+            "name": statType,
+            "measuredProperty": {
+                "@id": property
+            },
+            "statType": {
+                "@id": statType
+            },
+            "constrainingProperty": []
+        },
+        "observationAbout": {},
+        "value": value,
+        "unitCode": unit
+    };
+    return record;
 }
 
 
 
 
+const $92413447c3a75377$export$bac8020bbb4f7950 = {
+    isEmail: $92413447c3a75377$var$isValidEmail
+};
+function $92413447c3a75377$var$isValidEmail(email) {
+    if (typeof email !== "string") throw new TypeError("The provided value must be a string.");
+    // Regular expression to validate email addresses
+    const emailRegex = /^[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?$/;
+    return emailRegex.test(email);
+}
+
+
 const $03899943a5d4eab2$export$94a70d284fcdf065 = {
     get: $03899943a5d4eab2$var$getPropertyValueFromDot,
     getPropertyValueFromDot: $03899943a5d4eab2$var$getPropertyValueFromDot,
+    isJson: $03899943a5d4eab2$var$isJson,
     set: $03899943a5d4eab2$var$setPropertyValueFromDot,
     setPropertyValueFromDot: $03899943a5d4eab2$var$setPropertyValueFromDot,
     flatten: $03899943a5d4eab2$var$objectToDotNotation,
     objectToDotNotation: $03899943a5d4eab2$var$objectToDotNotation,
-    simplify: $03899943a5d4eab2$var$simplify
+    simplify: $03899943a5d4eab2$var$simplify,
+    toPropertiesList: $03899943a5d4eab2$var$jsonToPropertiesSingle,
+    toPropertiesSingle: $03899943a5d4eab2$var$jsonToPropertiesList
 };
+function $03899943a5d4eab2$var$isJson(value) {
+    try {
+        let l = JSON.parse(value);
+        return true;
+    } catch  {
+        return false;
+    }
+}
 function $03899943a5d4eab2$var$getPropertyValueFromDot(key, value) {
     // Retrieves value by following dot notation
     var items = key.split(".");
@@ -589,6 +613,27 @@ function $03899943a5d4eab2$var$simplify(data) {
         return newData;
     } else // If the data is neither an array nor an object, return it as is
     return data;
+}
+function $03899943a5d4eab2$var$jsonToPropertiesSingle(record) {
+    // Converts lists to single item(the first item)
+    if (Array.isArray(record)) {
+        if (record.length == 0) return null;
+        record = record[0];
+    }
+    if (Object.keys(record)) for (let k of Object.jeys(record))record[k] = jsonWithoutList(record[k]);
+    return record;
+}
+function $03899943a5d4eab2$var$jsonToPropertiesList(record) {
+    // Converts single items to lists
+    if (Array.isArray(record)) {
+        let newArray = [];
+        for (let r of record)newArray.push(jsonToLists(r));
+        record = newArray;
+    }
+    if (Object.keys(record)) for (let k of Object.jeys(record))record[k] = [
+        record[k]
+    ];
+    return record;
 }
 
 
@@ -771,6 +816,56 @@ function $c34dce0368b8abc6$export$7642ec6da7b10b(records, keys, headers) {
 
 
 
+
+const $6a48e11209e06b9f$export$57abcc0c7c9e66d0 = {
+    get: $6a48e11209e06b9f$var$getApi,
+    post: $6a48e11209e06b9f$var$postApi,
+    delete: $6a48e11209e06b9f$var$deleteApi
+};
+async function $6a48e11209e06b9f$var$getApi(baseUrl, urlPath, params) {
+    const requestOptionsGet = {
+        method: "GET",
+        headers: {
+            "Content-Type": "application/json"
+        }
+    };
+    let url = new URL(urlPath, String(baseUrl));
+    url.search = new URLSearchParams(params);
+    const response = await fetch(url, requestOptionsGet);
+    if (response.status != 200) throw new Error(String(response.status) + " " + response.statusText);
+    let results = await response.json();
+    return results;
+}
+async function $6a48e11209e06b9f$var$postApi(baseUrl, urlPath, records) {
+    //Post 
+    let requestOptions = {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify(records)
+    };
+    let url = new URL(urlPath, String(baseUrl));
+    const response = await fetch(url, requestOptions);
+    if (response.status != 200) throw new Error(String(response.status) + " " + response.statusText);
+    return true;
+}
+async function $6a48e11209e06b9f$var$deleteApi(baseUrl, urlPath, params) {
+    const requestOptionsGet = {
+        method: "DELETE",
+        headers: {
+            "Content-Type": "application/json"
+        }
+    };
+    let url = new URL(urlPath, String(baseUrl));
+    url.search = new URLSearchParams(params);
+    const response = await fetch(url, requestOptionsGet);
+    if (response.status != 200) throw new Error(String(response.status) + " " + response.statusText);
+    return true;
+}
+
+
+
 class $6e423e9502adc63f$export$7729b59bd32e7982 {
     constructor(name){
         this.name = name;
@@ -880,8 +975,10 @@ class $6e423e9502adc63f$export$7729b59bd32e7982 {
 
 const $53bcb33ef2023ce8$export$f936470337fdc8d0 = {
     analysis: (0, $336c234775b67d62$export$35d3dd03f0194c3a),
+    api: (0, $6a48e11209e06b9f$export$57abcc0c7c9e66d0),
     array: (0, $9fc8b212f324f9e3$export$4736c2d1b0001d00),
     date: (0, $18d56086b081e2cc$export$15c85b69ec02b47c),
+    email: (0, $92413447c3a75377$export$bac8020bbb4f7950),
     json: (0, $03899943a5d4eab2$export$94a70d284fcdf065),
     number: (0, $135f0c356f6f593e$export$96be39e8128f5891),
     object: (0, $1fd01b1ecffa6019$export$42f247ccf9267abd),

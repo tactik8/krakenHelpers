@@ -15,9 +15,9 @@
       "@babel/plugin-syntax-import-attributes"
     ]
   },
-  "name": "krakenhelper",
+  "name": "krakenhelpers",
   "description": "Helper methods",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "author": "Tactik8",
   "license": "ISC"
 }

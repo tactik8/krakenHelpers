@@ -1,24 +1,34 @@
 
 
 
+
+/** @const {Object}  krakenDateHelpers
+ * - isDate: Determiens if value is of type Date
+ * - toDate: Converts a value (string, etc.) to Date
+ * - getDuration: Returns duration between two dates
+ * - getDurationRecord: Returns duration in schema.org QuantitativeValue record
+ */
 export const krakenDateHelpers = {
 
     // Base
+    isDate: validateDate,
     getDuration: getDuration,
     getDurationRecord: getDurationRecord,
     toDate: toDate,
     toText: toText,
-    validateDate: validateDate,
-    
     // Shortcuts
-    isDate: validateDate,
+    validateDate: validateDate,
     getDate: toDate,
     duration: getDuration,
     durationRecord: getDurationRecord,
 
 }
 
-
+/**
+ * Returns true if value if a Date object
+ * @param {String | Date | object} value
+ * @return {bool} isDate True if date object
+ */
 function validateDate(value){
     if(value instanceof Date) { return true }
     return false

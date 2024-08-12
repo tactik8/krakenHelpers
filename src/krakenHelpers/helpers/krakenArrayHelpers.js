@@ -5,6 +5,7 @@ import { krakenObjectHelpers } from './krakenObjectHelpers.js'
 
 export const krakenArrayHelpers = {
 
+    toText: toText,
     isArray: validateArray,
     validateArray: validateArray,
     toArray: ensureArray,
@@ -12,25 +13,14 @@ export const krakenArrayHelpers = {
     getKeys: getKeys,
     keys: getKeys,
     getValuesForKey: getValuesForKey,
-    getNumbersForKey: getNumbersForKey,
-    getMax: getMax,
-    getMin: getMin,
-    getN: getN,
-    getNull: getNull,
-    getSum: getSum,
-    getAverage: getAverage,
-    getStandardDeviation: getStandardDeviation,
-    stddev: getStandardDeviation,
-    getMaxRecord: getMax,
-    getMinRecord: getMin,
-    getNRecord: getN,
-    getSumRecord: getSum,
-    getAverageRecord: getAverage,
-    getStandardDeviationRecord: getStandardDeviation,
-    getStatsRecord: getStatsRecord,
-    getUniqueN: getUniqueN
+    getNumbersForKey: getNumbersForKey
     
 }
+
+
+// -----------------------------------------------------
+//  Validation 
+// -----------------------------------------------------
 
 
 function validateArray(value){
@@ -41,9 +31,12 @@ function validateArray(value){
 }
 
 
+// -----------------------------------------------------
+//  Transformation 
+// -----------------------------------------------------
 
 function ensureArray(value) {
-
+    
     if(!value || value == null || value == {}){ return [] }
 
     if (validateArray(value)) {
@@ -62,6 +55,14 @@ function toText(value) {
     
 }
 
+
+
+// -----------------------------------------------------
+//  Query 
+// -----------------------------------------------------
+
+
+
 function getKeys(value){
     if(validateArray(value) == false){ return undefined }
 
@@ -76,13 +77,6 @@ function getKeys(value){
     keys.sort()
     return keys
 }
-
-
-// -----------------------------------------------------
-//  Columns focused methods 
-// -----------------------------------------------------
-
-
 
 function getValuesForKey(value, key){
 
@@ -133,232 +127,4 @@ function getUnitCodesForKey(value, key){
         }
     }
     return results    
-}
-
-function getMax(value, key){
-
-    value = ensureArray(value)
-    if(validateArray(value) == false){ return undefined }
-
-    let items = getNumbersForKey(value, key)
-    
-    let result = Math.max(...items)
-
-    return result
-    
-}
-
-function getMaxRecord(value, key){
-    
-    value = ensureArray(value)
-    if(validateArray(value) == false){ return undefined }
-
-    let result = getMax(value, key)
-    let unitCode = getUnitCodesForKey(value, key)
-
-    return getStatsRecord('maxValue', key, result, unitCode)
-
-     //count, median, marginOfError, maxValue, minValue
-}
-
-
-
-function getMin(value, key){
-    
-    value = ensureArray(value)
-    if(validateArray(value) == false){ return undefined }
-
-    let items = getNumbersForKey(value, key)
-
-    let result = Math.min(...items)
-
-    return result
-
-}
-
-function getMinRecord(value, key){
-
-    value = ensureArray(value)
-    if(validateArray(value) == false){ return undefined }
-
-    let result = getMin(value, key)
-    let unitCode = getUnitCodesForKey(value, key)
-
-    return getStatsRecord('minValue', key, result, unitCode)
-
-     //count, median, marginOfError, maxValue, minValue
-}
-
-
-function getN(value, key){
-
-    value = ensureArray(value)
-    if(validateArray(value) == false){ return undefined }
-
-    let items = getNumbersForKey(value, key)
-
-    let result = items.length
-
-    return result
-    
-}
-
-function getNRecord(value, key){
-
-    value = ensureArray(value)
-    if(validateArray(value) == false){ return undefined }
-
-    let result = getN(value, key)
-    let unitCode = getUnitCodesForKey(value, key)
-
-    return getStatsRecord('count', key, result, unitCode)
-
-     //count, median, marginOfError, maxValue, minValue
-}
-
-function getSum(value, key){
-    
-    value = ensureArray(value)
-    if(validateArray(value) == false){ return undefined }
-
-    let items = getNumbersForKey(value, key)
-
-    let result = items.reduce((partialSum, a) => partialSum + a, 0);
-
-    return result
-
-}
-
-function getSumRecord(value, key){
-
-    value = ensureArray(value)
-    if(validateArray(value) == false){ return undefined }
-
-    let result = getSum(value, key)
-    let unitCode = getUnitCodesForKey(value, key)
-
-    return getStatsRecord('sum', key, result, unitCode)
-
-     //count, median, marginOfError, maxValue, minValue
-}
-
-function getAverage(value, key){
-
-    value = ensureArray(value)
-    if(validateArray(value) == false){ return undefined }
-
-    let items = getNumbersForKey(value, key)
-
-    if(items.length == 0){ return 0 }
-
-    let sumAll = items.reduce((partialSum, a) => partialSum + a, 0);
-
-    let result = sumAll / items.length
-
-    return result
-}
-
-function getAverageRecord(value, key){
-
-    value = ensureArray(value)
-    if(validateArray(value) == false){ return undefined }
-
-    let result = getAverage(value, key)
-    let unitCode = getUnitCodesForKey(value, key)
-    
-    return getStatsRecord('average', key, result, unitCode)
-
-     //count, median, marginOfError, maxValue, minValue
-}
-
-
-function getStandardDeviation(value, key){
-
-    value = ensureArray(value)
-    if(validateArray(value) == false){ return undefined }
-
-    let items = getNumbersForKey(value, key)
-
-    if(items.length == 0){ return 0 }
-
-    let n = items.length
-    let mean = items.reduce((a, b) => a + b) / n
-    let result =  Math.sqrt(items.map(x => Math.pow(x - mean, 2)).reduce((a, b) => a + b) / n)
-
-    return result
-}
-
-function getStandardDeviationRecord(value, key){
-
-    value = ensureArray(value)
-    if(validateArray(value) == false){ return undefined }
-
-    let result = getStandardDeviation(value, key)
-    let unitCode = getUnitCodesForKey(value, key)
-
-    return getStatsRecord('marginOfError', key, result, unitCode)
-
-}
-
-function getNull(value, key){
-
-    value = ensureArray(value)
-    if(validateArray(value) == false){ return undefined }
-
-    let nullValues = 0
-    for(let v of value){
-
-        
-        if ((!v || v == null || v == "" || v == {} || v == []) && v!== 0){
-            nullValues + 1
-        }
-    }
-
-    return nullValues
-
-}
-
-function getUniqueN(value, key){
-
-    value = ensureArray(value)
-    if(validateArray(value) == false){ return undefined }
-
-
-    let uniqueValues = [...new Set(value)];
-
-    let result = uniqueValues.length
-    
-
-    return result
-
-}
-
-// -----------------------------------------------------
-//  Statistical record 
-// -----------------------------------------------------
-
-function getStatsRecord(statType, property, value, unitCode){
-
-
-    let record = {
-        "@context": "https://schema.org/",
-        "@id": "Observation_Median_Age_Person_Female_SanAntonio_TX_2014",
-        "@type": "Observation",
-        "name": name,
-        "variableMeasured": {
-            "@context": "https://schema.org/",
-            "@type": "StatisticalVariable",
-            "@id": "Median_Height_Person_Female",
-            "name": statType,
-            "measuredProperty": {"@id": property },
-            "statType": {"@id": statType},
-            "constrainingProperty": []
-        },
-        "observationAbout": {},
-        "value": value,
-        "unitCode": unit
-    }
-
-    return record
-
 }
