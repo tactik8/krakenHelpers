@@ -832,7 +832,7 @@ async function $6a48e11209e06b9f$var$getApi(baseUrl, urlPath, params) {
     let url = new URL(urlPath, String(baseUrl));
     url.search = new URLSearchParams(params);
     const response = await fetch(url, requestOptionsGet);
-    if (response.status != 200) throw new Error(String(response.status) + " " + response.statusText);
+    if (response.status != 200 || response.status != 201 || response.status != 202) throw new Error(String(response.status) + " " + response.statusText);
     let results = await response.json();
     return results;
 }
@@ -847,7 +847,7 @@ async function $6a48e11209e06b9f$var$postApi(baseUrl, urlPath, records) {
     };
     let url = new URL(urlPath, String(baseUrl));
     const response = await fetch(url, requestOptions);
-    if (response.status != 200) throw new Error(String(response.status) + " " + response.statusText);
+    if (response.status != 200 || response.status != 201 || response.status != 202) throw new Error(String(response.status) + " " + response.statusText);
     return true;
 }
 async function $6a48e11209e06b9f$var$deleteApi(baseUrl, urlPath, params) {
@@ -860,7 +860,7 @@ async function $6a48e11209e06b9f$var$deleteApi(baseUrl, urlPath, params) {
     let url = new URL(urlPath, String(baseUrl));
     url.search = new URLSearchParams(params);
     const response = await fetch(url, requestOptionsGet);
-    if (response.status != 200) throw new Error(String(response.status) + " " + response.statusText);
+    if (response.status != 200 || response.status != 201 || response.status != 202) throw new Error(String(response.status) + " " + response.statusText);
     return true;
 }
 

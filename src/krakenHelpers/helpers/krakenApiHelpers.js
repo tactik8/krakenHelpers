@@ -29,7 +29,7 @@ async function getApi(baseUrl, urlPath,  params){
 
     const response = await fetch(url, requestOptionsGet)
 
-    if(response.status != 200){  
+    if(response.status != 200 || response.status != 201 || response.status != 202){  
         throw new Error(String(response.status) + ' ' +response.statusText);
     }
     
@@ -56,8 +56,8 @@ async function postApi(baseUrl, urlPath,  records){
 
     const response = await fetch(url, requestOptions)
 
-    if(response.status != 200){  
-        throw new Error(String(response.status) + ' ' +response.statusText);
+    if(response.status != 200 || response.status != 201 || response.status != 202){  
+        throw new Error(String(response.status) + ' ' + response.statusText);
     }
 
     return true
@@ -79,7 +79,7 @@ async function deleteApi(baseUrl, urlPath,  params){
 
     const response = await fetch(url, requestOptionsGet)
 
-    if(response.status != 200){  
+    if(response.status != 200 || response.status != 201 || response.status != 202){  
         throw new Error(String(response.status) + ' ' +response.statusText);
     }
     
@@ -87,5 +87,4 @@ async function deleteApi(baseUrl, urlPath,  params){
     return true
     
 }
-
 

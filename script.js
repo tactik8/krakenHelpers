@@ -14,14 +14,16 @@ async function test(){
         }
     
     
-    let url = 'https://data.krknapi.com/api/test34'
+    let url = 'https://data.krknapi.com/'
+    let c = 'api/test34'
     
-    let r = await k.api.post(url, null, record)
+    let r = await k.api.post(url, c, record)
 
-    let rr = await k.api.get(url, null, {"@type": "Thing", "@id": "thing1"})
+    let rr = await k.api.get(url, c, {"@type": "Thing", "@id": "thing1"})
 
-    let rr2 = await k.api.get(url, null, {"@type": "Thing"})
+    let rr2 = await k.api.get(url, c, {"@type": "Thing"})
 
+    console.log(rr)
     
 }
 
