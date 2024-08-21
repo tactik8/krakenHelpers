@@ -865,6 +865,55 @@ async function $6a48e11209e06b9f$var$deleteApi(baseUrl, urlPath, params) {
 }
 
 
+class $9be01ebda65f7f50$export$f5bc5036afac6116 {
+    constructor(){
+        this._db = {};
+        this._maxArgsLength = 0;
+    }
+    getAll(argsLength) {
+        // Retrieves all values from cache
+        function getValues(db, maxArgsLength, l = 0) {
+            let results = [];
+            // Stop if reached depth
+            if (l == maxArgsLength) {
+                results.push(db);
+                return results;
+            }
+            // Iterate through paths
+            for (let k of Object.keys(db))results = results.concat(getValues(db[k], maxArgsLength, l + 1));
+            return results;
+        }
+        argsLength = argsLength || this._maxArgsLength;
+        let results = getValues(this._db, argsLength);
+        return results;
+    }
+    set(args) {
+        // Set a value in cache. First arguments is the path,  Last argument is the actual value
+        let path = this._db;
+        let i;
+        let a = arguments.length - 1;
+        for(i = 0; i < arguments.length - 2; i++){
+            if (!path[arguments[i]]) path[arguments[i]] = {};
+            path = path[arguments[i]];
+        }
+        if (this._maxArgsLength < a) this._maxArgsLength = a;
+        path[arguments[a - 1]] = arguments[a];
+        return;
+    }
+    get(args) {
+        // Get a value in cache.
+        let a = arguments.length - 1;
+        let i;
+        let path = this._db;
+        for(i = 0; i < arguments.length - 1; i++){
+            path = path?.[arguments[i]];
+            if (!path) return null;
+        }
+        return path[arguments[a]];
+    }
+}
+
+
 
 class $6e423e9502adc63f$export$7729b59bd32e7982 {
     constructor(name){
@@ -977,6 +1026,7 @@ const $53bcb33ef2023ce8$export$f936470337fdc8d0 = {
     analysis: (0, $336c234775b67d62$export$35d3dd03f0194c3a),
     api: (0, $6a48e11209e06b9f$export$57abcc0c7c9e66d0),
     array: (0, $9fc8b212f324f9e3$export$4736c2d1b0001d00),
+    Cache: (0, $9be01ebda65f7f50$export$f5bc5036afac6116),
     date: (0, $18d56086b081e2cc$export$15c85b69ec02b47c),
     email: (0, $92413447c3a75377$export$bac8020bbb4f7950),
     json: (0, $03899943a5d4eab2$export$94a70d284fcdf065),
