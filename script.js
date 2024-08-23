@@ -6,16 +6,19 @@ import { krakenHelpers as k } from './src/index.js'
 async function test(){
     
 
+    let url = 'https://2d432316-7c15-4f0f-9214-d4f6fba60627-00-1b1hmvrd8c12s.spock.replit.dev/api'
+
+   
     
-    let value = 'abc'
-    let c = new k.Cache()
 
-    c.set('path1', 'path2', value)
 
-    let result = c.get('path1', 'path2')
-            
-    console.log(result)
-    //expect(result).toStrictEqual(value);
+    console.log('pp1')
+
+    let results = await k.api.get(url, '/api/collection')
+    
+    console.log(results)
+
+
 
 
 
