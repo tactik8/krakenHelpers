@@ -1,5 +1,10 @@
 
 
+import { krakenArrayHelpers } from './krakenArrayHelpers.js'
+import { krakenObjectHelpers } from './krakenObjectHelpers.js'
+
+
+
 export const krakenThingHelpers = {
 
     isValid: validateThing,
@@ -7,7 +12,8 @@ export const krakenThingHelpers = {
     validateThing: validateThing,
     getRefRecord: getRefRecord,
     ref: getRefRecord,
-    toText: toText
+    toText: toText,
+    extractThingsFromRecord: extractThingsFromRecord
     
 }
 
@@ -68,4 +74,42 @@ function toText(value){
       
     return result
 
+}
+
+
+function extractThingsFromRecord(record){
+
+    
+    let results = []
+
+    if(krakenArrayHelpers.isArray(record)){
+
+        for(let r of record){
+            let values = extractThingsFromRecord(r)
+            if(values.length > 0){
+                results = results.concat(values)
+            }
+        }
+    } else if(krakenObjectHelpers.isObject(record)){
+
+        if(record?.['@type'] && record?.['@type'] != null){
+            results.push(record)
+        }
+        
+        for(let k of Object.keys(record)){
+            let v = record[k]
+            let values = extractThingsFromRecord(v)
+            if(values.length > 0){
+                results = results.concat(values)
+            }
+        }
+
+    } else {
+    }
+
+ 
+    
+    return results
+    
+    
 }

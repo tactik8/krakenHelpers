@@ -1,25 +1,38 @@
 
-//import { krakenHelpers as k } from './src/index.js'
+import { krakenHelpers as k } from './src/index.js'
 
-import { krakenHelpers as k } from './dist/main.js'
+//import { krakenHelpers as k } from './dist/main.js'
 
 
 
 async function test(){
     
 
-    let url = 'https://2d432316-7c15-4f0f-9214-d4f6fba60627-00-1b1hmvrd8c12s.spock.replit.dev/api'
+    let record = {
+             "@type": "Person",
+             "@id": "person_1",
+             "givenName": "givenName_1",
+             "familyName": "familyName_1",
+             "email": "test@test.com",
+             "telephone": "1-514-111-2222",
+             "hasOccupation": {
+                 "@type": "Occupation",
+                 "@id": "occupation_1",
+                 "name": "occupation_1"
+                 },
+             "worksfor": {
+                 "@type": "Organization",
+                 "@id": "organization_1",
+                 "name": "test_org_1",
+                 "url": "https://www.test.com"
+                 }
+         }
 
-   
+    let things = k.thing.extractThingsFromRecord(record)
+    console.log(things.length)
+
+
     
-
-
-    console.log('pp1')
-
-    let results = await k.api.get(url, '/api/collection')
-    
-    console.log(results)
-
 
 
 
