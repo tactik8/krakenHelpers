@@ -1,7 +1,7 @@
 
-import { krakenHelpers as k } from './src/index.js'
+//import { krakenHelpers as k } from './src/index.js'
 
-//import { krakenHelpers as k } from './dist/main.js'
+import { krakenHelpers  } from './dist/main.js'
 
 
 
@@ -28,10 +28,12 @@ async function test(){
                  }
          }
 
-    let things = k.thing.extractThingsFromRecord(record)
+    console.log(krakenHelpers)
+    let things = krakenHelpers.thing.extractThings(record)
     console.log(things.length)
 
 
+    
     
 
 

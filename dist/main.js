@@ -210,7 +210,7 @@ const $9a2a3d97de4234f5$export$c24b4489b93ad8cb = {
     getRefRecord: $9a2a3d97de4234f5$var$getRefRecord,
     ref: $9a2a3d97de4234f5$var$getRefRecord,
     toText: $9a2a3d97de4234f5$var$toText,
-    extractThingsFromRecord: $9a2a3d97de4234f5$var$extractThingsFromRecord
+    extractThings: $9a2a3d97de4234f5$var$extractThings
 };
 function $9a2a3d97de4234f5$var$validateThing(value) {
     if (!value["@type"]) return false;
@@ -243,17 +243,17 @@ function $9a2a3d97de4234f5$var$toText(value) {
     let result = `${value["@type"]}/${value["@id"]}`;
     return result;
 }
-function $9a2a3d97de4234f5$var$extractThingsFromRecord(record) {
+function $9a2a3d97de4234f5$var$extractThings(record) {
     let results = [];
     if ((0, $9fc8b212f324f9e3$export$4736c2d1b0001d00).isArray(record)) for (let r of record){
-        let values = $9a2a3d97de4234f5$var$extractThingsFromRecord(r);
+        let values = $9a2a3d97de4234f5$var$extractThings(r);
         if (values.length > 0) results = results.concat(values);
     }
     else if ((0, $1fd01b1ecffa6019$export$42f247ccf9267abd).isObject(record)) {
         if (record?.["@type"] && record?.["@type"] != null) results.push(record);
         for (let k of Object.keys(record)){
             let v = record[k];
-            let values = $9a2a3d97de4234f5$var$extractThingsFromRecord(v);
+            let values = $9a2a3d97de4234f5$var$extractThings(v);
             if (values.length > 0) results = results.concat(values);
         }
     }

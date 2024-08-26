@@ -13,7 +13,7 @@ export const krakenThingHelpers = {
     getRefRecord: getRefRecord,
     ref: getRefRecord,
     toText: toText,
-    extractThingsFromRecord: extractThingsFromRecord
+    extractThings: extractThings
     
 }
 
@@ -77,7 +77,7 @@ function toText(value){
 }
 
 
-function extractThingsFromRecord(record){
+function extractThings(record){
 
     
     let results = []
@@ -85,7 +85,7 @@ function extractThingsFromRecord(record){
     if(krakenArrayHelpers.isArray(record)){
 
         for(let r of record){
-            let values = extractThingsFromRecord(r)
+            let values = extractThings(r)
             if(values.length > 0){
                 results = results.concat(values)
             }
@@ -98,7 +98,7 @@ function extractThingsFromRecord(record){
         
         for(let k of Object.keys(record)){
             let v = record[k]
-            let values = extractThingsFromRecord(v)
+            let values = extractThings(v)
             if(values.length > 0){
                 results = results.concat(values)
             }
