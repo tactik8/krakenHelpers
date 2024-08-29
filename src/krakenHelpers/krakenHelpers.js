@@ -14,6 +14,8 @@ import { krakenThingHelpers } from './helpers/krakenThingHelpers.js'
 import { krakenUrlHelpers } from './helpers/krakenUrlHelpers.js'
 import { krakenValueHelpers } from './helpers/krakenValueHelpers.js'
 import { krakenApiHelpers } from './helpers/krakenApiHelpers.js'
+import { krakenHeadingsHelpers } from './helpers/krakenHeadingsHelpers.js'
+
 import { KrCache } from './helpers/krakenCache.js'
 
 
@@ -35,5 +37,6 @@ export const krakenHelpers = {
     thing: krakenThingHelpers,
     Timer: KrakenTimer,
     url: krakenUrlHelpers,
-    value: krakenValueHelpers
+    value: krakenValueHelpers,
+    headings: krakenHeadingsHelpers
 }

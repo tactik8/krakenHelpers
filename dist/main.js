@@ -884,6 +884,230 @@ async function $6a48e11209e06b9f$var$deleteApi(baseUrl, urlPath, params) {
 }
 
 
+
+const $f5e690043496127e$export$36b1aac33f5f1b68 = {
+    heading1: $f5e690043496127e$var$_getHeading1,
+    heading2: $f5e690043496127e$var$_getHeading2,
+    headingDescription: $f5e690043496127e$var$_getHeadingDescription,
+    headingDate: $f5e690043496127e$var$_getHeadingDate,
+    headingStatus: $f5e690043496127e$var$_getHeadingStatus
+};
+function $f5e690043496127e$var$_getHeading1(record) {
+    let heading = "heading1";
+    return $f5e690043496127e$var$_getHeadingX(record, heading);
+}
+function $f5e690043496127e$var$_getHeading2(record) {
+    let heading = "heading2";
+    return $f5e690043496127e$var$_getHeadingX(record, heading);
+}
+function $f5e690043496127e$var$_getHeadingDescription(record) {
+    let heading = "headingDescription";
+    return $f5e690043496127e$var$_getHeadingX(record, heading);
+}
+function $f5e690043496127e$var$_getHeadingDate(record) {
+    let heading = "headingDate";
+    return $f5e690043496127e$var$_getHeadingX(record, heading);
+}
+function $f5e690043496127e$var$_getHeadingStatus(record) {
+    let heading = "headingStatus";
+    return $f5e690043496127e$var$_getHeadingX(record, heading);
+}
+function $f5e690043496127e$var$_getHeadingX(record, heading) {
+    let record_type = record["@type"];
+    let config = $f5e690043496127e$var$getConfig();
+    let headingPossibilities = config?.[record_type]?.[heading];
+    if (!headingPossibilities || headingPossibilities == null) headingPossibilities = config?.["Thing"]?.[heading];
+    let headingValue = null;
+    for (let hp of headingPossibilities){
+        headingValue = $f5e690043496127e$var$_getValue(record, heading, hp);
+        if (headingValue && headingValue != null) break;
+    }
+    return headingValue;
+}
+function $f5e690043496127e$var$_getValue(record, heading, keys) {
+    keys = (0, $9fc8b212f324f9e3$export$4736c2d1b0001d00).ensureArray(keys);
+    let values = [];
+    for (let k of keys){
+        let value = record[k];
+        if (Array.isArray(value)) value = value[0];
+        // Handle object as values (when listItem references item for example )
+        if (value?.["@type"]) value = $f5e690043496127e$var$_getHeadingX(value, "heading1");
+        if (value && value != null) values.push(value);
+    }
+    if (values.length == 0) return null;
+    // Assemble values
+    let headingValue = values.join(" ");
+    return headingValue;
+}
+function $f5e690043496127e$var$getConfig() {
+    let record = {
+        Thing: {
+            heading1: [
+                "name",
+                "url",
+                "@id"
+            ],
+            heading2: [
+                "name",
+                "url",
+                "@id"
+            ],
+            headingDescription: [
+                "description"
+            ],
+            headingDate: [
+                ""
+            ]
+        },
+        Article: {
+            heading1: [
+                "headline",
+                "name",
+                "url",
+                "@id"
+            ],
+            heading2: [
+                "author",
+                "url",
+                "@id"
+            ],
+            headingDescription: [
+                "articleBody",
+                "text",
+                "description"
+            ],
+            headingDate: [
+                "datePublished",
+                "dateCreated"
+            ]
+        },
+        Action: {
+            heading1: [
+                "name",
+                "url",
+                "@id"
+            ],
+            heading2: [
+                "author",
+                "url",
+                "@id"
+            ],
+            headingDescription: [
+                "articleBody",
+                "text",
+                "description"
+            ],
+            headingDate: [
+                "datePublished",
+                "dateCreated"
+            ],
+            headingStatus: [
+                "actionStatus"
+            ]
+        },
+        Person: {
+            heading1: [
+                [
+                    "givenName",
+                    "familyName"
+                ],
+                "name",
+                "url",
+                "@id"
+            ],
+            heading2: [
+                "author",
+                "url",
+                "@id"
+            ],
+            headingDescription: [
+                "articleBody",
+                "text",
+                "description"
+            ],
+            headingDate: [
+                "datePublished",
+                "dateCreated"
+            ],
+            headingStatus: [
+                "actionStatus"
+            ]
+        },
+        ListItem: {
+            heading1: [
+                "item",
+                "name",
+                "url",
+                "@id"
+            ],
+            heading2: [
+                "item",
+                "url",
+                "@id"
+            ],
+            headingDescription: [
+                "text",
+                "description"
+            ],
+            headingDate: [
+                "datePublished",
+                "dateCreated"
+            ],
+            headingStatus: [
+                "actionStatus"
+            ]
+        },
+        CreativeWork: {
+            heading1: [
+                "headline",
+                "name",
+                "url",
+                "@id"
+            ],
+            heading2: [
+                "author",
+                "url",
+                "@id"
+            ],
+            headingDescription: [
+                "articleBody",
+                "text",
+                "description"
+            ],
+            headingDate: [
+                "datePublished",
+                "dateCreated"
+            ]
+        },
+        PostalAddress: {
+            heading1: [
+                "streetAddress",
+                "name",
+                "@id"
+            ],
+            heading2: [
+                [
+                    "addressLocality",
+                    "addressRegion",
+                    "postalCode",
+                    "addressCountry"
+                ]
+            ],
+            headingDescription: [
+                "text",
+                "name",
+                "description"
+            ],
+            headingDate: [
+                "datePublished",
+                "dateCreated"
+            ]
+        }
+    };
+    return record;
+}
+
+
 class $9be01ebda65f7f50$export$f5bc5036afac6116 {
     constructor(){
         this._db = {};
@@ -1056,7 +1280,8 @@ const $53bcb33ef2023ce8$export$f936470337fdc8d0 = {
     thing: (0, $9a2a3d97de4234f5$export$c24b4489b93ad8cb),
     Timer: (0, $6e423e9502adc63f$export$7729b59bd32e7982),
     url: (0, $2974f6a85c45961a$export$b881b526c33ee854),
-    value: (0, $5abff2bf4ee17cbb$export$da17952f31714a6e)
+    value: (0, $5abff2bf4ee17cbb$export$da17952f31714a6e),
+    headings: (0, $f5e690043496127e$export$36b1aac33f5f1b68)
 };
 
 
