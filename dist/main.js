@@ -48,6 +48,87 @@ function $1fd01b1ecffa6019$var$toText(value) {
 }
 
 
+const $2865c5ce12fd7c9f$export$fe5b3308000496d5 = {
+    toDot: $2865c5ce12fd7c9f$var$convertToDotNotation,
+    fromDot: $2865c5ce12fd7c9f$var$convertFromDotNotation,
+    getValue: $2865c5ce12fd7c9f$var$getPropertyValueFromDot
+};
+function $2865c5ce12fd7c9f$var$getPropertyValueFromDot(key, value) {
+    // Retrieves value by following dot notation
+    function _recursive(key, value) {
+        // Get property
+        let keyItems = key.split(".");
+        let keyItem1 = keyItems?.[0];
+        let property1 = keyItem1.split("[")[0];
+        let position1 = keyItem1.split("[")[1] || null;
+        let value1 = value?.[property1];
+        if (position1) try {
+            position1 = position1.replace("]", "");
+            position1 = position1.trim();
+            position1 = Number(position1);
+            if (!Array.isArray(value1)) value1 = [
+                value1
+            ];
+            value1 = value1?.[arrayPosition] || null;
+        } catch  {}
+        // Check if done, else recurse
+        if (keyItems.length > 1) {
+            let newKeys = keyItems.slice(1);
+            let newKey = newKeys.join(".");
+            return _recursive(newKey, value1);
+        } else return value1;
+    }
+    return _recursive(key, value);
+}
+function $2865c5ce12fd7c9f$var$convertToDotNotation(obj, parentKey = "", result = {}) {
+    for(let key in obj)if (obj.hasOwnProperty(key)) {
+        const newKey = parentKey ? `${parentKey}.${key}` : key; // Combine parent key with current key
+        if (typeof obj[key] === "object" && !Array.isArray(obj[key])) // If it's a nested object (not an array), recurse
+        $2865c5ce12fd7c9f$var$convertToDotNotation(obj[key], newKey, result);
+        else if (Array.isArray(obj[key])) // If it's an array, iterate over array elements and include index
+        obj[key].forEach((item, index)=>{
+            const arrayKey = `${newKey}[${index}]`;
+            if (typeof item === "object") // Recurse for array elements that are objects
+            $2865c5ce12fd7c9f$var$convertToDotNotation(item, arrayKey, result);
+            else // Directly add non-object array elements
+            result[arrayKey] = item;
+        });
+        else // If it's a primitive value, add it to the result
+        result[newKey] = obj[key];
+    }
+    return result;
+}
+function $2865c5ce12fd7c9f$var$convertFromDotNotation(dotNotationObj) {
+    const result = {};
+    for(let key in dotNotationObj)if (dotNotationObj.hasOwnProperty(key)) {
+        const value = dotNotationObj[key];
+        const keys = key.split("."); // Split the key by dots
+        let current = result;
+        for(let i = 0; i < keys.length; i++){
+            const part = keys[i];
+            // Check if the part contains array notation, e.g., "contacts[0]"
+            const arrayMatch = part.match(/^(\w+)\[(\d+)\]$/);
+            if (arrayMatch) {
+                const arrayKey = arrayMatch[1];
+                const arrayIndex = parseInt(arrayMatch[2], 10);
+                // Ensure the array exists at this key
+                if (!current[arrayKey]) current[arrayKey] = [];
+                // Ensure the specific index in the array exists
+                if (!current[arrayKey][arrayIndex]) current[arrayKey][arrayIndex] = i === keys.length - 1 ? value : {};
+                // Move the reference to the current array item
+                current = current[arrayKey][arrayIndex];
+            } else {
+                // Regular object key (no array notation)
+                if (!current[part]) current[part] = i === keys.length - 1 ? value : {};
+                // Move the reference to the next nested level
+                current = current[part];
+            }
+        }
+    }
+    return result;
+}
+
+
 const $9fc8b212f324f9e3$export$4736c2d1b0001d00 = {
     toText: $9fc8b212f324f9e3$var$toText,
     isArray: $9fc8b212f324f9e3$var$validateArray,
@@ -98,7 +179,8 @@ function $9fc8b212f324f9e3$var$getValuesForKey(value, key) {
     if ($9fc8b212f324f9e3$var$validateArray(value) == false) return undefined;
     let results = [];
     for (let v of value){
-        let v1 = v?.[key];
+        let v1 = (0, $2865c5ce12fd7c9f$export$fe5b3308000496d5).getValue(key, v) //v?.[key] 
+        ;
         if (v1) results.push(v1);
     }
     return results;
@@ -359,7 +441,15 @@ function $5abff2bf4ee17cbb$var$getTypeSchemaOrg(value) {
 
 const $336c234775b67d62$export$35d3dd03f0194c3a = {
     analyzeValues: $336c234775b67d62$var$analyzeValues,
-    analyze: $336c234775b67d62$var$analyze
+    analyze: $336c234775b67d62$var$analyze,
+    max: $336c234775b67d62$var$getMax,
+    min: $336c234775b67d62$var$getMin,
+    n: $336c234775b67d62$var$getN,
+    sum: $336c234775b67d62$var$getSum,
+    avg: $336c234775b67d62$var$getAverage,
+    stdev: $336c234775b67d62$var$getStandardDeviation,
+    first: $336c234775b67d62$var$getFirst,
+    last: $336c234775b67d62$var$getLast
 };
 function $336c234775b67d62$var$analyze(value) {
     value = (0, $9fc8b212f324f9e3$export$4736c2d1b0001d00).ka.ensureArray(value);
@@ -413,6 +503,22 @@ function $336c234775b67d62$var$analyzeValues(value, key) {
         analysis.stddev = $336c234775b67d62$var$getStandardDeviation(value, key);
     }
     return analysis;
+}
+function $336c234775b67d62$var$getFirst(value, key) {
+    value = (0, $9fc8b212f324f9e3$export$4736c2d1b0001d00).ensureArray(value);
+    if ((0, $9fc8b212f324f9e3$export$4736c2d1b0001d00).validateArray(value) == false) return undefined;
+    let items = (0, $9fc8b212f324f9e3$export$4736c2d1b0001d00).getValuesForKey(value, key);
+    items = (0, $9fc8b212f324f9e3$export$4736c2d1b0001d00).ensureArray(items);
+    let [result] = items.slice(0);
+    return result;
+}
+function $336c234775b67d62$var$getLast(value, key) {
+    value = (0, $9fc8b212f324f9e3$export$4736c2d1b0001d00).ensureArray(value);
+    if ((0, $9fc8b212f324f9e3$export$4736c2d1b0001d00).validateArray(value) == false) return undefined;
+    let items = (0, $9fc8b212f324f9e3$export$4736c2d1b0001d00).getValuesForKey(value, key);
+    items = (0, $9fc8b212f324f9e3$export$4736c2d1b0001d00).ensureArray(items);
+    let [result] = items.slice(-1);
+    return result;
 }
 function $336c234775b67d62$var$getMax(value, key) {
     value = (0, $9fc8b212f324f9e3$export$4736c2d1b0001d00).ensureArray(value);
@@ -567,65 +673,6 @@ function $92413447c3a75377$var$isValidEmail(email) {
 }
 
 
-const $2865c5ce12fd7c9f$export$fe5b3308000496d5 = {
-    toDot: $2865c5ce12fd7c9f$var$convertToDotNotation,
-    fromDot: $2865c5ce12fd7c9f$var$convertFromDotNotation,
-    getValue: $2865c5ce12fd7c9f$var$getPropertyValueFromDot
-};
-function $2865c5ce12fd7c9f$var$convertToDotNotation(obj, parentKey = "", result = {}) {
-    for(let key in obj)if (obj.hasOwnProperty(key)) {
-        const newKey = parentKey ? `${parentKey}.${key}` : key; // Combine parent key with current key
-        if (typeof obj[key] === "object" && !Array.isArray(obj[key])) // If it's a nested object (not an array), recurse
-        $2865c5ce12fd7c9f$var$convertToDotNotation(obj[key], newKey, result);
-        else if (Array.isArray(obj[key])) // If it's an array, iterate over array elements and include index
-        obj[key].forEach((item, index)=>{
-            const arrayKey = `${newKey}[${index}]`;
-            if (typeof item === "object") // Recurse for array elements that are objects
-            $2865c5ce12fd7c9f$var$convertToDotNotation(item, arrayKey, result);
-            else // Directly add non-object array elements
-            result[arrayKey] = item;
-        });
-        else // If it's a primitive value, add it to the result
-        result[newKey] = obj[key];
-    }
-    return result;
-}
-function $2865c5ce12fd7c9f$var$getPropertyValueFromDot(key, value) {
-    // Retrieves value by following dot notation
-    var items = key.split(".");
-    for(let t = 0; t < items.length; t++)value = value[items[t]];
-    return value;
-}
-function $2865c5ce12fd7c9f$var$convertFromDotNotation(dotNotationObj) {
-    const result = {};
-    for(let key in dotNotationObj)if (dotNotationObj.hasOwnProperty(key)) {
-        const value = dotNotationObj[key];
-        const keys = key.split("."); // Split the key by dots
-        let current = result;
-        for(let i = 0; i < keys.length; i++){
-            const part = keys[i];
-            // Check if the part contains array notation, e.g., "contacts[0]"
-            const arrayMatch = part.match(/^(\w+)\[(\d+)\]$/);
-            if (arrayMatch) {
-                const arrayKey = arrayMatch[1];
-                const arrayIndex = parseInt(arrayMatch[2], 10);
-                // Ensure the array exists at this key
-                if (!current[arrayKey]) current[arrayKey] = [];
-                // Ensure the specific index in the array exists
-                if (!current[arrayKey][arrayIndex]) current[arrayKey][arrayIndex] = i === keys.length - 1 ? value : {};
-                // Move the reference to the current array item
-                current = current[arrayKey][arrayIndex];
-            } else {
-                // Regular object key (no array notation)
-                if (!current[part]) current[part] = i === keys.length - 1 ? value : {};
-                // Move the reference to the next nested level
-                current = current[part];
-            }
-        }
-    }
-    return result;
-}
-
 
 const $03899943a5d4eab2$export$94a70d284fcdf065 = {
     get: $03899943a5d4eab2$var$getPropertyValueFromDot,
@@ -719,6 +766,7 @@ function $03899943a5d4eab2$var$jsonToPropertiesList(record) {
 
 
 
+
 const $6955f32358295148$export$efeacd8e2fafd6a1 = {
     extractMentions: $6955f32358295148$var$extractMentions,
     extractNames: $6955f32358295148$var$extractNames,
@@ -727,8 +775,20 @@ const $6955f32358295148$export$efeacd8e2fafd6a1 = {
     extractNumbers: $6955f32358295148$var$extractNumbers,
     extractPhoneNumbers: $6955f32358295148$var$extractPhoneNumbers,
     extractDates: $6955f32358295148$var$extractDates,
-    extractEmails: $6955f32358295148$var$extractEmails
+    extractEmails: $6955f32358295148$var$extractEmails,
+    toCamelCase: $6955f32358295148$var$toCamelCase,
+    fromCamelCase: $6955f32358295148$var$fromCamelCase
 };
+function $6955f32358295148$var$toCamelCase(str) {
+    return str// Split the string by spaces, underscores, or hyphens
+    .split(/[-_\s]+/)// Convert the first word to lowercase and capitalize the first letter of the following words
+    .map((word, index)=>index === 0 ? word.toLowerCase() : word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())// Join them back into a single string
+    .join("");
+}
+function $6955f32358295148$var$fromCamelCase(str) {
+    return str// Insert a space before every uppercase letter and convert the whole string to lowercase
+    .replace(/([A-Z])/g, " $1").toLowerCase().trim();
+}
 function $6955f32358295148$var$extractMentions(text) {
     // Error handling for invalid input
     if (typeof text !== "string") throw new Error("Input must be a string");
@@ -1168,6 +1228,77 @@ function $f5e690043496127e$var$getConfig() {
 }
 
 
+
+
+const $23c99379dceee5e4$export$cc74e2e6d445aa47 = {
+    get: $23c99379dceee5e4$var$replacePlaceholders,
+    replacePlaceholders: $23c99379dceee5e4$var$replacePlaceholders,
+    render: $23c99379dceee5e4$var$replacePlaceholders
+};
+function $23c99379dceee5e4$var$replacePlaceholders(template, record) {
+    // Replaces placeholders {{ }} by value from record
+    // Looks for {{ property1.property2 | command:propertyID }}
+    let content = template.replace(/{{(.*?)}}/g, (match, keyString)=>{
+        let value = $23c99379dceee5e4$var$_getValue(keyString, record);
+        return value; // Replace with value 
+    });
+    content = content.replace("  ", " ");
+    return content;
+}
+function $23c99379dceee5e4$var$_getValue(content, record) {
+    if (!content || content === null || content === "") return null;
+    if (!record || record === null || record === "") return null;
+    let keyPath = $23c99379dceee5e4$var$_getKeyPath(content);
+    let values = (0, $2865c5ce12fd7c9f$export$fe5b3308000496d5).getValue(keyPath, record);
+    let command = $23c99379dceee5e4$var$_getCommand(content);
+    let commandProperty = $23c99379dceee5e4$var$_getCommandProperty(content);
+    if (command && command != null && commandProperty && commandProperty != null) values = (0, $336c234775b67d62$export$35d3dd03f0194c3a)?.[command](values, commandProperty);
+    return values;
+}
+function $23c99379dceee5e4$var$_getKeyPath(value) {
+    if (!value || value === null || value === "") return null;
+    let keyString = value.trim();
+    if (!keyString || keyString === null || keyString === "") return null;
+    // Get key 
+    let key = keyString.split("|")[0];
+    key = key.trim(); // Remove any surrounding whitespace
+    if (!key || key === null || key === "") return "";
+    return key;
+}
+function $23c99379dceee5e4$var$_getCommand(value) {
+    if (!value || value === null || value === "") return null;
+    let keyString = value.trim();
+    if (!keyString || keyString === null || keyString === "") return null;
+    // Get commandSection 
+    let commandSection = keyString.split("|")?.[1] || null;
+    if (!commandSection || commandSection === null || commandSection === "") return null;
+    commandSection = commandSection.trim(); // Remove any surrounding whitespace
+    if (!commandSection || commandSection === null || commandSection === "") return null;
+    // Get command
+    let command = commandSection.split(":")?.[0];
+    if (!command || command === null || command === "") return null;
+    command = command.trim();
+    if (!command || command === null || command === "") return null;
+    return command;
+}
+function $23c99379dceee5e4$var$_getCommandProperty(value) {
+    if (!value || value === null || value === "") return null;
+    let keyString = value.trim();
+    if (!keyString || keyString === null || keyString === "") return null;
+    // Get commandSection 
+    let commandSection = keyString.split("|")?.[1] || null;
+    if (!commandSection || commandSection === null || commandSection === "") return null;
+    commandSection = commandSection.trim(); // Remove any surrounding whitespace
+    if (!commandSection || commandSection === null || commandSection === "") return null;
+    // Get command
+    let commandProperty = commandSection.split(":")?.[1];
+    if (!commandProperty || commandProperty === null || commandProperty === "") return null;
+    commandProperty = commandProperty.trim();
+    if (!commandProperty || commandProperty === null || commandProperty === "") return null;
+    return commandProperty;
+}
+
+
 const $c945f2bbf7fa7d9d$export$f8c0f914c8a0ee10 = {
     isNull: $c945f2bbf7fa7d9d$var$isNull,
     isNotNull: $c945f2bbf7fa7d9d$var$isNotNull
@@ -1371,8 +1502,10 @@ const $53bcb33ef2023ce8$export$f936470337fdc8d0 = {
     url: (0, $2974f6a85c45961a$export$b881b526c33ee854),
     value: (0, $5abff2bf4ee17cbb$export$da17952f31714a6e),
     headings: (0, $f5e690043496127e$export$36b1aac33f5f1b68),
+    null: (0, $c945f2bbf7fa7d9d$export$f8c0f914c8a0ee10),
     isNull: (0, $c945f2bbf7fa7d9d$export$f8c0f914c8a0ee10).isNull,
-    isNotNull: (0, $c945f2bbf7fa7d9d$export$f8c0f914c8a0ee10).isNotNull
+    isNotNull: (0, $c945f2bbf7fa7d9d$export$f8c0f914c8a0ee10).isNotNull,
+    template: (0, $23c99379dceee5e4$export$cc74e2e6d445aa47)
 };
 
 

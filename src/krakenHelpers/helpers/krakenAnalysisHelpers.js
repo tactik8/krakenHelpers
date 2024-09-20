@@ -1,10 +1,19 @@
 import { krakenArrayHelpers as ka } from "./krakenArrayHelpers.js";
 import { krakenValueHelpers as kv } from "./krakenValueHelpers.js";
 
+
 export const krakenAnalysisHelpers = {
 
     analyzeValues: analyzeValues,
-    analyze: analyze
+    analyze: analyze,
+    max: getMax,
+    min:getMin,
+    n: getN,
+    sum: getSum,
+    avg: getAverage,
+    stdev: getStandardDeviation,
+    first: getFirst,
+    last: getLast
 };
 
 
@@ -85,6 +94,7 @@ function analyzeValues(value, key) {
         analysis.stddev = getStandardDeviation(value, key);
         
         
+        
     }
 
     return analysis;
@@ -92,6 +102,40 @@ function analyzeValues(value, key) {
 
 
 
+
+
+
+function getFirst(value, key){
+
+    value = ka.ensureArray(value)
+    if(ka.validateArray(value) == false){ return undefined }
+
+    let items = ka.getValuesForKey(value, key)
+    items = ka.ensureArray(items)
+    
+    let [result] = items.slice(0)
+
+
+    return result
+
+}
+
+
+function getLast(value, key){
+
+    value = ka.ensureArray(value)
+    if(ka.validateArray(value) == false){ return undefined }
+
+    let items = ka.getValuesForKey(value, key)
+    items = ka.ensureArray(items)
+
+    let [result] = items.slice(-1)
+
+
+    return result
+
+
+}
 
 
 function getMax(value, key){

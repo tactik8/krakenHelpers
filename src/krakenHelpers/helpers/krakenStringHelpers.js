@@ -1,10 +1,8 @@
+import { krakenDateHelpers } from "./krakenDateHelpers.js";
 
-
-import { krakenDateHelpers } from './krakenDateHelpers.js'
-
+import { krakenDotNotationHelpers } from "./krakenDotNotationHelpers.js";
 
 export const krakenStringHelpers = {
-
     extractMentions: extractMentions,
     extractNames: extractNames,
     extractValueAndUnit: extractValueAndUnit,
@@ -13,15 +11,43 @@ export const krakenStringHelpers = {
     extractPhoneNumbers: extractPhoneNumbers,
     extractDates: extractDates,
     extractEmails: extractEmails,
-    
-    
+    toCamelCase: toCamelCase,
+    fromCamelCase: fromCamelCase
+};
+
+
+
+function toCamelCase(str) {
+    return (
+        str
+            // Split the string by spaces, underscores, or hyphens
+            .split(/[-_\s]+/)
+            // Convert the first word to lowercase and capitalize the first letter of the following words
+            .map((word, index) =>
+                index === 0
+                    ? word.toLowerCase()
+                    : word.charAt(0).toUpperCase() +
+                      word.slice(1).toLowerCase(),
+            )
+            // Join them back into a single string
+            .join("")
+    );
 }
 
+function fromCamelCase(str) {
+    return (
+        str
+            // Insert a space before every uppercase letter and convert the whole string to lowercase
+            .replace(/([A-Z])/g, " $1")
+            .toLowerCase()
+            .trim()
+    );
+}
 
 function extractMentions(text) {
     // Error handling for invalid input
-    if (typeof text !== 'string') {
-        throw new Error('Input must be a string');
+    if (typeof text !== "string") {
+        throw new Error("Input must be a string");
     }
 
     // Regular expression to match mentions
@@ -33,8 +59,8 @@ function extractMentions(text) {
 }
 
 function extractNames(inputString) {
-    if (typeof inputString !== 'string') {
-        throw new TypeError('Input must be a string');
+    if (typeof inputString !== "string") {
+        throw new TypeError("Input must be a string");
     }
 
     const namePattern = /\b[A-Z][a-z]*\b/g;
@@ -44,15 +70,15 @@ function extractNames(inputString) {
 }
 
 function extractValueAndUnit(input) {
-    if (typeof input !== 'string') {
-        throw new Error('Input must be a string');
+    if (typeof input !== "string") {
+        throw new Error("Input must be a string");
     }
 
     const regex = /(-?\d+\.?\d*)\s*([a-zA-Z]+)/;
     const match = input.match(regex);
 
     if (!match) {
-        throw new Error('No value and unit found in the input string');
+        throw new Error("No value and unit found in the input string");
     }
 
     const value = parseFloat(match[1]);
@@ -61,12 +87,9 @@ function extractValueAndUnit(input) {
     return { value, unit };
 }
 
-
-
-
 function extractNumbers(input) {
-    if (typeof input !== 'string') {
-        throw new Error('Input must be a string');
+    if (typeof input !== "string") {
+        throw new Error("Input must be a string");
     }
 
     const numbers = input.match(/\d+/g);
@@ -77,17 +100,16 @@ function extractNumbers(input) {
     return numbers.map(Number);
 }
 
-
 function extractPhoneNumbers(input) {
     // Error handling: check if input is a string
-    if (typeof input !== 'string') {
-        throw new Error('Input must be a string');
+    if (typeof input !== "string") {
+        throw new Error("Input must be a string");
     }
 
     // Regular expression to match different telephone number formats
     //const phoneRegex = /(\+?\d{1,2}[-.\s]?)?(\(?\d{3}\)?[-.\s]?)?\d{3}[-.\s]?\d{4}/g;
-    const phoneRegex = /(?:([+]\d{1,4})[-.\s]?)?(?:[(](\d{1,3})[)][-.\s]?)?(\d{1,4})[-.\s]?(\d{1,4})[-.\s]?(\d{1,9})/g
-
+    const phoneRegex =
+        /(?:([+]\d{1,4})[-.\s]?)?(?:[(](\d{1,3})[)][-.\s]?)?(\d{1,4})[-.\s]?(\d{1,4})[-.\s]?(\d{1,9})/g;
 
     // Extract phone numbers
     const phoneNumbers = input.match(phoneRegex);
@@ -100,68 +122,62 @@ function extractPhoneNumbers(input) {
     return phoneNumbers;
 }
 
-
-
-
-
 function extractDates(input) {
     try {
-        if (typeof input !== 'string') {
-            return []
+        if (typeof input !== "string") {
+            return [];
         }
 
         // Regular expression to match dates in YYYY-MM-DD, DD/MM/YYYY, or MM-DD-YYYY format
-        const datePattern = /\b(\d{4}-\d{2}-\d{2}|\d{2}\/\d{2}\/\d{4}|\d{2}-\d{2}-\d{4})\b/g;
+        const datePattern =
+            /\b(\d{4}-\d{2}-\d{2}|\d{2}\/\d{2}\/\d{4}|\d{2}-\d{2}-\d{4})\b/g;
         const dates = input.match(datePattern);
 
         if (!dates) {
             return [];
         }
 
-        let validDates = []
-        for(let date of dates){
-
-            let d = krakenDateHelpers.toDate(date) 
-            if(d && d != null){
-                validDates.push(d)
+        let validDates = [];
+        for (let date of dates) {
+            let d = krakenDateHelpers.toDate(date);
+            if (d && d != null) {
+                validDates.push(d);
             }
         }
-        
+
         return validDates;
-        
     } catch (error) {
         return [];
     }
 }
 
-
 function extractEmails(text) {
-  try {
-    // Check if the input is a string
-    if (typeof text !== 'string') {
-      throw new Error('Input must be a string');
+    try {
+        // Check if the input is a string
+        if (typeof text !== "string") {
+            throw new Error("Input must be a string");
+        }
+
+        // Regular expression for matching email addresses
+        const emailRegex =
+            /\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,7}\b/g;
+        const emails = text.match(emailRegex);
+
+        // Check if any emails were found
+        if (emails === null) {
+            throw new Error("No email addresses found");
+        }
+
+        return emails;
+    } catch (error) {
+        return `Error: ${error.message}`;
     }
-
-    // Regular expression for matching email addresses
-    const emailRegex = /\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,7}\b/g;
-    const emails = text.match(emailRegex);
-
-    // Check if any emails were found
-    if (emails === null) {
-      throw new Error('No email addresses found');
-    }
-
-    return emails;
-  } catch (error) {
-    return `Error: ${error.message}`;
-  }
 }
-
 
 function extractUrls(text) {
     try {
-        if (typeof text !== 'string') {
-            throw new Error('Input must be a string');
+        if (typeof text !== "string") {
+            throw new Error("Input must be a string");
         }
 
         const urlRegex = /https?:\/\/[^\s/$.?#].[^\s]*/g;
@@ -173,7 +189,7 @@ function extractUrls(text) {
 
         return urls;
     } catch (error) {
-        console.error('An error occurred:', error.message);
+        console.error("An error occurred:", error.message);
         return [];
     }
 }

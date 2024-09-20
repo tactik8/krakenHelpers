@@ -42,10 +42,9 @@ async function test(){
 
     let r = k.dot.toDot(record)
     
-    console.log(k.dot.getValue('hasOccupation[0].name', r))
     
     
-    let template = 'name: {{givenName}} {{familyName}} cie: {{hasOccupation | sum: amount.mnt}} {{hasOccupation | max: amount.curr}}'
+    let template = 'name: {{givenName}} {{familyName}} cie: {{hasOccupation | sum: amount.mnt}} {{hasOccupation | first: amount.curr}}'
 
     let content = k.template.replacePlaceholders(template, record)
 

@@ -8,6 +8,58 @@ export const krakenDotNotationHelpers = {
 
 
 
+
+function getPropertyValueFromDot(key, value){
+    // Retrieves value by following dot notation
+
+
+
+    function _recursive(key, value){
+
+        // Get property
+        let keyItems = key.split('.')
+        let keyItem1 = keyItems?.[0]
+        
+
+        let property1 = keyItem1.split('[')[0]
+        let position1 = keyItem1.split('[')[1] || null
+        
+        let value1 = value?.[property1]
+
+        if(position1){
+            try{
+                position1 = position1.replace(']', '')
+                position1 = position1.trim()
+                position1 = Number(position1)
+                if(!Array.isArray(value1)){value1 = [value1]}
+                value1 = value1?.[arrayPosition] || null
+            } catch {
+
+            }
+        }
+        
+        // Check if done, else recurse
+        if(keyItems.length > 1){
+            let newKeys = keyItems.slice(1)
+            let newKey = newKeys.join('.')
+            return _recursive(newKey, value1)
+        } else {
+            return value1
+        }
+        
+        
+    }
+
+    
+    return _recursive(key, value);
+
+
+    
+}
+
+
+
+
 function convertToDotNotation(obj, parentKey = '', result = {}) {
     for (let key in obj) {
         if (obj.hasOwnProperty(key)) {
@@ -38,18 +90,6 @@ function convertToDotNotation(obj, parentKey = '', result = {}) {
 }
 
 
-function getPropertyValueFromDot(key, value){
-    // Retrieves value by following dot notation
-
-    var items =key.split('.');
-
-    for (let t=0; t<items.length; t++){
-        value = value[items[t]];
-    };
-
-
-    return value;
-}
 
 function convertFromDotNotation(dotNotationObj) {
     const result = {};

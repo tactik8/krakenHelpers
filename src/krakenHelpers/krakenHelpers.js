@@ -17,6 +17,7 @@ import { krakenUrlHelpers } from './helpers/krakenUrlHelpers.js'
 import { krakenValueHelpers } from './helpers/krakenValueHelpers.js'
 import { krakenApiHelpers } from './helpers/krakenApiHelpers.js'
 import { krakenHeadingsHelpers } from './helpers/krakenHeadingsHelpers.js'
+import { krakenTemplateHelpers } from './helpers/krakenTemplateHelpers.js'
 
 import { krakenNullHelpers } from './helpers/krakenNullHelpers.js'
 
@@ -45,6 +46,8 @@ export const krakenHelpers = {
     url: krakenUrlHelpers,
     value: krakenValueHelpers,
     headings: krakenHeadingsHelpers,
+    null: krakenNullHelpers,
     isNull: krakenNullHelpers.isNull,
-    isNotNull: krakenNullHelpers.isNotNull
+    isNotNull: krakenNullHelpers.isNotNull,
+    template: krakenTemplateHelpers
 }

@@ -1,6 +1,7 @@
 import { krakenNumberHelpers } from './krakenNumberHelpers.js'
 import { krakenObjectHelpers } from './krakenObjectHelpers.js'
 
+import { krakenDotNotationHelpers } from './krakenDotNotationHelpers.js'
 
 
 export const krakenArrayHelpers = {
@@ -85,7 +86,7 @@ function getValuesForKey(value, key){
 
     let results = []
     for(let v of value){
-        let v1 = v?.[key] 
+        let v1 = krakenDotNotationHelpers.getValue(key, v) //v?.[key] 
         if(v1){
             results.push(v1)
         }
