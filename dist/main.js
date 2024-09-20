@@ -1273,7 +1273,6 @@ function $f5e690043496127e$var$getConfig() {
 
 
 
-
 const $23c99379dceee5e4$export$cc74e2e6d445aa47 = {
     get: $23c99379dceee5e4$var$replacePlaceholders,
     replacePlaceholders: $23c99379dceee5e4$var$replacePlaceholders,
@@ -1286,9 +1285,15 @@ function $23c99379dceee5e4$var$replacePlaceholders(template, record) {
 }
 function $23c99379dceee5e4$var$replacePlaceholdersLists(template, record) {
     // Replace simple {{name}} placeholders
-    //let result = template.replace(/{{(.*?)}}/g, (_, key) => _getValue(key, record)  || '');
+    console.log(template);
+    console.log(typeof template);
+    if (!template || template == null || template === "") return template;
+    while(template.includes("{{ "))template = template.replace("{{ ", "{{");
+    while(template.includes(" }}"))template = template.replace(" }}", "}}");
+    while(template.includes("{{# "))template = template.replace("{{# ", "{{#");
+    while(template.includes("{{/ "))template = template.replace("{{/ ", "{{/");
     while(template.includes("{{#")){
-        // Get last 
+        // Get last
         let parts = template.split("{{#");
         let propertyContent = parts[parts.length - 1];
         let contentBefore = parts.slice(0, parts.length - 1).join("{{#");
@@ -1297,7 +1302,7 @@ function $23c99379dceee5e4$var$replacePlaceholdersLists(template, record) {
         valueContentItems = valueContentItems.slice(1);
         let valueContent = valueContentItems.join("}}");
         let content = valueContent.split("{{/" + propertyID)[0];
-        let contentAfter = valueContent.split("{{/" + propertyID).slice(1).join("{{/");
+        let contentAfter = valueContent.split("{{/" + propertyID + "}}").slice(1).join("{{/");
         // Get values
         let values = (0, $2865c5ce12fd7c9f$export$fe5b3308000496d5).getValue(propertyID, record);
         if (!Array.isArray(values)) values = [
@@ -1310,7 +1315,7 @@ function $23c99379dceee5e4$var$replacePlaceholdersLists(template, record) {
             tempRecord = (0, $2865c5ce12fd7c9f$export$fe5b3308000496d5).setValue(tempRecord, propertyID, value);
             partsContent += $23c99379dceee5e4$var$replacePlaceholdersValues(content, tempRecord);
         }
-        template = contentBefore + partsContent + contentAfter;
+        template = String(contentBefore) + String(partsContent) + String(contentAfter);
     }
     return template;
 }
@@ -1319,7 +1324,7 @@ function $23c99379dceee5e4$var$replacePlaceholdersValues(template, record) {
     // Looks for {{ property1.property2 | command:propertyID }}
     let content = template.replace(/{{(.*?)}}/g, (match, keyString)=>{
         let value = $23c99379dceee5e4$var$_getValue(keyString, record);
-        return value; // Replace with value 
+        return value; // Replace with value
     });
     content = content.replace("  ", " ");
     return content;
@@ -1338,7 +1343,7 @@ function $23c99379dceee5e4$var$_getKeyPath(value) {
     if (!value || value === null || value === "") return null;
     let keyString = value.trim();
     if (!keyString || keyString === null || keyString === "") return null;
-    // Get key 
+    // Get key
     let key = keyString.split("|")[0];
     key = key.trim(); // Remove any surrounding whitespace
     if (!key || key === null || key === "") return "";
@@ -1348,7 +1353,7 @@ function $23c99379dceee5e4$var$_getCommand(value) {
     if (!value || value === null || value === "") return null;
     let keyString = value.trim();
     if (!keyString || keyString === null || keyString === "") return null;
-    // Get commandSection 
+    // Get commandSection
     let commandSection = keyString.split("|")?.[1] || null;
     if (!commandSection || commandSection === null || commandSection === "") return null;
     commandSection = commandSection.trim(); // Remove any surrounding whitespace
@@ -1364,7 +1369,7 @@ function $23c99379dceee5e4$var$_getCommandProperty(value) {
     if (!value || value === null || value === "") return null;
     let keyString = value.trim();
     if (!keyString || keyString === null || keyString === "") return null;
-    // Get commandSection 
+    // Get commandSection
     let commandSection = keyString.split("|")?.[1] || null;
     if (!commandSection || commandSection === null || commandSection === "") return null;
     commandSection = commandSection.trim(); // Remove any surrounding whitespace

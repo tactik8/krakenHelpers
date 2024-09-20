@@ -663,7 +663,7 @@
 77/home/runner/krakenHelpers/node_modules/lightningcss-linux-x64-musl/README.md1722860353738607434 0
 80/home/runner/krakenHelpers/node_modules/lightningcss-linux-x64-musl/package.json1722860353738607434 0
 67/home/runner/krakenHelpers/node_modules/lightningcss-linux-x64-musl1722860353738607434 1
-58/home/runner/krakenHelpers/node_modules/.package-lock.json1726847021301284325 0
+58/home/runner/krakenHelpers/node_modules/.package-lock.json1726859268577011883 0
 54/home/runner/krakenHelpers/node_modules/.bin/escodegen1722860366686581858 0
 55/home/runner/krakenHelpers/node_modules/.bin/esgenerate1722860366682581866 0
 50/home/runner/krakenHelpers/node_modules/.bin/acorn1722860366682581866 0
@@ -3873,7 +3873,7 @@
 92/home/runner/krakenHelpers/node_modules/@parcel/packager-js/node_modules/type-fest/readme.md1722859817911665822 0
 55/home/runner/krakenHelpers/node_modules/cliui/README.md1722859817531666573 0
 58/home/runner/krakenHelpers/node_modules/@parcel/diagnostic1722859818095665459 1
-47/home/runner/krakenHelpers/node_modules/@parcel1726847020903284886 1
+47/home/runner/krakenHelpers/node_modules/@parcel1726859268134012204 1
 83/home/runner/krakenHelpers/node_modules/@sinonjs/fake-timers/src/fake-timers-src.js1722859818031665585 0
 61/home/runner/krakenHelpers/.cache/typescript/5.5/package.json1726837232289798854 0
 83/home/runner/krakenHelpers/node_modules/@sinonjs/commons/types/value-to-string.d.ts1722859819275663128 0
@@ -5869,7 +5869,7 @@
 78/home/runner/krakenHelpers/node_modules/@swc/helpers/_/_ts_values/package.json1722859820363660979 0
 78/home/runner/krakenHelpers/node_modules/js-yaml/lib/js-yaml/schema/failsafe.js1722859818227665198 0
 105/home/runner/krakenHelpers/.cache/typescript/5.5/node_modules/@babel/types/lib/converters/toIdentifier.js1726837232159799194 0
-80/home/runner/krakenHelpers/.cache/typescript/5.5/node_modules/.package-lock.json1726854713516348393 0
+80/home/runner/krakenHelpers/.cache/typescript/5.5/node_modules/.package-lock.json1726859358055627523 0
 92/home/runner/krakenHelpers/node_modules/@parcel/codeframe/node_modules/color-convert/LICENSE1722859817271667086 0
 73/home/runner/krakenHelpers/node_modules/babel-plugin-polyfill-corejs3/esm1722859818235665182 1
 80/home/runner/krakenHelpers/node_modules/@parcel/utils/src/generateCertificate.js1722859818783664100 0
@@ -5914,7 +5914,7 @@
 72/home/runner/krakenHelpers/node_modules/@parcel/utils/src/getExisting.js1722859818811664045 0
 89/home/runner/krakenHelpers/node_modules/@babel/runtime/helpers/objectWithoutProperties.js1722859819983661729 0
 92/home/runner/krakenHelpers/node_modules/jsdom/lib/jsdom/living/nodes/HTMLHeadElement-impl.js1722860366602582025 0
-31/home/runner/krakenHelpers/dist1726858495615569304 1
+31/home/runner/krakenHelpers/dist1726860542800419503 1
 58/home/runner/krakenHelpers/node_modules/anymatch/README.md1722859817499666636 0
 91/home/runner/krakenHelpers/node_modules/@jest/reporters/node_modules/color-convert/index.js1722859817167667292 0
 85/home/runner/krakenHelpers/node_modules/@babel/plugin-syntax-dynamic-import/README.md1722859817075667474 0
@@ -6826,7 +6826,7 @@
 121/home/runner/krakenHelpers/node_modules/@parcel/optimizer-htmlnano/node_modules/svgo/plugins/removeUnknownsAndDefaults.js1722859819651662385 0
 86/home/runner/krakenHelpers/node_modules/@babel/types/lib/validators/generated/index.js1722859820163661374 0
 87/home/runner/krakenHelpers/node_modules/@babel/runtime/helpers/taggedTemplateLiteral.js1722859820007661682 0
-39/home/runner/krakenHelpers/node_modules1726847020902284888 1
+39/home/runner/krakenHelpers/node_modules1726859268133012205 1
 96/home/runner/krakenHelpers/.cache/typescript/5.4/node_modules/@sinclair/typebox/value/value.d.ts1722859278260731767 0
 110/home/runner/krakenHelpers/node_modules/pure-rand/lib/esm/types/distribution/UnsafeUniformIntDistribution.d.ts1722859819311663057 0
 54/home/runner/krakenHelpers/node_modules/supports-color1722859816955667711 1
@@ -6960,7 +6960,7 @@
 103/home/runner/krakenHelpers/.cache/typescript/5.4/node_modules/@babel/types/lib/builders/validateNode.js1722859278268731751 0
 75/home/runner/krakenHelpers/node_modules/dom-serializer/lib/esm/package.json1722859818023665601 0
 98/home/runner/krakenHelpers/node_modules/@parcel/optimizer-htmlnano/node_modules/css-tree/lib/lexer1722859820023661651 1
-26/home/runner/krakenHelpers1726858476688583288 1
+26/home/runner/krakenHelpers1726860497250542522 1
 93/home/runner/krakenHelpers/node_modules/jsdom/lib/jsdom/living/nodes/HTMLLabelElement-impl.js1722860366606582017 0
 79/home/runner/krakenHelpers/node_modules/regjsparser/node_modules/jsesc/jsesc.js1722859817751666139 0
 65/home/runner/krakenHelpers/node_modules/@babel/regjsgen/README.md1722859817619666400 0
@@ -7540,7 +7540,7 @@
 82/home/runner/krakenHelpers/node_modules/@babel/types/lib/converters/valueToNode.js1722859819803662086 0
 107/home/runner/krakenHelpers/node_modules/@parcel/transformer-svg/node_modules/semver/internal/identifiers.js1722859818491664677 0
 83/home/runner/krakenHelpers/.cache/typescript/5.4/node_modules/stack-utils/readme.md1722859278096732092 0
-51/home/runner/krakenHelpers/.cache/replit/env/latest1726854695114361075 0
+51/home/runner/krakenHelpers/.cache/replit/env/latest1726859353085641056 0
 61/home/runner/krakenHelpers/node_modules/yargs/locales/hu.json1722859819343662994 0
 89/home/runner/krakenHelpers/node_modules/@parcel/reporter-dev-server/lib/ServerReporter.js1722859819635662417 0
 53/home/runner/krakenHelpers/node_modules/@babel/parser1722859819655662377 1
@@ -7914,7 +7914,7 @@
 97/home/runner/krakenHelpers/node_modules/csso/node_modules/css-tree/lib/syntax/config/generator.js1722859820167661366 0
 90/home/runner/krakenHelpers/.cache/typescript/5.4/node_modules/undici-types/dispatcher.d.ts1722859278108732068 0
 68/home/runner/krakenHelpers/node_modules/@jest/console/build/types.js1722859817795666051 0
-56/home/runner/krakenHelpers/.cache/replit/env/latest.json1726854695115361074 0
+56/home/runner/krakenHelpers/.cache/replit/env/latest.json1726859353085641056 0
 101/home/runner/krakenHelpers/.cache/typescript/5.4/node_modules/react-is/umd/react-is.production.min.js1722859278048732186 0
 97/home/runner/krakenHelpers/.cache/typescript/5.5/node_modules/@types/babel__traverse/package.json1726837231884799915 0
 103/home/runner/krakenHelpers/node_modules/@parcel/optimizer-svgo/node_modules/mdn-data/css/selectors.json1722859819295663089 0
@@ -8477,7 +8477,7 @@
 100/home/runner/krakenHelpers/node_modules/regenerate-unicode-properties/Script_Extensions/Inherited.js1722859819895661904 0
 101/home/runner/krakenHelpers/node_modules/@parcel/optimizer-svgo/node_modules/svgo/plugins/prefixIds.js1722859819395662891 0
 95/home/runner/krakenHelpers/node_modules/@babel/plugin-transform-block-scoping/lib/validation.js1722859818427664803 0
-45/home/runner/krakenHelpers/node_modules/@lmdb1726847020903284886 1
+45/home/runner/krakenHelpers/node_modules/@lmdb1726859268135012203 1
 114/home/runner/krakenHelpers/node_modules/@babel/plugin-bugfix-v8-static-class-fields-redefine-readonly/package.json1722859817971665704 0
 58/home/runner/krakenHelpers/node_modules/jest-leak-detector1722859817499666636 1
 75/home/runner/krakenHelpers/node_modules/yargs/build/lib/utils/is-promise.js1722859818771664123 0
@@ -8518,7 +8518,7 @@
 88/home/runner/krakenHelpers/node_modules/@jest/transform/node_modules/has-flag/index.d.ts1722859816655668304 0
 60/home/runner/krakenHelpers/node_modules/lmdb/src/lmdb-js.cpp1722859820015661667 0
 30/home/runner/krakenHelpers/src1724243884994802708 1
-52/home/runner/krakenHelpers/src/krakenHelpers/helpers1726857683427170618 1
+52/home/runner/krakenHelpers/src/krakenHelpers/helpers1726860487223569604 1
 58/home/runner/krakenHelpers/node_modules/msgpackr/README.md1722859819923661847 0
 114/home/runner/krakenHelpers/node_modules/@parcel/optimizer-htmlnano/node_modules/css-tree/lib/syntax/scope/index.js1722859819863661967 0
 108/home/runner/krakenHelpers/node_modules/@parcel/transformer-svg/node_modules/semver/ranges/to-comparators.js1722859819283663112 0
@@ -8596,7 +8596,7 @@
 105/home/runner/krakenHelpers/node_modules/@parcel/core/test/fixtures/library-custom-scopehoist/package.json1722859820259661185 0
 79/home/runner/krakenHelpers/node_modules/@jest/console/node_modules/chalk/source1722859816971667678 1
 74/home/runner/krakenHelpers/node_modules/@parcel/logger/test/Logger.test.js1722859817931665783 0
-39/home/runner/krakenHelpers/dist/main.js1726858495607569310 0
+39/home/runner/krakenHelpers/dist/main.js1726860542795419517 0
 55/home/runner/krakenHelpers/.github/workflows/static.yml1722626434780681088 0
 70/home/runner/krakenHelpers/node_modules/jest-config/build/constants.js1722859817295667040 0
 71/home/runner/krakenHelpers/node_modules/caniuse-lite/data/regions/MX.js1722859820475660758 0
@@ -8604,10 +8604,10 @@
 77/home/runner/krakenHelpers/node_modules/@babel/plugin-syntax-class-properties1722859817311667008 1
 62/home/runner/krakenHelpers/node_modules/source-map/lib/util.js1722859818287665080 0
 71/home/runner/krakenHelpers/node_modules/@babel/helper-string-parser/lib1722859816959667703 1
-31/home/runner/krakenHelpers/.upm1726847021611283888 1
+31/home/runner/krakenHelpers/.upm1726860472287609945 1
 83/home/runner/krakenHelpers/node_modules/@babel/types/lib/validators/validate.js.map1722859820227661248 0
 109/home/runner/krakenHelpers/node_modules/@parcel/optimizer-htmlnano/node_modules/css-select/lib/index.d.ts.map1722859818683664297 0
-42/home/runner/krakenHelpers/.upm/store.json1726847021611283888 0
+42/home/runner/krakenHelpers/.upm/store.json1726860472287609945 0
 79/home/runner/krakenHelpers/node_modules/css-tree/cjs/syntax/node/MediaQuery.cjs1722859819811662070 0
 82/home/runner/krakenHelpers/node_modules/jest-runtime/node_modules/has-flag/license1722859816967667687 0
 65/home/runner/krakenHelpers/node_modules/@jridgewell/trace-mapping1722859818459664740 1
@@ -9175,7 +9175,7 @@
 90/home/runner/krakenHelpers/node_modules/jest-runner/node_modules/supports-color/browser.js1722859816651668310 0
 110/home/runner/krakenHelpers/node_modules/@parcel/optimizer-svgo/node_modules/css-tree/lib/common/TokenStream.js1722859820019661659 0
 78/home/runner/krakenHelpers/node_modules/jest-config/build/resolveConfigPath.js1722859818595664472 0
-44/home/runner/krakenHelpers/package-lock.json1726847021162284521 0
+44/home/runner/krakenHelpers/package-lock.json1726859268409012005 0
 76/home/runner/krakenHelpers/node_modules/@babel/plugin-syntax-top-level-await1722859817311667008 1
 84/home/runner/krakenHelpers/node_modules/@babel/plugin-syntax-top-level-await/LICENSE1722859816979667664 0
 108/home/runner/krakenHelpers/node_modules/@parcel/optimizer-svgo/node_modules/css-tree/lib/convertor/create.js1722859818791664084 0
@@ -11981,7 +11981,7 @@
 76/home/runner/krakenHelpers/node_modules/@parcel/bundler-default/package.json1722859818547664566 0
 59/home/runner/krakenHelpers/node_modules/@lezer/lr/README.md1722859818751664163 0
 89/home/runner/krakenHelpers/node_modules/css-select/node_modules/domutils/lib/traversal.js1722859818619664424 0
-44/home/runner/krakenHelpers/node_modules/@swc1726847020902284888 1
+44/home/runner/krakenHelpers/node_modules/@swc1726859268134012204 1
 61/home/runner/krakenHelpers/node_modules/@swc/counter/index.js1722859817127667371 0
 65/home/runner/krakenHelpers/node_modules/@swc/counter/CHANGELOG.md1722859817215667197 0
 54/home/runner/krakenHelpers/node_modules/domelementtype1722859817987665672 1
@@ -12137,7 +12137,7 @@
 88/home/runner/krakenHelpers/node_modules/@jest/console/node_modules/ansi-styles/readme.md1722859816971667678 0
 91/home/runner/krakenHelpers/node_modules/@swc/helpers/esm/_class_private_field_loose_base.js1722859819775662140 0
 88/home/runner/krakenHelpers/node_modules/css-select/lib/esm/pseudo-selectors/filters.d.ts1722859819615662457 0
-66/home/runner/krakenHelpers/.cache/typescript/5.5/package-lock.json1726854713514348394 0
+66/home/runner/krakenHelpers/.cache/typescript/5.5/package-lock.json1726859358053627528 0
 81/home/runner/krakenHelpers/.cache/typescript/5.4/node_modules/braces/lib/utils.js1722859278056732170 0
 90/home/runner/krakenHelpers/node_modules/@swc/helpers/esm/_class_private_field_loose_key.js1722859819779662132 0
 51/home/runner/krakenHelpers/node_modules/ansi-styles1722859816775668066 1
@@ -12542,7 +12542,7 @@
 83/home/runner/krakenHelpers/node_modules/@lmdb/lmdb-linux-x64/node.abi108.glibc.node1722859819515662654 0
 107/home/runner/krakenHelpers/node_modules/@parcel/transformer-html/node_modules/semver/functions/satisfies.js1722859819147663381 0
 81/home/runner/krakenHelpers/node_modules/@lmdb/lmdb-linux-x64/node.napi.glibc.node1722859819987661721 0
-57/home/runner/krakenHelpers/node_modules/@msgpackr-extract1726847020903284886 1
+57/home/runner/krakenHelpers/node_modules/@msgpackr-extract1726859268134012204 1
 81/home/runner/krakenHelpers/.cache/typescript/5.4/node_modules/jest-diff/README.md1722859278200731886 0
 55/home/runner/krakenHelpers/node_modules/@babel/core/lib1722859819987661721 1
 86/home/runner/krakenHelpers/node_modules/@parcel/core/node_modules/semver/ranges/ltr.js1722859818587664487 0
@@ -13134,7 +13134,7 @@
 90/home/runner/krakenHelpers/node_modules/jest-snapshot/node_modules/semver/functions/lte.js1722859818563664534 0
 87/home/runner/krakenHelpers/node_modules/@babel/runtime/helpers/classPrivateFieldGet2.js1722859818779664108 0
 92/home/runner/krakenHelpers/node_modules/jest-snapshot/node_modules/semver/functions/minor.js1722859818727664211 0
-39/home/runner/krakenHelpers/package.json1726858476654583313 0
+39/home/runner/krakenHelpers/package.json1726860497231542573 0
 78/home/runner/krakenHelpers/.cache/typescript/5.4/node_modules/@babel/highlight1722859278116732052 1
 97/home/runner/krakenHelpers/node_modules/jest-snapshot/node_modules/semver/functions/prerelease.js1722859818915663839 0
 85/home/runner/krakenHelpers/node_modules/babel-jest/node_modules/color-convert/LICENSE1722859817287667055 0
@@ -13886,7 +13886,7 @@
 61/home/runner/krakenHelpers/node_modules/posthtml/node_modules1722859813891673762 1
 75/home/runner/krakenHelpers/node_modules/css-select/lib/esm/compile.d.ts.map1722859819143663389 0
 73/home/runner/krakenHelpers/node_modules/css-select/lib/esm/compile.js.map1722859819167663342 0
-77/home/runner/krakenHelpers/src/krakenHelpers/helpers/krakenTemplateHelpers.js1726857683423170621 0
+77/home/runner/krakenHelpers/src/krakenHelpers/helpers/krakenTemplateHelpers.js1726860487192569687 0
 73/home/runner/krakenHelpers/node_modules/css-select/lib/esm/index.d.ts.map1722859819263663152 0
 73/home/runner/krakenHelpers/node_modules/make-dir/node_modules/.bin/semver1722859822807656151 0
 63/home/runner/krakenHelpers/node_modules/undici-types/fetch.d.ts1722859818195665262 0
@@ -13975,7 +13975,7 @@
 89/home/runner/krakenHelpers/node_modules/wrap-ansi/node_modules/color-convert/package.json1722859816187669228 0
 79/home/runner/krakenHelpers/node_modules/csso/lib/restructure/6-restructBlock.js1722859819355662970 0
 91/home/runner/krakenHelpers/node_modules/wrap-ansi/node_modules/color-convert/conversions.js1722859816959667703 0
-43/home/runner/krakenHelpers/dist/main.js.map1726858495611569307 0
+43/home/runner/krakenHelpers/dist/main.js.map1726860542800419503 0
 44/home/runner/krakenHelpers/node_modules/exit1722859818519664622 1
 76/home/runner/krakenHelpers/node_modules/@jest/console/build/CustomConsole.js1722859817367666897 0
 85/home/runner/krakenHelpers/node_modules/wrap-ansi/node_modules/color-convert/index.js1722859817159667308 0
