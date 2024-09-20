@@ -3,10 +3,78 @@
 export const krakenDotNotationHelpers = {
     toDot: convertToDotNotation,
     fromDot: convertFromDotNotation,
-    getValue: getPropertyValueFromDot
+    getValue: getPropertyValueFromDot,
+    setValue: setPropertyValueFromDot
 }
 
 
+
+function setPropertyValueFromDot(record, key, value){
+
+    function _recursiveSet(record, key, value){
+
+        // Get property
+        let keyItems = key.split('.')
+        let keyItem1 = keyItems?.[0]
+
+
+        let property1 = keyItem1.split('[')[0]
+        let position1 = keyItem1.split('[')[1] || null
+
+        
+        
+        let value1 = value?.[property1]
+
+
+        if(position1 && position1 != null){
+           
+            try{
+                position1 = position1.replace(']', '')
+                position1 = position1.trim()
+                position1 = Number(position1)
+                if(!Array.isArray(value1)){value1 = [value1]}
+                value1 = value1?.[arrayPosition] || null
+            } catch {
+
+            }
+        }
+
+        // Check if done, else recurse
+        if(keyItems.length > 1){
+            let newKeys = keyItems.slice(1)
+            let newKey = newKeys.join('.')
+
+            if(!position1 || position1 == null){
+                if(!value1){ value1 = {}}
+                record[property1] = _recursiveSet(value1, newKey, value)
+                return record
+            } else {
+                if(!value1){ value1 = []}
+                record[property1][position1] = _recursiveSet(value1, newKey, value) 
+                return record
+            }
+            
+        } else {
+
+            if(!position1 || position1 == null){
+                if(!record?.[property1]){ record[property1] = {}}
+                record[property1] = value
+                return record
+            } else {
+                if(!record?.[property1]){ record[property1] = []}
+                record[property1][position1] = value 
+                return record
+            }
+
+        }
+
+
+    }
+
+
+    return _recursiveSet(record, key, value);
+    
+}
 
 
 function getPropertyValueFromDot(key, value){
@@ -26,6 +94,7 @@ function getPropertyValueFromDot(key, value){
         
         let value1 = value?.[property1]
 
+        
         if(position1){
             try{
                 position1 = position1.replace(']', '')
@@ -52,8 +121,6 @@ function getPropertyValueFromDot(key, value){
 
     
     return _recursive(key, value);
-
-
     
 }
 

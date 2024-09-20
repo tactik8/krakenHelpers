@@ -1,5 +1,6 @@
 import {krakenAnalysisHelpers } from './krakenAnalysisHelpers.js'
 import { krakenDotNotationHelpers } from "./krakenDotNotationHelpers.js";
+import { krakenJsonHelpers } from './krakenJsonHelpers.js';
 
 
 
@@ -11,9 +12,70 @@ export const krakenTemplateHelpers = {
     
 }
 
-
-
 function replacePlaceholders(template, record) {
+
+    template = replacePlaceholdersLists(template, record) 
+    template = replacePlaceholdersValues(template, record) 
+    return template
+
+}
+
+
+
+
+
+function replacePlaceholdersLists(template, record) {
+  // Replace simple {{name}} placeholders
+  //let result = template.replace(/{{(.*?)}}/g, (_, key) => _getValue(key, record)  || '');
+
+
+
+    while(template.includes('{{#')){
+        // Get last 
+        let parts = template.split('{{#')
+        let propertyContent = parts[parts.length -1]
+        let contentBefore = parts.slice(0, parts.length -1).join('{{#')
+    
+    
+        let propertyID = propertyContent.split('}}')[0]
+        let valueContentItems = propertyContent.split('}}')
+        valueContentItems = valueContentItems.slice(1)
+        let valueContent = valueContentItems.join('}}')
+    
+        
+        let content = valueContent.split('{{/' + propertyID)[0]
+        let contentAfter = valueContent.split('{{/' + propertyID).slice(1).join('{{/')
+         
+        
+        
+    
+        // Get values
+        let values = krakenDotNotationHelpers.getValue(propertyID, record)
+        if(!Array.isArray(values)){ values = [values]}
+
+
+        let partsContent = ''
+        for(let i=0; i < values.length; i++){
+            let value = values[i]
+            let tempRecord = JSON.parse(JSON.stringify(record))
+            tempRecord =  krakenDotNotationHelpers.setValue(tempRecord, propertyID, value )
+            partsContent += replacePlaceholdersValues(content, tempRecord)
+        }
+
+        template = contentBefore + partsContent + contentAfter
+            
+
+    }
+    
+    
+  
+
+  return template;
+}
+
+
+
+function replacePlaceholdersValues(template, record) {
     // Replaces placeholders {{ }} by value from record
     // Looks for {{ property1.property2 | command:propertyID }}
 

@@ -51,8 +51,51 @@ function $1fd01b1ecffa6019$var$toText(value) {
 const $2865c5ce12fd7c9f$export$fe5b3308000496d5 = {
     toDot: $2865c5ce12fd7c9f$var$convertToDotNotation,
     fromDot: $2865c5ce12fd7c9f$var$convertFromDotNotation,
-    getValue: $2865c5ce12fd7c9f$var$getPropertyValueFromDot
+    getValue: $2865c5ce12fd7c9f$var$getPropertyValueFromDot,
+    setValue: $2865c5ce12fd7c9f$var$setPropertyValueFromDot
 };
+function $2865c5ce12fd7c9f$var$setPropertyValueFromDot(record, key, value) {
+    function _recursiveSet(record, key, value) {
+        // Get property
+        let keyItems = key.split(".");
+        let keyItem1 = keyItems?.[0];
+        let property1 = keyItem1.split("[")[0];
+        let position1 = keyItem1.split("[")[1] || null;
+        let value1 = value?.[property1];
+        if (position1 && position1 != null) try {
+            position1 = position1.replace("]", "");
+            position1 = position1.trim();
+            position1 = Number(position1);
+            if (!Array.isArray(value1)) value1 = [
+                value1
+            ];
+            value1 = value1?.[arrayPosition] || null;
+        } catch  {}
+        // Check if done, else recurse
+        if (keyItems.length > 1) {
+            let newKeys = keyItems.slice(1);
+            let newKey = newKeys.join(".");
+            if (!position1 || position1 == null) {
+                if (!value1) value1 = {};
+                record[property1] = _recursiveSet(value1, newKey, value);
+                return record;
+            } else {
+                if (!value1) value1 = [];
+                record[property1][position1] = _recursiveSet(value1, newKey, value);
+                return record;
+            }
+        } else if (!position1 || position1 == null) {
+            if (!record?.[property1]) record[property1] = {};
+            record[property1] = value;
+            return record;
+        } else {
+            if (!record?.[property1]) record[property1] = [];
+            record[property1][position1] = value;
+            return record;
+        }
+    }
+    return _recursiveSet(record, key, value);
+}
 function $2865c5ce12fd7c9f$var$getPropertyValueFromDot(key, value) {
     // Retrieves value by following dot notation
     function _recursive(key, value) {
@@ -1230,12 +1273,48 @@ function $f5e690043496127e$var$getConfig() {
 
 
 
+
 const $23c99379dceee5e4$export$cc74e2e6d445aa47 = {
     get: $23c99379dceee5e4$var$replacePlaceholders,
     replacePlaceholders: $23c99379dceee5e4$var$replacePlaceholders,
     render: $23c99379dceee5e4$var$replacePlaceholders
 };
 function $23c99379dceee5e4$var$replacePlaceholders(template, record) {
+    template = $23c99379dceee5e4$var$replacePlaceholdersLists(template, record);
+    template = $23c99379dceee5e4$var$replacePlaceholdersValues(template, record);
+    return template;
+}
+function $23c99379dceee5e4$var$replacePlaceholdersLists(template, record) {
+    // Replace simple {{name}} placeholders
+    //let result = template.replace(/{{(.*?)}}/g, (_, key) => _getValue(key, record)  || '');
+    while(template.includes("{{#")){
+        // Get last 
+        let parts = template.split("{{#");
+        let propertyContent = parts[parts.length - 1];
+        let contentBefore = parts.slice(0, parts.length - 1).join("{{#");
+        let propertyID = propertyContent.split("}}")[0];
+        let valueContentItems = propertyContent.split("}}");
+        valueContentItems = valueContentItems.slice(1);
+        let valueContent = valueContentItems.join("}}");
+        let content = valueContent.split("{{/" + propertyID)[0];
+        let contentAfter = valueContent.split("{{/" + propertyID).slice(1).join("{{/");
+        // Get values
+        let values = (0, $2865c5ce12fd7c9f$export$fe5b3308000496d5).getValue(propertyID, record);
+        if (!Array.isArray(values)) values = [
+            values
+        ];
+        let partsContent = "";
+        for(let i = 0; i < values.length; i++){
+            let value = values[i];
+            let tempRecord = JSON.parse(JSON.stringify(record));
+            tempRecord = (0, $2865c5ce12fd7c9f$export$fe5b3308000496d5).setValue(tempRecord, propertyID, value);
+            partsContent += $23c99379dceee5e4$var$replacePlaceholdersValues(content, tempRecord);
+        }
+        template = contentBefore + partsContent + contentAfter;
+    }
+    return template;
+}
+function $23c99379dceee5e4$var$replacePlaceholdersValues(template, record) {
     // Replaces placeholders {{ }} by value from record
     // Looks for {{ property1.property2 | command:propertyID }}
     let content = template.replace(/{{(.*?)}}/g, (match, keyString)=>{

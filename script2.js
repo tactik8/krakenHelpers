@@ -32,7 +32,7 @@ async function test(){
                         }
                       },
                 ],
-             "worksfor": {
+             "worksFor": {
                  "@type": "Organization",
                  "@id": "organization_1",
                  "name": "test_org_1",
@@ -40,11 +40,10 @@ async function test(){
                  }
          }
 
-    let r = k.dot.toDot(record)
     
+
     
-    
-    let template = 'name: {{givenName}} {{familyName}} cie: {{hasOccupation | sum: amount.mnt}} {{hasOccupation | first: amount.curr}}'
+    let template = 'name: {{givenName}} {{familyName}} cie: {{hasOccupation | sum: amount.mnt}} {{hasOccupation | first: amount.curr}} {{#hasOccupation}} n:{{hasOccupation.name}} {{/hasOccupation}}'
 
     let content = k.template.replacePlaceholders(template, record)
 
