@@ -1168,6 +1168,34 @@ function $f5e690043496127e$var$getConfig() {
 }
 
 
+const $c945f2bbf7fa7d9d$export$f8c0f914c8a0ee10 = {
+    isNull: $c945f2bbf7fa7d9d$var$isNull,
+    isNotNull: $c945f2bbf7fa7d9d$var$isNotNull
+};
+function $c945f2bbf7fa7d9d$var$isNotNull(value) {
+    return !$c945f2bbf7fa7d9d$var$isNull(value);
+}
+function $c945f2bbf7fa7d9d$var$isNull(value) {
+    if (value === 0) return false;
+    if (value === undefined) return true;
+    if (value === null) return true;
+    if (value === "") return true;
+    // If array, removes null values then check if length == 0
+    if (Array.isArray(value)) {
+        value = value.filter((x)=>$c945f2bbf7fa7d9d$var$isNull(x) == false);
+        if (value.length == 0) return true;
+        else return false;
+    }
+    // If object, check if it has keys
+    if (typeof value === "object" && !Array.isArray(value) && value !== null) {
+        if (Object.keys(value).length == 0) return true;
+        else return false;
+    }
+    // Catch all
+    return false;
+}
+
+
 class $9be01ebda65f7f50$export$f5bc5036afac6116 {
     constructor(){
         this._db = {};
@@ -1342,7 +1370,9 @@ const $53bcb33ef2023ce8$export$f936470337fdc8d0 = {
     Timer: (0, $6e423e9502adc63f$export$7729b59bd32e7982),
     url: (0, $2974f6a85c45961a$export$b881b526c33ee854),
     value: (0, $5abff2bf4ee17cbb$export$da17952f31714a6e),
-    headings: (0, $f5e690043496127e$export$36b1aac33f5f1b68)
+    headings: (0, $f5e690043496127e$export$36b1aac33f5f1b68),
+    isNull: (0, $c945f2bbf7fa7d9d$export$f8c0f914c8a0ee10).isNull,
+    isNotNull: (0, $c945f2bbf7fa7d9d$export$f8c0f914c8a0ee10).isNotNull
 };
 
 
