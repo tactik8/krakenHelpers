@@ -5,6 +5,8 @@ import { krakenArrayHelpers } from './helpers/krakenArrayHelpers.js'
 import { krakenDateHelpers } from './helpers/krakenDateHelpers.js'
 import { krakenEmailHelpers } from './helpers/krakenEmailHelpers.js'
 
+import { krakenDotNotationHelpers } from './helpers/krakenDotNotationHelpers.js'
+
 import { krakenJsonHelpers } from './helpers/krakenJsonHelpers.js'
 import { krakenNumberHelpers } from './helpers/krakenNumberHelpers.js'
 import { krakenObjectHelpers } from './helpers/krakenObjectHelpers.js'
@@ -28,6 +30,7 @@ export const krakenHelpers = {
     array: krakenArrayHelpers,
     Cache: KrCache,
     date: krakenDateHelpers,
+    dot: krakenDotNotationHelpers,
     email:krakenEmailHelpers,
     json: krakenJsonHelpers,
     number: krakenNumberHelpers,
