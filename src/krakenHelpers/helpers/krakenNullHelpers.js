@@ -76,7 +76,6 @@ function isEqual(value1, value2) {
 
 
     
-    console.log('c')
     
     // Equality for Thing
     let v1_record_type = value1?.record_type || value1?.["@type"];
@@ -87,27 +86,22 @@ function isEqual(value1, value2) {
     if (isNull(v1_record_type) && isNotNull(v2_record_type)) {
         return false;
     }
-    console.log('e')
     if (isNotNull(v1_record_type) && isNull(v2_record_type)) {
         return false;
     }
-    console.log('f')
     if (isNull(v1_record_id) && isNotNull(v2_record_id)) {
         return false;
     }
-    console.log('g')
     if (isNotNull(v1_record_id) && isNull(v2_record_id)) {
         return false;
     }
 
-    console.log('l')
     if (isNotNull(v1_record_type) && isNotNull(v2_record_type)) {
         if (isNotNull(v1_record_id) && isNotNull(v2_record_id)) {
             if (
                 v1_record_type == v2_record_type &&
                 v1_record_id == v2_record_id
             ) {
-                console.log(v1_record_id, v2_record_id)
                 return true;
             } else {
                 return false;
@@ -115,16 +109,13 @@ function isEqual(value1, value2) {
         }
     }
 
-    console.log('q')
     // Equality for objects
     try {
-        console.log(JSON.stringify(value1),  JSON.stringify(value2))
         if (JSON.stringify(value1) == JSON.stringify(value2)) {
             return true;
         }
     } catch {}
 
-    console.log('t')
 
     
     return false;

@@ -1423,35 +1423,25 @@ function $c945f2bbf7fa7d9d$var$isEqual(value1, value2) {
     try {
         if (value == value2) return true;
     } catch  {}
-    console.log("c");
     // Equality for Thing
     let v1_record_type = value1?.record_type || value1?.["@type"];
     let v2_record_type = value2?.record_type || value2?.["@type"];
     let v1_record_id = value1?.record_id || value1?.["@id"];
     let v2_record_id = value2?.record_id || value2?.["@id"];
     if ($c945f2bbf7fa7d9d$var$isNull(v1_record_type) && $c945f2bbf7fa7d9d$var$isNotNull(v2_record_type)) return false;
-    console.log("e");
     if ($c945f2bbf7fa7d9d$var$isNotNull(v1_record_type) && $c945f2bbf7fa7d9d$var$isNull(v2_record_type)) return false;
-    console.log("f");
     if ($c945f2bbf7fa7d9d$var$isNull(v1_record_id) && $c945f2bbf7fa7d9d$var$isNotNull(v2_record_id)) return false;
-    console.log("g");
     if ($c945f2bbf7fa7d9d$var$isNotNull(v1_record_id) && $c945f2bbf7fa7d9d$var$isNull(v2_record_id)) return false;
-    console.log("l");
     if ($c945f2bbf7fa7d9d$var$isNotNull(v1_record_type) && $c945f2bbf7fa7d9d$var$isNotNull(v2_record_type)) {
         if ($c945f2bbf7fa7d9d$var$isNotNull(v1_record_id) && $c945f2bbf7fa7d9d$var$isNotNull(v2_record_id)) {
-            if (v1_record_type == v2_record_type && v1_record_id == v2_record_id) {
-                console.log(v1_record_id, v2_record_id);
-                return true;
-            } else return false;
+            if (v1_record_type == v2_record_type && v1_record_id == v2_record_id) return true;
+            else return false;
         }
     }
-    console.log("q");
     // Equality for objects
     try {
-        console.log(JSON.stringify(value1), JSON.stringify(value2));
         if (JSON.stringify(value1) == JSON.stringify(value2)) return true;
     } catch  {}
-    console.log("t");
     return false;
 }
 
