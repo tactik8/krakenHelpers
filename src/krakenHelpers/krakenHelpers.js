@@ -49,5 +49,7 @@ export const krakenHelpers = {
     null: krakenNullHelpers,
     isNull: krakenNullHelpers.isNull,
     isNotNull: krakenNullHelpers.isNotNull,
+    isEqual:krakenNullHelpers.isEqual,
+    isNotEqual:krakenNullHelpers.isNotEqual,
     template: krakenTemplateHelpers
 }

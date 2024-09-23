@@ -1385,28 +1385,73 @@ function $23c99379dceee5e4$var$_getCommandProperty(value) {
 
 const $c945f2bbf7fa7d9d$export$f8c0f914c8a0ee10 = {
     isNull: $c945f2bbf7fa7d9d$var$isNull,
-    isNotNull: $c945f2bbf7fa7d9d$var$isNotNull
+    isNotNull: $c945f2bbf7fa7d9d$var$isNotNull,
+    isEqual: $c945f2bbf7fa7d9d$var$isEqual,
+    isNotEqual: $c945f2bbf7fa7d9d$var$isNotEqual
 };
-function $c945f2bbf7fa7d9d$var$isNotNull(value) {
-    return !$c945f2bbf7fa7d9d$var$isNull(value);
+function $c945f2bbf7fa7d9d$var$isNotNull(value1) {
+    return !$c945f2bbf7fa7d9d$var$isNull(value1);
 }
-function $c945f2bbf7fa7d9d$var$isNull(value) {
-    if (value === 0) return false;
-    if (value === undefined) return true;
-    if (value === null) return true;
-    if (value === "") return true;
+function $c945f2bbf7fa7d9d$var$isNull(value1) {
+    if (value1 === 0) return false;
+    if (value1 === undefined) return true;
+    if (value1 === null) return true;
+    if (value1 === "") return true;
     // If array, removes null values then check if length == 0
-    if (Array.isArray(value)) {
-        value = value.filter((x)=>$c945f2bbf7fa7d9d$var$isNull(x) == false);
-        if (value.length == 0) return true;
+    if (Array.isArray(value1)) {
+        value1 = value1.filter((x)=>$c945f2bbf7fa7d9d$var$isNull(x) == false);
+        if (value1.length == 0) return true;
         else return false;
     }
     // If object, check if it has keys
-    if (typeof value === "object" && !Array.isArray(value) && value !== null) {
-        if (Object.keys(value).length == 0) return true;
+    if (typeof value1 === "object" && !Array.isArray(value1) && value1 !== null) {
+        if (Object.keys(value1).length == 0) return true;
         else return false;
     }
     // Catch all
+    return false;
+}
+function $c945f2bbf7fa7d9d$var$isNotEqual(value1, value2) {
+    return !$c945f2bbf7fa7d9d$var$isEqual(value1, value2);
+}
+function $c945f2bbf7fa7d9d$var$isEqual(value1, value2) {
+    // if nulls
+    if ($c945f2bbf7fa7d9d$var$isNull(value1) && $c945f2bbf7fa7d9d$var$isNull(value2)) return true;
+    if ($c945f2bbf7fa7d9d$var$isNull(value1) && $c945f2bbf7fa7d9d$var$isNotNull(value2)) return false;
+    if ($c945f2bbf7fa7d9d$var$isNotNull(value1) && $c945f2bbf7fa7d9d$var$isNull(value2)) return false;
+    // Equality for others
+    try {
+        if (value == value2) return true;
+    } catch  {}
+    console.log("c");
+    // Equality for Thing
+    let v1_record_type = value1?.record_type || value1?.["@type"];
+    let v2_record_type = value2?.record_type || value2?.["@type"];
+    let v1_record_id = value1?.record_id || value1?.["@id"];
+    let v2_record_id = value2?.record_id || value2?.["@id"];
+    if ($c945f2bbf7fa7d9d$var$isNull(v1_record_type) && $c945f2bbf7fa7d9d$var$isNotNull(v2_record_type)) return false;
+    console.log("e");
+    if ($c945f2bbf7fa7d9d$var$isNotNull(v1_record_type) && $c945f2bbf7fa7d9d$var$isNull(v2_record_type)) return false;
+    console.log("f");
+    if ($c945f2bbf7fa7d9d$var$isNull(v1_record_id) && $c945f2bbf7fa7d9d$var$isNotNull(v2_record_id)) return false;
+    console.log("g");
+    if ($c945f2bbf7fa7d9d$var$isNotNull(v1_record_id) && $c945f2bbf7fa7d9d$var$isNull(v2_record_id)) return false;
+    console.log("l");
+    if ($c945f2bbf7fa7d9d$var$isNotNull(v1_record_type) && $c945f2bbf7fa7d9d$var$isNotNull(v2_record_type)) {
+        if ($c945f2bbf7fa7d9d$var$isNotNull(v1_record_id) && $c945f2bbf7fa7d9d$var$isNotNull(v2_record_id)) {
+            if (v1_record_type == v2_record_type && v1_record_id == v2_record_id) {
+                console.log(v1_record_id, v2_record_id);
+                return true;
+            } else return false;
+        }
+    }
+    console.log("q");
+    // Equality for objects
+    try {
+        console.log(JSON.stringify(value1), JSON.stringify(value2));
+        if (JSON.stringify(value1) == JSON.stringify(value2)) return true;
+    } catch  {}
+    console.log("t");
     return false;
 }
 
@@ -1589,6 +1634,8 @@ const $53bcb33ef2023ce8$export$f936470337fdc8d0 = {
     null: (0, $c945f2bbf7fa7d9d$export$f8c0f914c8a0ee10),
     isNull: (0, $c945f2bbf7fa7d9d$export$f8c0f914c8a0ee10).isNull,
     isNotNull: (0, $c945f2bbf7fa7d9d$export$f8c0f914c8a0ee10).isNotNull,
+    isEqual: (0, $c945f2bbf7fa7d9d$export$f8c0f914c8a0ee10).isEqual,
+    isNotEqual: (0, $c945f2bbf7fa7d9d$export$f8c0f914c8a0ee10).isNotEqual,
     template: (0, $23c99379dceee5e4$export$cc74e2e6d445aa47)
 };
 
