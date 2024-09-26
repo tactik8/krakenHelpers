@@ -1011,7 +1011,8 @@ async function $6a48e11209e06b9f$var$getApi(baseUrl, urlPath, params) {
             "Content-Type": "application/json"
         }
     };
-    let url = new URL(urlPath, String(baseUrl));
+    urlPath = urlPath || "";
+    let url = new URL(String(urlPath), String(baseUrl));
     url.search = new URLSearchParams(params);
     const response = await fetch(url, requestOptionsGet);
     if (response.status != 200 && response.status != 201 && response.status && 202) throw new Error(String(response.status) + " " + response.statusText);
@@ -1027,10 +1028,11 @@ async function $6a48e11209e06b9f$var$postApi(baseUrl, urlPath, records) {
         },
         body: JSON.stringify(records)
     };
-    let url = new URL(urlPath, String(baseUrl));
+    urlPath = urlPath || "";
+    let url = new URL(String(urlPath), String(baseUrl));
     const response = await fetch(url, requestOptions);
     if (response.status != 200 && response.status != 201 && response.status != 202) throw new Error(String(response.status) + " " + response.statusText);
-    return true;
+    return response;
 }
 async function $6a48e11209e06b9f$var$deleteApi(baseUrl, urlPath, params) {
     const requestOptionsGet = {
@@ -1039,7 +1041,8 @@ async function $6a48e11209e06b9f$var$deleteApi(baseUrl, urlPath, params) {
             "Content-Type": "application/json"
         }
     };
-    let url = new URL(urlPath, String(baseUrl));
+    urlPath = urlPath || "";
+    let url = new URL(String(urlPath), String(baseUrl));
     url.search = new URLSearchParams(params);
     const response = await fetch(url, requestOptionsGet);
     if (response.status != 200 && response.status != 201 && response.status != 202) throw new Error(String(response.status) + " " + response.statusText);
@@ -1387,7 +1390,10 @@ const $c945f2bbf7fa7d9d$export$f8c0f914c8a0ee10 = {
     isNull: $c945f2bbf7fa7d9d$var$isNull,
     isNotNull: $c945f2bbf7fa7d9d$var$isNotNull,
     isEqual: $c945f2bbf7fa7d9d$var$isEqual,
-    isNotEqual: $c945f2bbf7fa7d9d$var$isNotEqual
+    isNotEqual: $c945f2bbf7fa7d9d$var$isNotEqual,
+    isEven: $c945f2bbf7fa7d9d$var$isEven,
+    isOdd: $c945f2bbf7fa7d9d$var$isOdd,
+    isOdd: $c945f2bbf7fa7d9d$var$isOdd
 };
 function $c945f2bbf7fa7d9d$var$isNotNull(value1) {
     return !$c945f2bbf7fa7d9d$var$isNull(value1);
@@ -1443,6 +1449,224 @@ function $c945f2bbf7fa7d9d$var$isEqual(value1, value2) {
         if (JSON.stringify(value1) == JSON.stringify(value2)) return true;
     } catch  {}
     return false;
+}
+function $c945f2bbf7fa7d9d$var$isEven(value1) {
+    try {
+        if (value1 % 2 == 1) return false;
+        else return true;
+    } catch  {
+        return false;
+    }
+}
+function $c945f2bbf7fa7d9d$var$isOdd(value1) {
+    try {
+        if (value1 % 2 == 0) return false;
+        else return true;
+    } catch  {
+        return false;
+    }
+}
+
+
+
+
+const $5f4f35b6ef9ecbdf$export$76d497fdd9c60660 = {
+    Thing: $5f4f35b6ef9ecbdf$export$1dd6e8119d1f29dd,
+    Action: $5f4f35b6ef9ecbdf$export$2fddb5f9f1c2375e
+};
+let $5f4f35b6ef9ecbdf$var$DB = [];
+class $5f4f35b6ef9ecbdf$export$1dd6e8119d1f29dd {
+    constructor(record_type_or_record, record_id){
+        this._record = {};
+        if (record_type_or_record?.["@type"]) this._record = record_type_or_record;
+        else {
+            this._record["@type"] = record_type_or_record;
+            this._record["@id"] = record_id;
+        }
+        $5f4f35b6ef9ecbdf$var$DB.push(this);
+    }
+    // -----------------------------------------------------
+    //  Core  
+    // -----------------------------------------------------
+    toString() {
+        return `${this.record_type} ${this.record_id}`;
+    }
+    toJSON() {
+        return this.record;
+    }
+    get json() {
+        return JSON.stringify(this.record, null, 4);
+    }
+    new() {
+        let newObject = new Thing_simple();
+        newObject.record = this.record;
+    }
+    clone() {
+        let newObject = new Thing_simple();
+        newObject.record = this.record;
+    }
+    // -----------------------------------------------------
+    //  Attributes 
+    // -----------------------------------------------------
+    get record() {
+        return JSON.parse(JSON.stringify(this._record));
+    }
+    set record(value) {
+        this._record = JSON.parse(JSON.stringify(value));
+    }
+    get record_type() {
+        return this._record?.["@type"];
+    }
+    set record_type(value) {
+        this._record["@type"] = value;
+    }
+    get record_id() {
+        if (krakenNUllHelpers.isNull(this._record?.["@id"])) this._record["@id"], String(crypto.randomUUID());
+        return this._record?.["@id"];
+    }
+    set record_id(value) {
+        this._record["@id"] = value;
+    }
+    // -----------------------------------------------------
+    //  Shortcut Attributes 
+    // -----------------------------------------------------
+    get name() {
+        return this._record?.name;
+    }
+    set name(value) {
+        return this._record.name = value;
+    }
+    get url() {
+        return this._record?.url;
+    }
+    set url(value) {
+        return this._record.url = value;
+    }
+}
+class $5f4f35b6ef9ecbdf$export$2fddb5f9f1c2375e extends $5f4f35b6ef9ecbdf$export$1dd6e8119d1f29dd {
+    constructor(name, object){
+        super("Action");
+        this.setActive();
+        this.name = name;
+        this.object = object;
+    }
+    // -----------------------------------------------------
+    //  Base 
+    // -----------------------------------------------------
+    toString() {
+        return `${(0, $18d56086b081e2cc$export$15c85b69ec02b47c).date.toText(this.startTime)} ${this.name} ${this.status}`;
+    }
+    new() {
+        let newObject = new Action_simple();
+        newObject.record = this.record;
+    }
+    clone() {
+        let newObject = new Action_simple();
+        newObject.record = this.record;
+    }
+    lt(other) {
+        if (krakenNUllHelpers.isNull(this.endTime) && krakenNUllHelpers.isNull(other.endTime)) return false;
+        if (krakenNUllHelpers.isNull(this.endTime) && (0, $c945f2bbf7fa7d9d$export$f8c0f914c8a0ee10).isNotNull(other.endTime)) return false;
+        if ((0, $c945f2bbf7fa7d9d$export$f8c0f914c8a0ee10).isNotNull(this.endTime) && krakenNUllHelpers.isNull(other.endTime)) return true;
+        if (this.endTime < other.endTime) return true;
+        if (this.endTime > other.endTime) return false;
+        return false;
+    }
+    gt(other) {
+        if (krakenNUllHelpers.isNull(this.endTime) && krakenNUllHelpers.isNull(other.endTime)) return false;
+        if (krakenNUllHelpers.isNull(this.endTime) && (0, $c945f2bbf7fa7d9d$export$f8c0f914c8a0ee10).isNotNull(other.endTime)) return false;
+        if ((0, $c945f2bbf7fa7d9d$export$f8c0f914c8a0ee10).isNotNull(this.endTime) && krakenNUllHelpers.isNull(other.endTime)) return true;
+        if (this.endTime > other.endTime) return true;
+        if (this.endTime < other.endTime) return false;
+        return false;
+    }
+    // -----------------------------------------------------
+    //  Action attributes 
+    // -----------------------------------------------------
+    get actionStatus() {
+        return this._record?.actionStatus;
+    }
+    set actionStatus(value) {
+        this._record.actionStatus = value;
+    }
+    get status() {
+        let value = this.actionStatus || "";
+        if ((0, $c945f2bbf7fa7d9d$export$f8c0f914c8a0ee10).isNotNull(value)) value = value.replace("ActionStatus", "");
+        return value;
+    }
+    get object() {
+        return this._record?.object;
+    }
+    set object(value) {
+        this._record.object = value;
+    }
+    get instrument() {
+        return this._record?.instrument;
+    }
+    set instrument(value) {
+        this._record.instrument = value;
+    }
+    get result() {
+        return this._record?.result;
+    }
+    set result(value) {
+        this._record.result = value;
+        if ((0, $c945f2bbf7fa7d9d$export$f8c0f914c8a0ee10).isNotNull(value)) {
+            this.actionStatus = "CompletedActionStatus";
+            this.endTime = new Date();
+        }
+    }
+    get startTime() {
+        return this._record?.startTime;
+    }
+    set startTime(value) {
+        this._record.startTime = value;
+    }
+    get endTime() {
+        return this._record?.endTime;
+    }
+    set endTime(value) {
+        this._record.endTime = value;
+    }
+    get error() {
+        return this._record?.error;
+    }
+    set error(value) {
+        this._record.error = value;
+        if ((0, $c945f2bbf7fa7d9d$export$f8c0f914c8a0ee10).isNotNull(value)) {
+            this.actionStatus = "FailedActionStatus";
+            this.endTime = new Date();
+        }
+    }
+    get duration() {
+        return (0, $18d56086b081e2cc$export$15c85b69ec02b47c).date.duration(this.startTime, this.endTime);
+    }
+    isSuccess() {
+        return this.actionStatus == "CompletedActionStatus";
+    }
+    // -----------------------------------------------------
+    //  Action methods 
+    // -----------------------------------------------------
+    setPotential(error) {
+        this.actionStatus = "PotentialActionStatus";
+        this.error = String(error);
+        this.startTime = null;
+        this.endTime = null;
+    }
+    setActive(error) {
+        this.actionStatus = "ActiveActionStatus";
+        this.error = String(error);
+        this.startTime = new Date();
+    }
+    setCompleted() {
+        this.actionStatus = "CompletedActionStatus";
+        this.endTime = new Date();
+    }
+    setFailed(error) {
+        this.actionStatus = "FailedActionStatus";
+        this.error = String(error);
+        this.endTime = new Date();
+    }
 }
 
 
@@ -1626,7 +1850,8 @@ const $53bcb33ef2023ce8$export$f936470337fdc8d0 = {
     isNotNull: (0, $c945f2bbf7fa7d9d$export$f8c0f914c8a0ee10).isNotNull,
     isEqual: (0, $c945f2bbf7fa7d9d$export$f8c0f914c8a0ee10).isEqual,
     isNotEqual: (0, $c945f2bbf7fa7d9d$export$f8c0f914c8a0ee10).isNotEqual,
-    template: (0, $23c99379dceee5e4$export$cc74e2e6d445aa47)
+    template: (0, $23c99379dceee5e4$export$cc74e2e6d445aa47),
+    simple: (0, $5f4f35b6ef9ecbdf$export$76d497fdd9c60660)
 };
 
 

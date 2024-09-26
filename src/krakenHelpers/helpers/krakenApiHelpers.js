@@ -23,7 +23,9 @@ async function getApi(baseUrl, urlPath,  params){
         }
     };
 
-    let url = new URL(urlPath, String(baseUrl));
+    urlPath = urlPath || ''
+    
+    let url = new URL(String(urlPath), String(baseUrl));
 
     url.search = new URLSearchParams(params);
 
@@ -52,7 +54,9 @@ async function postApi(baseUrl, urlPath,  records){
         body: JSON.stringify(records)
     };
 
-    let url = new URL(urlPath, String(baseUrl));
+    urlPath = urlPath || ''
+    
+    let url = new URL(String(urlPath), String(baseUrl));
 
     const response = await fetch(url, requestOptions)
 
@@ -60,7 +64,7 @@ async function postApi(baseUrl, urlPath,  records){
         throw new Error(String(response.status) + ' ' + response.statusText);
     }
 
-    return true
+    return response
     
 }
 
@@ -73,7 +77,9 @@ async function deleteApi(baseUrl, urlPath,  params){
         }
     };
 
-    let url = new URL(urlPath, String(baseUrl));
+    urlPath = urlPath || ''
+
+    let url = new URL(String(urlPath), String(baseUrl));
 
     url.search = new URLSearchParams(params);
 

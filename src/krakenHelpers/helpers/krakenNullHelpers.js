@@ -2,7 +2,9 @@ export const krakenNullHelpers = {
     isNull: isNull,
     isNotNull: isNotNull,
     isEqual: isEqual,
-    isNotEqual: isNotEqual
+    isNotEqual: isNotEqual,
+    isEven: isEven,
+    isOdd, isOdd
 };
 
 function isNotNull(value) {
@@ -119,4 +121,32 @@ function isEqual(value1, value2) {
 
     
     return false;
+}
+
+
+
+function isEven(value){
+
+    try{
+        if(value % 2 == 1){
+            return false
+        } else {
+            return true
+        }
+            
+    } catch { return false }
+    
+}
+
+function isOdd(value){
+
+    try{
+        if(value % 2 == 0){
+            return false
+        } else {
+            return true
+        }
+
+    } catch { return false }
+
 }

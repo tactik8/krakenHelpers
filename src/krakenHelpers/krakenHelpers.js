@@ -21,6 +21,8 @@ import { krakenTemplateHelpers } from './helpers/krakenTemplateHelpers.js'
 
 import { krakenNullHelpers } from './helpers/krakenNullHelpers.js'
 
+import { krakenSimpleThingsHelpers } from './helpers/krakenSimpleThingsHelpers.js'
+
 
 import { KrCache } from './helpers/krakenCache.js'
 
@@ -51,5 +53,6 @@ export const krakenHelpers = {
     isNotNull: krakenNullHelpers.isNotNull,
     isEqual:krakenNullHelpers.isEqual,
     isNotEqual:krakenNullHelpers.isNotEqual,
-    template: krakenTemplateHelpers
+    template: krakenTemplateHelpers,
+    simple: krakenSimpleThingsHelpers
 }
