@@ -1470,10 +1470,6 @@ function $c945f2bbf7fa7d9d$var$isOdd(value1) {
 
 
 
-const $5f4f35b6ef9ecbdf$export$76d497fdd9c60660 = {
-    Thing: $5f4f35b6ef9ecbdf$export$1dd6e8119d1f29dd,
-    Action: $5f4f35b6ef9ecbdf$export$2fddb5f9f1c2375e
-};
 let $5f4f35b6ef9ecbdf$var$DB = [];
 class $5f4f35b6ef9ecbdf$export$1dd6e8119d1f29dd {
     constructor(record_type_or_record, record_id){
@@ -1668,6 +1664,10 @@ class $5f4f35b6ef9ecbdf$export$2fddb5f9f1c2375e extends $5f4f35b6ef9ecbdf$export
         this.endTime = new Date();
     }
 }
+const $5f4f35b6ef9ecbdf$export$76d497fdd9c60660 = {
+    Thing: $5f4f35b6ef9ecbdf$export$1dd6e8119d1f29dd,
+    Action: $5f4f35b6ef9ecbdf$export$2fddb5f9f1c2375e
+};
 
 
 class $9be01ebda65f7f50$export$f5bc5036afac6116 {

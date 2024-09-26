@@ -1,14 +1,10 @@
 
-import { krakenDateHelpers } from './krakenDateHelpers'
+import { krakenDateHelpers } from './krakenDateHelpers.js'
 
-import { krakenNullHelpers } from './krakenNullHelpers'
+import { krakenNullHelpers } from './krakenNullHelpers.js'
 
-export const krakenSimpleThingsHelpers = {
 
-    Thing: KrSimpleThing,
-    Action: KrSimpleAction
-    
-}
+
 
 
 let DB = []
@@ -259,5 +255,16 @@ export class KrSimpleAction extends KrSimpleThing {
         this.endTime =  new Date()
     }
 
+
+}
+
+
+
+
+
+export const krakenSimpleThingsHelpers = {
+
+    Thing: KrSimpleThing,
+    Action: KrSimpleAction
 
 }
