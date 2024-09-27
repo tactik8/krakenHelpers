@@ -253,18 +253,111 @@ function $9fc8b212f324f9e3$var$getUnitCodesForKey(value, key) {
 
 
 
-/** @const {Object}  krakenDateHelpers
- * - isDate: Determiens if value is of type Date
- * - toDate: Converts a value (string, etc.) to Date
- * - getDuration: Returns duration between two dates
- * - getDurationRecord: Returns duration in schema.org QuantitativeValue record
- */ const $18d56086b081e2cc$export$15c85b69ec02b47c = {
+const $c945f2bbf7fa7d9d$export$f8c0f914c8a0ee10 = {
+    isNull: $c945f2bbf7fa7d9d$var$isNull,
+    isNotNull: $c945f2bbf7fa7d9d$var$isNotNull,
+    isEqual: $c945f2bbf7fa7d9d$var$isEqual,
+    isNotEqual: $c945f2bbf7fa7d9d$var$isNotEqual,
+    isEven: $c945f2bbf7fa7d9d$var$isEven,
+    isOdd: $c945f2bbf7fa7d9d$var$isOdd,
+    isOdd: $c945f2bbf7fa7d9d$var$isOdd
+};
+function $c945f2bbf7fa7d9d$var$isNotNull(value1) {
+    return !$c945f2bbf7fa7d9d$var$isNull(value1);
+}
+function $c945f2bbf7fa7d9d$var$isNull(value1) {
+    if (value1 === 0) return false;
+    if (value1 === undefined) return true;
+    if (value1 === null) return true;
+    if (value1 === "") return true;
+    // Check if date
+    try {
+        let v = value1.getTime();
+        if (!isNaN(v)) return false;
+    } catch  {}
+    // If array, removes null values then check if length == 0
+    if (Array.isArray(value1)) {
+        value1 = value1.filter((x)=>$c945f2bbf7fa7d9d$var$isNull(x) == false);
+        if (value1.length == 0) return true;
+        else return false;
+    }
+    // If object, check if it has keys
+    if (typeof value1 === "object" && !Array.isArray(value1) && value1 !== null) {
+        if (Object.keys(value1).length == 0) return true;
+        else return false;
+    }
+    // Catch all
+    return false;
+}
+function $c945f2bbf7fa7d9d$var$isNotEqual(value1, value2) {
+    return !$c945f2bbf7fa7d9d$var$isEqual(value1, value2);
+}
+function $c945f2bbf7fa7d9d$var$isEqual(value1, value2) {
+    // if nulls
+    if ($c945f2bbf7fa7d9d$var$isNull(value1) && $c945f2bbf7fa7d9d$var$isNull(value2)) return true;
+    if ($c945f2bbf7fa7d9d$var$isNull(value1) && $c945f2bbf7fa7d9d$var$isNotNull(value2)) return false;
+    if ($c945f2bbf7fa7d9d$var$isNotNull(value1) && $c945f2bbf7fa7d9d$var$isNull(value2)) return false;
+    // Equality for others
+    try {
+        if (value == value2) return true;
+    } catch  {}
+    // Equality for Thing
+    let v1_record_type = value1?.record_type || value1?.["@type"];
+    let v2_record_type = value2?.record_type || value2?.["@type"];
+    let v1_record_id = value1?.record_id || value1?.["@id"];
+    let v2_record_id = value2?.record_id || value2?.["@id"];
+    if ($c945f2bbf7fa7d9d$var$isNull(v1_record_type) && $c945f2bbf7fa7d9d$var$isNotNull(v2_record_type)) return false;
+    if ($c945f2bbf7fa7d9d$var$isNotNull(v1_record_type) && $c945f2bbf7fa7d9d$var$isNull(v2_record_type)) return false;
+    if ($c945f2bbf7fa7d9d$var$isNull(v1_record_id) && $c945f2bbf7fa7d9d$var$isNotNull(v2_record_id)) return false;
+    if ($c945f2bbf7fa7d9d$var$isNotNull(v1_record_id) && $c945f2bbf7fa7d9d$var$isNull(v2_record_id)) return false;
+    if ($c945f2bbf7fa7d9d$var$isNotNull(v1_record_type) && $c945f2bbf7fa7d9d$var$isNotNull(v2_record_type)) {
+        if ($c945f2bbf7fa7d9d$var$isNotNull(v1_record_id) && $c945f2bbf7fa7d9d$var$isNotNull(v2_record_id)) {
+            if (v1_record_type == v2_record_type && v1_record_id == v2_record_id) return true;
+            else return false;
+        }
+    }
+    // Equality for objects
+    try {
+        if (JSON.stringify(value1) == JSON.stringify(value2)) return true;
+    } catch  {}
+    return false;
+}
+function $c945f2bbf7fa7d9d$var$isEven(value1) {
+    try {
+        if (value1 % 2 == 1) return false;
+        else return true;
+    } catch  {
+        return false;
+    }
+}
+function $c945f2bbf7fa7d9d$var$isOdd(value1) {
+    try {
+        if (value1 % 2 == 0) return false;
+        else return true;
+    } catch  {
+        return false;
+    }
+}
+
+
+const $18d56086b081e2cc$export$15c85b69ec02b47c = {
     // Base
     isDate: $18d56086b081e2cc$var$validateDate,
+    isTextDate: $18d56086b081e2cc$var$validateTextDate,
     getDuration: $18d56086b081e2cc$var$getDuration,
     getDurationRecord: $18d56086b081e2cc$var$getDurationRecord,
     toDate: $18d56086b081e2cc$var$toDate,
     toText: $18d56086b081e2cc$var$toText,
+    human: {
+        duration: $18d56086b081e2cc$var$getHumanReadableDuration,
+        date: $18d56086b081e2cc$var$getHumanReadableDate
+    },
+    iso: {
+        getIsoDurationFromDates: $18d56086b081e2cc$var$toISODurationFromDates,
+        getTextFromIsoDuration: $18d56086b081e2cc$var$convertISODurationToEnglish,
+        getIsoDurationFromText: $18d56086b081e2cc$var$convertEnglishToISODuration
+    },
+    now: $18d56086b081e2cc$var$getCurrentDateObject,
     // Shortcuts
     validateDate: $18d56086b081e2cc$var$validateDate,
     getDate: $18d56086b081e2cc$var$toDate,
@@ -279,22 +372,67 @@ function $9fc8b212f324f9e3$var$getUnitCodesForKey(value, key) {
     if (value instanceof Date) return true;
     return false;
 }
+function $18d56086b081e2cc$var$validateTextDate(value) {
+    if (value instanceof Date) return true;
+    value = $18d56086b081e2cc$var$toDate(value);
+    if (value instanceof Date) return true;
+    return false;
+}
 function $18d56086b081e2cc$var$toText(value) {
-    if ($18d56086b081e2cc$var$validateDate(value) == false) return undefined;
-    let formattedDate = value.toISOString().split(".")[0];
-    formattedDate.replace("T", ", ");
+    if ($18d56086b081e2cc$var$validateDate(value) == false) {
+        value = $18d56086b081e2cc$var$toDate(value);
+        if ($18d56086b081e2cc$var$validateDate(value) == false) return "";
+    }
+    let formattedDate = value.toLocaleString();
     return formattedDate;
 }
 function $18d56086b081e2cc$var$toDate(value) {
     if ($18d56086b081e2cc$var$validateDate(value) == true) return value;
+    if (typeof value !== "string") return undefined;
+    // Native conversion
     try {
-        if (typeof value !== "string") return undefined;
         const date = new Date(value);
-        if (isNaN(date.getTime())) return undefined;
-        return date;
-    } catch (error) {
-        return undefined;
+        if (!isNaN(date.getTime())) return date;
+    } catch (error) {}
+    // Convert from different formats
+    const formatMap = {
+        "YYYY-MM-DD": /(\d{4})-(\d{2})-(\d{2})/,
+        "MM/DD/YYYY": /(\d{2})\/(\d{2})\/(\d{4})/,
+        "DD-MM-YYYY": /(\d{2})-(\d{2})-(\d{4})/,
+        "YYYY/MM/DD": /(\d{4})\/(\d{2})\/(\d{2})/
+    };
+    for (let format of Object.keys(formatMap)){
+        const regex = formatMap[format];
+        const match = value.match(regex);
+        if (!match) continue;
+        let year, month, day;
+        switch(format){
+            case "YYYY-MM-DD":
+            case "YYYY/MM/DD":
+                year = match[1];
+                month = match[2] - 1; // JS months are 0-based
+                day = match[3];
+                break;
+            case "MM/DD/YYYY":
+                month = match[1] - 1;
+                day = match[2];
+                year = match[3];
+                break;
+            case "DD-MM-YYYY":
+                day = match[1];
+                month = match[2] - 1;
+                year = match[3];
+                break;
+            default:
+                break;
+        }
+        const date = new Date(year, month, day);
+        // Check if the date is valid
+        try {
+            if (!isNaN(date.getTime())) return date;
+        } catch  {}
     }
+    return null;
 }
 function $18d56086b081e2cc$var$getDuration(date1, date2) {
     date1 = $18d56086b081e2cc$var$toDate(date1);
@@ -324,8 +462,429 @@ function $18d56086b081e2cc$var$getDurationRecord(date1, date2) {
     };
     return result;
 }
+function $18d56086b081e2cc$var$getCurrentDateObject() {
+    let now = new Date();
+    return now;
+}
+// -----------------------------------------------------
+//  Human readable  
+// -----------------------------------------------------
+function $18d56086b081e2cc$var$getHumanReadableDate(date) {
+    // If not date 2, assume date 2 is now
+    const now = new Date();
+    const targetDate = new Date(date);
+    const diff = Math.abs(now - targetDate); // difference in milliseconds
+    const seconds = Math.floor(diff / 1000);
+    const minutes = Math.floor(seconds / 60);
+    const hours = Math.floor(minutes / 60);
+    const days = Math.floor(hours / 24);
+    const months = Math.floor(days / 30); // approximation for months
+    const years = Math.floor(days / 365); // approximation for years
+    if (years > 0) return years === 1 ? "1 year ago" : `${years} years ago`;
+    else if (months > 0) return months === 1 ? "1 month ago" : `${months} months ago`;
+    else if (days > 0) return days === 1 ? "1 day ago" : `${days} days ago`;
+    else if (hours > 0) return hours === 1 ? "1 hour ago" : `${hours} hours ago`;
+    else if (minutes > 0) return minutes === 1 ? "1 minute ago" : `${minutes} minutes ago`;
+    else return seconds === 1 ? "1 second ago" : `${seconds} seconds ago`;
+}
+function $18d56086b081e2cc$var$getHumanReadableDuration(startDate, endDate) {
+    startDate = $18d56086b081e2cc$var$toDate(startDate);
+    endDate = $18d56086b081e2cc$var$toDate(endDate);
+    if ((0, $c945f2bbf7fa7d9d$export$f8c0f914c8a0ee10).isNull(startDate)) return "";
+    if ((0, $c945f2bbf7fa7d9d$export$f8c0f914c8a0ee10).isNull(endDate)) return "";
+    const diffInMilliseconds = Math.abs(endDate - startDate);
+    const millisecondsInSecond = 1000;
+    const millisecondsInMinute = millisecondsInSecond * 60;
+    const millisecondsInHour = millisecondsInMinute * 60;
+    const millisecondsInDay = millisecondsInHour * 24;
+    const millisecondsInMonth = millisecondsInDay * 30.44; // Approximate value for a month
+    const millisecondsInYear = millisecondsInDay * 365.25; // Account for leap years
+    const years = Math.floor(diffInMilliseconds / millisecondsInYear);
+    const months = Math.floor(diffInMilliseconds % millisecondsInYear / millisecondsInMonth);
+    const days = Math.floor(diffInMilliseconds % millisecondsInMonth / millisecondsInDay);
+    const hours = Math.floor(diffInMilliseconds % millisecondsInDay / millisecondsInHour);
+    const minutes = Math.floor(diffInMilliseconds % millisecondsInHour / millisecondsInMinute);
+    const seconds = Math.floor(diffInMilliseconds % millisecondsInMinute / millisecondsInSecond);
+    let duration = [];
+    if (years) return `${years} year${years > 1 ? "s" : ""}`;
+    if (months) return `${months} month${months > 1 ? "s" : ""}`;
+    if (days) return `${days} day${days > 1 ? "s" : ""}`;
+    if (hours) return `${hours} hour${hours > 1 ? "s" : ""}`;
+    if (minutes) return `${minutes} minute${minutes > 1 ? "s" : ""}`;
+    if (seconds) return `${seconds} second${seconds >= 0 ? "s" : ""}`;
+    return "";
+}
+// -----------------------------------------------------
+//  ISO 
+// -----------------------------------------------------
+function $18d56086b081e2cc$var$toISODurationFromDates(startDate, endDate) {
+    const start = new Date(startDate);
+    const end = new Date(endDate);
+    let years = end.getFullYear() - start.getFullYear();
+    let months = end.getMonth() - start.getMonth();
+    let days = end.getDate() - start.getDate();
+    let hours = end.getHours() - start.getHours();
+    let minutes = end.getMinutes() - start.getMinutes();
+    let seconds = end.getSeconds() - start.getSeconds();
+    // Handle negative values by adjusting the larger units
+    if (seconds < 0) {
+        seconds += 60;
+        minutes--;
+    }
+    if (minutes < 0) {
+        minutes += 60;
+        hours--;
+    }
+    if (hours < 0) {
+        hours += 24;
+        days--;
+    }
+    if (days < 0) {
+        const daysInPreviousMonth = new Date(end.getFullYear(), end.getMonth(), 0).getDate();
+        days += daysInPreviousMonth;
+        months--;
+    }
+    if (months < 0) {
+        months += 12;
+        years--;
+    }
+    // Construct ISO 8601 duration string
+    let duration = "P";
+    if (years > 0) duration += `${years}Y`;
+    if (months > 0) duration += `${months}M`;
+    if (days > 0) duration += `${days}D`;
+    if (hours > 0 || minutes > 0 || seconds > 0) {
+        duration += "T"; // Time part separator
+        if (hours > 0) duration += `${hours}H`;
+        if (minutes > 0) duration += `${minutes}M`;
+        if (seconds > 0) duration += `${seconds}S`;
+    }
+    return duration;
+}
+function $18d56086b081e2cc$var$convertISODurationToEnglish(duration) {
+    const isoDurationRegex = /^P(?:(\d+)Y)?(?:(\d+)M)?(?:(\d+)D)?(?:T(?:(\d+)H)?(?:(\d+)M)?(?:(\d+)S)?)?$/;
+    const matches = duration.match(isoDurationRegex);
+    if (!matches) return "Invalid ISO 8601 duration";
+    const years = matches[1] ? `${matches[1]} year${matches[1] > 1 ? "s" : ""}` : "";
+    const months = matches[2] ? `${matches[2]} month${matches[2] > 1 ? "s" : ""}` : "";
+    const days = matches[3] ? `${matches[3]} day${matches[3] > 1 ? "s" : ""}` : "";
+    const hours = matches[4] ? `${matches[4]} hour${matches[4] > 1 ? "s" : ""}` : "";
+    const minutes = matches[5] ? `${matches[5]} minute${matches[5] > 1 ? "s" : ""}` : "";
+    const seconds = matches[6] ? `${matches[6]} second${matches[6] > 1 ? "s" : ""}` : "";
+    const parts = [
+        years,
+        months,
+        days,
+        hours,
+        minutes,
+        seconds
+    ].filter(Boolean);
+    if (parts.length === 0) return "No duration specified";
+    return parts.join(", ");
+}
+function $18d56086b081e2cc$var$convertEnglishToISODuration(englishDuration) {
+    const timeUnits = {
+        year: "Y",
+        years: "Y",
+        month: "M",
+        months: "M",
+        day: "D",
+        days: "D",
+        hour: "H",
+        hours: "H",
+        minute: "M",
+        minutes: "M",
+        second: "S",
+        seconds: "S"
+    };
+    let years = 0, months = 0, days = 0, hours = 0, minutes = 0, seconds = 0;
+    // Split the input into parts (e.g., ["2 years", "6 months"])
+    const parts = englishDuration.split(",").map((part)=>part.trim());
+    parts.forEach((part)=>{
+        const [value, unit] = part.split(" ");
+        const number = parseInt(value, 10);
+        if (isNaN(number) || !timeUnits[unit.toLowerCase()]) throw new Error("Invalid duration format");
+        switch(unit.toLowerCase()){
+            case "year":
+            case "years":
+                years = number;
+                break;
+            case "month":
+            case "months":
+                months = number;
+                break;
+            case "day":
+            case "days":
+                days = number;
+                break;
+            case "hour":
+            case "hours":
+                hours = number;
+                break;
+            case "minute":
+            case "minutes":
+                minutes = number;
+                break;
+            case "second":
+            case "seconds":
+                seconds = number;
+                break;
+        }
+    });
+    // Construct ISO 8601 duration string
+    let isoDuration = "P";
+    if (years) isoDuration += `${years}Y`;
+    if (months) isoDuration += `${months}M`;
+    if (days) isoDuration += `${days}D`;
+    if (hours || minutes || seconds) {
+        isoDuration += "T";
+        if (hours) isoDuration += `${hours}H`;
+        if (minutes) isoDuration += `${minutes}M`;
+        if (seconds) isoDuration += `${seconds}S`;
+    }
+    return isoDuration || "P0D"; // Return P0D for no duration
+}
 
 
+
+
+
+
+
+const $f5e690043496127e$export$36b1aac33f5f1b68 = {
+    heading1: $f5e690043496127e$var$_getHeading1,
+    heading2: $f5e690043496127e$var$_getHeading2,
+    headingDescription: $f5e690043496127e$var$_getHeadingDescription,
+    headingDate: $f5e690043496127e$var$_getHeadingDate,
+    headingStatus: $f5e690043496127e$var$_getHeadingStatus
+};
+function $f5e690043496127e$var$_getHeading1(record) {
+    let heading = "heading1";
+    return $f5e690043496127e$var$_getHeadingX(record, heading);
+}
+function $f5e690043496127e$var$_getHeading2(record) {
+    let heading = "heading2";
+    return $f5e690043496127e$var$_getHeadingX(record, heading);
+}
+function $f5e690043496127e$var$_getHeadingDescription(record) {
+    let heading = "headingDescription";
+    return $f5e690043496127e$var$_getHeadingX(record, heading);
+}
+function $f5e690043496127e$var$_getHeadingDate(record) {
+    let heading = "headingDate";
+    return $f5e690043496127e$var$_getHeadingX(record, heading);
+}
+function $f5e690043496127e$var$_getHeadingStatus(record) {
+    let heading = "headingStatus";
+    return $f5e690043496127e$var$_getHeadingX(record, heading);
+}
+function $f5e690043496127e$var$_getHeadingX(record, heading) {
+    let record_type = record["@type"];
+    let config = $f5e690043496127e$var$getConfig();
+    let headingPossibilities = config?.[record_type]?.[heading];
+    if ((0, $c945f2bbf7fa7d9d$export$f8c0f914c8a0ee10).isNotNull(headingPossibilities)) headingPossibilities = config?.["Thing"]?.[heading];
+    let headingValue = null;
+    for (let hp of headingPossibilities){
+        headingValue = $f5e690043496127e$var$_getValue(record, heading, hp);
+        if ((0, $c945f2bbf7fa7d9d$export$f8c0f914c8a0ee10).isNotNull(headingValue)) break;
+    }
+    return headingValue;
+}
+function $f5e690043496127e$var$_getValue(record, heading, keys) {
+    keys = (0, $9fc8b212f324f9e3$export$4736c2d1b0001d00).ensureArray(keys);
+    let values = [];
+    for (let k of keys){
+        let value = record[k];
+        if (Array.isArray(value)) value = value[0];
+        // Handle object as values (when listItem references item for example )
+        if (value?.["@type"]) value = $f5e690043496127e$var$_getHeadingX(value, "heading1");
+        if (value && value != null) values.push(value);
+    }
+    if (values.length == 0) return null;
+    // Assemble values
+    let headingValue = values.join(" ");
+    return headingValue;
+}
+function $f5e690043496127e$var$getConfig() {
+    let record = {
+        Thing: {
+            heading1: [
+                "name",
+                "url",
+                "@id"
+            ],
+            heading2: [
+                "name",
+                "url",
+                "@id"
+            ],
+            headingDescription: [
+                "description"
+            ],
+            headingDate: [
+                ""
+            ]
+        },
+        Article: {
+            heading1: [
+                "headline",
+                "name",
+                "url",
+                "@id"
+            ],
+            heading2: [
+                "author",
+                "url",
+                "@id"
+            ],
+            headingDescription: [
+                "articleBody",
+                "text",
+                "description"
+            ],
+            headingDate: [
+                "datePublished",
+                "dateCreated"
+            ]
+        },
+        Action: {
+            heading1: [
+                "name",
+                "url",
+                "@id"
+            ],
+            heading2: [
+                "author",
+                "url",
+                "@id"
+            ],
+            headingDescription: [
+                "articleBody",
+                "text",
+                "description"
+            ],
+            headingDate: [
+                "datePublished",
+                "dateCreated"
+            ],
+            headingStatus: [
+                "actionStatus"
+            ]
+        },
+        Person: {
+            heading1: [
+                [
+                    "givenName",
+                    "familyName"
+                ],
+                "name",
+                "url",
+                "@id"
+            ],
+            heading2: [
+                "author",
+                "url",
+                "@id"
+            ],
+            headingDescription: [
+                "articleBody",
+                "text",
+                "description"
+            ],
+            headingDate: [
+                "datePublished",
+                "dateCreated"
+            ],
+            headingStatus: [
+                "actionStatus"
+            ]
+        },
+        ListItem: {
+            heading1: [
+                "item",
+                "name",
+                "url",
+                "@id"
+            ],
+            heading2: [
+                "item",
+                "url",
+                "@id"
+            ],
+            headingDescription: [
+                "text",
+                "description"
+            ],
+            headingDate: [
+                "datePublished",
+                "dateCreated"
+            ],
+            headingStatus: [
+                "actionStatus"
+            ]
+        },
+        CreativeWork: {
+            heading1: [
+                "headline",
+                "name",
+                "url",
+                "@id"
+            ],
+            heading2: [
+                "author",
+                "url",
+                "@id"
+            ],
+            headingDescription: [
+                "articleBody",
+                "text",
+                "description"
+            ],
+            headingDate: [
+                "datePublished",
+                "dateCreated"
+            ]
+        },
+        PostalAddress: {
+            heading1: [
+                "streetAddress",
+                "name",
+                "@id"
+            ],
+            heading2: [
+                [
+                    "addressLocality",
+                    "addressRegion",
+                    "postalCode",
+                    "addressCountry"
+                ]
+            ],
+            headingDescription: [
+                "text",
+                "name",
+                "description"
+            ],
+            headingDate: [
+                "datePublished",
+                "dateCreated"
+            ]
+        },
+        QuantitativeValue: {
+            heading1: [
+                [
+                    "value",
+                    "unitText"
+                ],
+                [
+                    "value",
+                    "unitCode"
+                ],
+                "@id"
+            ]
+        }
+    };
+    return record;
+}
 
 
 const $9a2a3d97de4234f5$export$c24b4489b93ad8cb = {
@@ -338,8 +897,8 @@ const $9a2a3d97de4234f5$export$c24b4489b93ad8cb = {
     extractThings: $9a2a3d97de4234f5$var$extractThings
 };
 function $9a2a3d97de4234f5$var$validateThing(value) {
-    if (!value["@type"]) return false;
-    return true;
+    if ((0, $c945f2bbf7fa7d9d$export$f8c0f914c8a0ee10).isNotNull(value?.["@type"]) || (0, $c945f2bbf7fa7d9d$export$f8c0f914c8a0ee10).isNotNull(value?.record_type)) return true;
+    return false;
 }
 function $9a2a3d97de4234f5$var$getRefRecord(value) {
     if ($9a2a3d97de4234f5$var$validateThing(value) == false) return undefined;
@@ -351,31 +910,19 @@ function $9a2a3d97de4234f5$var$getRefRecord(value) {
 }
 function $9a2a3d97de4234f5$var$toText(value) {
     if ($9a2a3d97de4234f5$var$validateThing(value) == false) return undefined;
-    let record_type = value["@type"];
-    let record_id = value["@id"];
-    if (record_type == "QuantitativeValue") {
-        let result = `${value["value"]} ${value["unitText"] || value["unitCode"] || ""}`;
-        return result;
-    }
-    if (record_type == "DefinedTerm") {
-        if (value.name && value.name != null) return value.name;
-        if (value.termCode && value.termCode != null) return value.termCode;
-    }
-    if (record_type == "Person") {
-        if (value["givenName"] && value["familyName"]) return `${value["givenName"]} ${value["familyName"]}`;
-    }
-    record_type;
-    let result = `${value["@type"]}/${value["@id"]}`;
-    return result;
+    var x;
+    return (0, $f5e690043496127e$export$36b1aac33f5f1b68).heading1(value);
 }
 function $9a2a3d97de4234f5$var$extractThings(record) {
-    let results = [];
+    /**
+     * Returns all child things in record
+     */ let results = [];
     if ((0, $9fc8b212f324f9e3$export$4736c2d1b0001d00).isArray(record)) for (let r of record){
         let values = $9a2a3d97de4234f5$var$extractThings(r);
         if (values.length > 0) results = results.concat(values);
     }
     else if ((0, $1fd01b1ecffa6019$export$42f247ccf9267abd).isObject(record)) {
-        if (record?.["@type"] && record?.["@type"] != null) results.push(record);
+        if ((0, $c945f2bbf7fa7d9d$export$f8c0f914c8a0ee10).isNotNull(record?.["@type"]) || (0, $c945f2bbf7fa7d9d$export$f8c0f914c8a0ee10).isNotNull(record?.record_type)) results.push(record);
         for (let k of Object.keys(record)){
             let v = record[k];
             let values = $9a2a3d97de4234f5$var$extractThings(v);
@@ -436,6 +983,40 @@ function $2974f6a85c45961a$var$getDomain(value) {
 }
 
 
+
+
+const $6955f32358295148$export$efeacd8e2fafd6a1 = {
+    toCamelCase: $6955f32358295148$var$toCamelCase,
+    fromCamelCase: $6955f32358295148$var$fromCamelCase,
+    capitalize: $6955f32358295148$var$capitalizeWords
+};
+function $6955f32358295148$var$toCamelCase(str) {
+    return str// Split the string by spaces, underscores, or hyphens
+    .split(/[-_\s]+/)// Convert the first word to lowercase and capitalize the first letter of the following words
+    .map((word, index)=>index === 0 ? word.toLowerCase() : word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())// Join them back into a single string
+    .join("");
+}
+function $6955f32358295148$var$fromCamelCase(str) {
+    return str// Insert a space before every uppercase letter and convert the whole string to lowercase
+    .replace(/([A-Z])/g, " $1").toLowerCase().trim();
+}
+function $6955f32358295148$var$capitalizeWords(input) {
+    // Error checking: input should be a string
+    if (typeof input !== "string") return input;
+    try {
+        // Split the string into an array of words, capitalize the first letter of each word, then join them back into a single string
+        return input.split(" ").map((word)=>{
+            if (word.length > 0) return word.charAt(0).toUpperCase() + word.slice(1).toLowerCase();
+            return word; // Handles cases where there might be multiple spaces
+        }).join(" ");
+    } catch (error) {
+        return input;
+    }
+} // -----------------------------------------------------
+ //  Comment 
+ // -----------------------------------------------------
+
+
 const $5abff2bf4ee17cbb$export$da17952f31714a6e = {
     toText: $5abff2bf4ee17cbb$var$toText,
     getType: $5abff2bf4ee17cbb$var$getType,
@@ -444,13 +1025,25 @@ const $5abff2bf4ee17cbb$export$da17952f31714a6e = {
     valuesToText: $5abff2bf4ee17cbb$var$innerValuesToText
 };
 function $5abff2bf4ee17cbb$var$toText(value) {
-    if ((!value || value == null || value == [] || value == {}) && value != 0) return "";
+    if (value !== 0 && value === undefined) return "";
+    if (value !== 0 && value === null) return "";
+    if (value !== 0 && value == "") return "";
+    if (value !== 0 && Array.isArray(value) && value.length == 0) return "";
+    if (value !== 0 && value == {}) return "";
+    if (value !== 0 && value == "undefined") return "";
     if ((0, $9a2a3d97de4234f5$export$c24b4489b93ad8cb).isThing(value)) return (0, $9a2a3d97de4234f5$export$c24b4489b93ad8cb).toText(value);
     else if ((0, $18d56086b081e2cc$export$15c85b69ec02b47c).isDate(value)) return (0, $18d56086b081e2cc$export$15c85b69ec02b47c).toText(value);
+    else if ((0, $18d56086b081e2cc$export$15c85b69ec02b47c).isTextDate(value)) return (0, $18d56086b081e2cc$export$15c85b69ec02b47c).toText(value);
     else if ((0, $9fc8b212f324f9e3$export$4736c2d1b0001d00).isArray(value)) return (0, $9fc8b212f324f9e3$export$4736c2d1b0001d00).toText(value);
     else if ((0, $135f0c356f6f593e$export$96be39e8128f5891).isNumber(value)) return (0, $135f0c356f6f593e$export$96be39e8128f5891).toText(value);
     else if ((0, $1fd01b1ecffa6019$export$42f247ccf9267abd).isObject(value)) return (0, $1fd01b1ecffa6019$export$42f247ccf9267abd).toText(value);
-    else return String(value);
+    else {
+        value = String(value);
+        value = value.replace("ActionStatus", "");
+        value = value.replace("undefined", "");
+        value = (0, $6955f32358295148$export$efeacd8e2fafd6a1).fromCamelCase(value);
+        return value;
+    }
 }
 function $5abff2bf4ee17cbb$var$innerValuesToText(value) {
     if ((0, $9fc8b212f324f9e3$export$4736c2d1b0001d00).isArray(value)) {
@@ -705,6 +1298,60 @@ function $336c234775b67d62$var$getStatsRecord(statType, property, value, unitCod
 
 
 
+const $6a48e11209e06b9f$export$57abcc0c7c9e66d0 = {
+    get: $6a48e11209e06b9f$var$getApi,
+    post: $6a48e11209e06b9f$var$postApi,
+    delete: $6a48e11209e06b9f$var$deleteApi
+};
+async function $6a48e11209e06b9f$var$getApi(baseUrl, urlPath, params) {
+    const requestOptionsGet = {
+        method: "GET",
+        headers: {
+            "Content-Type": "application/json"
+        }
+    };
+    urlPath = urlPath || "";
+    let url = new URL(String(urlPath), String(baseUrl));
+    url.search = new URLSearchParams(params);
+    const response = await fetch(url, requestOptionsGet);
+    if (response.status != 200 && response.status != 201 && response.status && 202) throw new Error(String(response.status) + " " + response.statusText);
+    let results = await response.json();
+    return results;
+}
+async function $6a48e11209e06b9f$var$postApi(baseUrl, urlPath, records) {
+    //Post 
+    let requestOptions = {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify(records)
+    };
+    urlPath = urlPath || "";
+    let url = new URL(String(urlPath), String(baseUrl));
+    const response = await fetch(url, requestOptions);
+    if (response.status != 200 && response.status != 201 && response.status != 202) throw new Error(String(response.status) + " " + response.statusText);
+    return response;
+}
+async function $6a48e11209e06b9f$var$deleteApi(baseUrl, urlPath, params) {
+    const requestOptionsGet = {
+        method: "DELETE",
+        headers: {
+            "Content-Type": "application/json"
+        }
+    };
+    urlPath = urlPath || "";
+    let url = new URL(String(urlPath), String(baseUrl));
+    url.search = new URLSearchParams(params);
+    const response = await fetch(url, requestOptionsGet);
+    if (response.status != 200 && response.status != 201 && response.status != 202) throw new Error(String(response.status) + " " + response.statusText);
+    return true;
+}
+
+
+
+
+
 const $92413447c3a75377$export$bac8020bbb4f7950 = {
     isEmail: $92413447c3a75377$var$isValidEmail
 };
@@ -713,6 +1360,108 @@ function $92413447c3a75377$var$isValidEmail(email) {
     // Regular expression to validate email addresses
     const emailRegex = /^[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?$/;
     return emailRegex.test(email);
+}
+
+
+
+
+const $51552dec6bec6edd$export$f886cb3e488af9cc = {
+    extractMentions: $51552dec6bec6edd$var$extractMentions,
+    extractNames: $51552dec6bec6edd$var$extractNames,
+    extractValueAndUnit: $51552dec6bec6edd$var$extractValueAndUnit,
+    extractUrls: $51552dec6bec6edd$var$extractUrls,
+    extractNumbers: $51552dec6bec6edd$var$extractNumbers,
+    extractPhoneNumbers: $51552dec6bec6edd$var$extractPhoneNumbers,
+    extractDates: $51552dec6bec6edd$var$extractDates,
+    extractEmails: $51552dec6bec6edd$var$extractEmails
+};
+function $51552dec6bec6edd$var$extractMentions(text) {
+    // Error handling for invalid input
+    if (typeof text !== "string") throw new Error("Input must be a string");
+    // Regular expression to match mentions
+    const mentionRegex = /\B@\w+/g;
+    const mentions = text.match(mentionRegex);
+    // Return an empty array if no mentions found
+    return mentions ? mentions : [];
+}
+function $51552dec6bec6edd$var$extractNames(inputString) {
+    if (typeof inputString !== "string") throw new TypeError("Input must be a string");
+    const namePattern = /\b[A-Z][a-z]*\b/g;
+    const names = inputString.match(namePattern);
+    return names || [];
+}
+function $51552dec6bec6edd$var$extractValueAndUnit(input) {
+    if (typeof input !== "string") throw new Error("Input must be a string");
+    const regex = /(-?\d+\.?\d*)\s*([a-zA-Z]+)/;
+    const match = input.match(regex);
+    if (!match) throw new Error("No value and unit found in the input string");
+    const value = parseFloat(match[1]);
+    const unit = match[2];
+    return {
+        value: value,
+        unit: unit
+    };
+}
+function $51552dec6bec6edd$var$extractNumbers(input) {
+    if (typeof input !== "string") throw new Error("Input must be a string");
+    const numbers = input.match(/\d+/g);
+    if (numbers === null) return [];
+    return numbers.map(Number);
+}
+function $51552dec6bec6edd$var$extractPhoneNumbers(input) {
+    // Error handling: check if input is a string
+    if (typeof input !== "string") throw new Error("Input must be a string");
+    // Regular expression to match different telephone number formats
+    //const phoneRegex = /(\+?\d{1,2}[-.\s]?)?(\(?\d{3}\)?[-.\s]?)?\d{3}[-.\s]?\d{4}/g;
+    const phoneRegex = /(?:([+]\d{1,4})[-.\s]?)?(?:[(](\d{1,3})[)][-.\s]?)?(\d{1,4})[-.\s]?(\d{1,4})[-.\s]?(\d{1,9})/g;
+    // Extract phone numbers
+    const phoneNumbers = input.match(phoneRegex);
+    // If no phone numbers are found, return an empty array
+    if (!phoneNumbers) return [];
+    return phoneNumbers;
+}
+function $51552dec6bec6edd$var$extractDates(input) {
+    try {
+        if (typeof input !== "string") return [];
+        // Regular expression to match dates in YYYY-MM-DD, DD/MM/YYYY, or MM-DD-YYYY format
+        const datePattern = /\b(\d{4}-\d{2}-\d{2}|\d{2}\/\d{2}\/\d{4}|\d{2}-\d{2}-\d{4})\b/g;
+        const dates = input.match(datePattern);
+        if (!dates) return [];
+        let validDates = [];
+        for (let date of dates){
+            let d = (0, $18d56086b081e2cc$export$15c85b69ec02b47c).toDate(date);
+            if (d && d != null) validDates.push(d);
+        }
+        return validDates;
+    } catch (error) {
+        return [];
+    }
+}
+function $51552dec6bec6edd$var$extractEmails(text) {
+    try {
+        // Check if the input is a string
+        if (typeof text !== "string") throw new Error("Input must be a string");
+        // Regular expression for matching email addresses
+        const emailRegex = /\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,7}\b/g;
+        const emails = text.match(emailRegex);
+        // Check if any emails were found
+        if (emails === null) throw new Error("No email addresses found");
+        return emails;
+    } catch (error) {
+        return `Error: ${error.message}`;
+    }
+}
+function $51552dec6bec6edd$var$extractUrls(text) {
+    try {
+        if (typeof text !== "string") throw new Error("Input must be a string");
+        const urlRegex = /https?:\/\/[^\s/$.?#].[^\s]*/g;
+        const urls = text.match(urlRegex);
+        if (!urls) return [];
+        return urls;
+    } catch (error) {
+        console.error("An error occurred:", error.message);
+        return [];
+    }
 }
 
 
@@ -810,665 +1559,6 @@ function $03899943a5d4eab2$var$jsonToPropertiesList(record) {
 
 
 
-const $6955f32358295148$export$efeacd8e2fafd6a1 = {
-    extractMentions: $6955f32358295148$var$extractMentions,
-    extractNames: $6955f32358295148$var$extractNames,
-    extractValueAndUnit: $6955f32358295148$var$extractValueAndUnit,
-    extractUrls: $6955f32358295148$var$extractUrls,
-    extractNumbers: $6955f32358295148$var$extractNumbers,
-    extractPhoneNumbers: $6955f32358295148$var$extractPhoneNumbers,
-    extractDates: $6955f32358295148$var$extractDates,
-    extractEmails: $6955f32358295148$var$extractEmails,
-    toCamelCase: $6955f32358295148$var$toCamelCase,
-    fromCamelCase: $6955f32358295148$var$fromCamelCase
-};
-function $6955f32358295148$var$toCamelCase(str) {
-    return str// Split the string by spaces, underscores, or hyphens
-    .split(/[-_\s]+/)// Convert the first word to lowercase and capitalize the first letter of the following words
-    .map((word, index)=>index === 0 ? word.toLowerCase() : word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())// Join them back into a single string
-    .join("");
-}
-function $6955f32358295148$var$fromCamelCase(str) {
-    return str// Insert a space before every uppercase letter and convert the whole string to lowercase
-    .replace(/([A-Z])/g, " $1").toLowerCase().trim();
-}
-function $6955f32358295148$var$extractMentions(text) {
-    // Error handling for invalid input
-    if (typeof text !== "string") throw new Error("Input must be a string");
-    // Regular expression to match mentions
-    const mentionRegex = /\B@\w+/g;
-    const mentions = text.match(mentionRegex);
-    // Return an empty array if no mentions found
-    return mentions ? mentions : [];
-}
-function $6955f32358295148$var$extractNames(inputString) {
-    if (typeof inputString !== "string") throw new TypeError("Input must be a string");
-    const namePattern = /\b[A-Z][a-z]*\b/g;
-    const names = inputString.match(namePattern);
-    return names || [];
-}
-function $6955f32358295148$var$extractValueAndUnit(input) {
-    if (typeof input !== "string") throw new Error("Input must be a string");
-    const regex = /(-?\d+\.?\d*)\s*([a-zA-Z]+)/;
-    const match = input.match(regex);
-    if (!match) throw new Error("No value and unit found in the input string");
-    const value = parseFloat(match[1]);
-    const unit = match[2];
-    return {
-        value: value,
-        unit: unit
-    };
-}
-function $6955f32358295148$var$extractNumbers(input) {
-    if (typeof input !== "string") throw new Error("Input must be a string");
-    const numbers = input.match(/\d+/g);
-    if (numbers === null) return [];
-    return numbers.map(Number);
-}
-function $6955f32358295148$var$extractPhoneNumbers(input) {
-    // Error handling: check if input is a string
-    if (typeof input !== "string") throw new Error("Input must be a string");
-    // Regular expression to match different telephone number formats
-    //const phoneRegex = /(\+?\d{1,2}[-.\s]?)?(\(?\d{3}\)?[-.\s]?)?\d{3}[-.\s]?\d{4}/g;
-    const phoneRegex = /(?:([+]\d{1,4})[-.\s]?)?(?:[(](\d{1,3})[)][-.\s]?)?(\d{1,4})[-.\s]?(\d{1,4})[-.\s]?(\d{1,9})/g;
-    // Extract phone numbers
-    const phoneNumbers = input.match(phoneRegex);
-    // If no phone numbers are found, return an empty array
-    if (!phoneNumbers) return [];
-    return phoneNumbers;
-}
-function $6955f32358295148$var$extractDates(input) {
-    try {
-        if (typeof input !== "string") return [];
-        // Regular expression to match dates in YYYY-MM-DD, DD/MM/YYYY, or MM-DD-YYYY format
-        const datePattern = /\b(\d{4}-\d{2}-\d{2}|\d{2}\/\d{2}\/\d{4}|\d{2}-\d{2}-\d{4})\b/g;
-        const dates = input.match(datePattern);
-        if (!dates) return [];
-        let validDates = [];
-        for (let date of dates){
-            let d = (0, $18d56086b081e2cc$export$15c85b69ec02b47c).toDate(date);
-            if (d && d != null) validDates.push(d);
-        }
-        return validDates;
-    } catch (error) {
-        return [];
-    }
-}
-function $6955f32358295148$var$extractEmails(text) {
-    try {
-        // Check if the input is a string
-        if (typeof text !== "string") throw new Error("Input must be a string");
-        // Regular expression for matching email addresses
-        const emailRegex = /\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,7}\b/g;
-        const emails = text.match(emailRegex);
-        // Check if any emails were found
-        if (emails === null) throw new Error("No email addresses found");
-        return emails;
-    } catch (error) {
-        return `Error: ${error.message}`;
-    }
-}
-function $6955f32358295148$var$extractUrls(text) {
-    try {
-        if (typeof text !== "string") throw new Error("Input must be a string");
-        const urlRegex = /https?:\/\/[^\s/$.?#].[^\s]*/g;
-        const urls = text.match(urlRegex);
-        if (!urls) return [];
-        return urls;
-    } catch (error) {
-        console.error("An error occurred:", error.message);
-        return [];
-    }
-}
-
-
-
-
-
-
-
-let $c34dce0368b8abc6$var$MAX_WIDTH = 30;
-function $c34dce0368b8abc6$export$7642ec6da7b10b(records, keys, headers) {
-    let content = "";
-    // Duplicate records
-    records = JSON.parse(JSON.stringify(records));
-    // If record, convert properties to array
-    if ((0, $9fc8b212f324f9e3$export$4736c2d1b0001d00).isArray(records) == false) {
-        if ((0, $1fd01b1ecffa6019$export$42f247ccf9267abd).isObject(records) == true) {
-            let values = [];
-            let keys = Object.keys(records);
-            for (let k of keys){
-                let v = records[k];
-                v.propertyID = k;
-                values.push(v);
-            }
-            records = values;
-        }
-    }
-    // Build keys from records keys if missing
-    if (!keys || keys == null) keys = (0, $9fc8b212f324f9e3$export$4736c2d1b0001d00).getKeys(records);
-    // Build headers from keys if missing
-    if (!headers || headers == null) headers = keys;
-    // Convert values
-    records = (0, $5abff2bf4ee17cbb$export$da17952f31714a6e).valuesToText(records);
-    // Get max length for each keys
-    let keysLength = {};
-    let totalLength = 0;
-    for(let i = 0; i < keys.length; i++){
-        let key = keys[i];
-        let header = headers[i];
-        let values = (0, $9fc8b212f324f9e3$export$4736c2d1b0001d00).getValuesForKey(records, key);
-        keysLength[key] = header.length;
-        for (let v of values){
-            let l = v.length;
-            if (l > keysLength[key]) keysLength[key] = l;
-        }
-        totalLength += keysLength[key] + 2;
-    }
-    // Build table header
-    // Top bar line
-    content += `${"".padEnd(totalLength, "-")}`;
-    content += "\n";
-    // Headings
-    for(let i = 0; i < keys.length; i++){
-        let key = keys[i];
-        let header = headers[i];
-        content += `${header.padEnd(keysLength[key] + 2, " ")}`;
-    }
-    content += "\n";
-    for (let key of keys)content += `${"".padEnd(keysLength[key] + 2, "-")}`;
-    content += "\n";
-    // Build table rows
-    for (let record of records){
-        for (let key of keys){
-            let c = String(record?.[key]) || "";
-            if (c.length > $c34dce0368b8abc6$var$MAX_WIDTH) c = c.slice(0, $c34dce0368b8abc6$var$MAX_WIDTH - 3) + "... ";
-            c = c.padEnd(keysLength[key] + 2, " ");
-            content += `${c}`;
-        }
-        content += "\n";
-    }
-    content += `${"".padEnd(totalLength, "-")}`;
-    content += "\n";
-    return content;
-}
-
-
-
-
-
-
-
-const $6a48e11209e06b9f$export$57abcc0c7c9e66d0 = {
-    get: $6a48e11209e06b9f$var$getApi,
-    post: $6a48e11209e06b9f$var$postApi,
-    delete: $6a48e11209e06b9f$var$deleteApi
-};
-async function $6a48e11209e06b9f$var$getApi(baseUrl, urlPath, params) {
-    const requestOptionsGet = {
-        method: "GET",
-        headers: {
-            "Content-Type": "application/json"
-        }
-    };
-    urlPath = urlPath || "";
-    let url = new URL(String(urlPath), String(baseUrl));
-    url.search = new URLSearchParams(params);
-    const response = await fetch(url, requestOptionsGet);
-    if (response.status != 200 && response.status != 201 && response.status && 202) throw new Error(String(response.status) + " " + response.statusText);
-    let results = await response.json();
-    return results;
-}
-async function $6a48e11209e06b9f$var$postApi(baseUrl, urlPath, records) {
-    //Post 
-    let requestOptions = {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json"
-        },
-        body: JSON.stringify(records)
-    };
-    urlPath = urlPath || "";
-    let url = new URL(String(urlPath), String(baseUrl));
-    const response = await fetch(url, requestOptions);
-    if (response.status != 200 && response.status != 201 && response.status != 202) throw new Error(String(response.status) + " " + response.statusText);
-    return response;
-}
-async function $6a48e11209e06b9f$var$deleteApi(baseUrl, urlPath, params) {
-    const requestOptionsGet = {
-        method: "DELETE",
-        headers: {
-            "Content-Type": "application/json"
-        }
-    };
-    urlPath = urlPath || "";
-    let url = new URL(String(urlPath), String(baseUrl));
-    url.search = new URLSearchParams(params);
-    const response = await fetch(url, requestOptionsGet);
-    if (response.status != 200 && response.status != 201 && response.status != 202) throw new Error(String(response.status) + " " + response.statusText);
-    return true;
-}
-
-
-
-const $f5e690043496127e$export$36b1aac33f5f1b68 = {
-    heading1: $f5e690043496127e$var$_getHeading1,
-    heading2: $f5e690043496127e$var$_getHeading2,
-    headingDescription: $f5e690043496127e$var$_getHeadingDescription,
-    headingDate: $f5e690043496127e$var$_getHeadingDate,
-    headingStatus: $f5e690043496127e$var$_getHeadingStatus
-};
-function $f5e690043496127e$var$_getHeading1(record) {
-    let heading = "heading1";
-    return $f5e690043496127e$var$_getHeadingX(record, heading);
-}
-function $f5e690043496127e$var$_getHeading2(record) {
-    let heading = "heading2";
-    return $f5e690043496127e$var$_getHeadingX(record, heading);
-}
-function $f5e690043496127e$var$_getHeadingDescription(record) {
-    let heading = "headingDescription";
-    return $f5e690043496127e$var$_getHeadingX(record, heading);
-}
-function $f5e690043496127e$var$_getHeadingDate(record) {
-    let heading = "headingDate";
-    return $f5e690043496127e$var$_getHeadingX(record, heading);
-}
-function $f5e690043496127e$var$_getHeadingStatus(record) {
-    let heading = "headingStatus";
-    return $f5e690043496127e$var$_getHeadingX(record, heading);
-}
-function $f5e690043496127e$var$_getHeadingX(record, heading) {
-    let record_type = record["@type"];
-    let config = $f5e690043496127e$var$getConfig();
-    let headingPossibilities = config?.[record_type]?.[heading];
-    if (!headingPossibilities || headingPossibilities == null) headingPossibilities = config?.["Thing"]?.[heading];
-    let headingValue = null;
-    for (let hp of headingPossibilities){
-        headingValue = $f5e690043496127e$var$_getValue(record, heading, hp);
-        if (headingValue && headingValue != null) break;
-    }
-    return headingValue;
-}
-function $f5e690043496127e$var$_getValue(record, heading, keys) {
-    keys = (0, $9fc8b212f324f9e3$export$4736c2d1b0001d00).ensureArray(keys);
-    let values = [];
-    for (let k of keys){
-        let value = record[k];
-        if (Array.isArray(value)) value = value[0];
-        // Handle object as values (when listItem references item for example )
-        if (value?.["@type"]) value = $f5e690043496127e$var$_getHeadingX(value, "heading1");
-        if (value && value != null) values.push(value);
-    }
-    if (values.length == 0) return null;
-    // Assemble values
-    let headingValue = values.join(" ");
-    return headingValue;
-}
-function $f5e690043496127e$var$getConfig() {
-    let record = {
-        Thing: {
-            heading1: [
-                "name",
-                "url",
-                "@id"
-            ],
-            heading2: [
-                "name",
-                "url",
-                "@id"
-            ],
-            headingDescription: [
-                "description"
-            ],
-            headingDate: [
-                ""
-            ]
-        },
-        Article: {
-            heading1: [
-                "headline",
-                "name",
-                "url",
-                "@id"
-            ],
-            heading2: [
-                "author",
-                "url",
-                "@id"
-            ],
-            headingDescription: [
-                "articleBody",
-                "text",
-                "description"
-            ],
-            headingDate: [
-                "datePublished",
-                "dateCreated"
-            ]
-        },
-        Action: {
-            heading1: [
-                "name",
-                "url",
-                "@id"
-            ],
-            heading2: [
-                "author",
-                "url",
-                "@id"
-            ],
-            headingDescription: [
-                "articleBody",
-                "text",
-                "description"
-            ],
-            headingDate: [
-                "datePublished",
-                "dateCreated"
-            ],
-            headingStatus: [
-                "actionStatus"
-            ]
-        },
-        Person: {
-            heading1: [
-                [
-                    "givenName",
-                    "familyName"
-                ],
-                "name",
-                "url",
-                "@id"
-            ],
-            heading2: [
-                "author",
-                "url",
-                "@id"
-            ],
-            headingDescription: [
-                "articleBody",
-                "text",
-                "description"
-            ],
-            headingDate: [
-                "datePublished",
-                "dateCreated"
-            ],
-            headingStatus: [
-                "actionStatus"
-            ]
-        },
-        ListItem: {
-            heading1: [
-                "item",
-                "name",
-                "url",
-                "@id"
-            ],
-            heading2: [
-                "item",
-                "url",
-                "@id"
-            ],
-            headingDescription: [
-                "text",
-                "description"
-            ],
-            headingDate: [
-                "datePublished",
-                "dateCreated"
-            ],
-            headingStatus: [
-                "actionStatus"
-            ]
-        },
-        CreativeWork: {
-            heading1: [
-                "headline",
-                "name",
-                "url",
-                "@id"
-            ],
-            heading2: [
-                "author",
-                "url",
-                "@id"
-            ],
-            headingDescription: [
-                "articleBody",
-                "text",
-                "description"
-            ],
-            headingDate: [
-                "datePublished",
-                "dateCreated"
-            ]
-        },
-        PostalAddress: {
-            heading1: [
-                "streetAddress",
-                "name",
-                "@id"
-            ],
-            heading2: [
-                [
-                    "addressLocality",
-                    "addressRegion",
-                    "postalCode",
-                    "addressCountry"
-                ]
-            ],
-            headingDescription: [
-                "text",
-                "name",
-                "description"
-            ],
-            headingDate: [
-                "datePublished",
-                "dateCreated"
-            ]
-        }
-    };
-    return record;
-}
-
-
-
-
-const $23c99379dceee5e4$export$cc74e2e6d445aa47 = {
-    get: $23c99379dceee5e4$var$replacePlaceholders,
-    replacePlaceholders: $23c99379dceee5e4$var$replacePlaceholders,
-    render: $23c99379dceee5e4$var$replacePlaceholders
-};
-function $23c99379dceee5e4$var$replacePlaceholders(template, record) {
-    template = $23c99379dceee5e4$var$replacePlaceholdersLists(template, record);
-    template = $23c99379dceee5e4$var$replacePlaceholdersValues(template, record);
-    return template;
-}
-function $23c99379dceee5e4$var$replacePlaceholdersLists(template, record) {
-    // Replace simple {{name}} placeholders
-    console.log(template);
-    console.log(typeof template);
-    if (!template || template == null || template === "") return template;
-    while(template.includes("{{ "))template = template.replace("{{ ", "{{");
-    while(template.includes(" }}"))template = template.replace(" }}", "}}");
-    while(template.includes("{{# "))template = template.replace("{{# ", "{{#");
-    while(template.includes("{{/ "))template = template.replace("{{/ ", "{{/");
-    while(template.includes("{{#")){
-        // Get last
-        let parts = template.split("{{#");
-        let propertyContent = parts[parts.length - 1];
-        let contentBefore = parts.slice(0, parts.length - 1).join("{{#");
-        let propertyID = propertyContent.split("}}")[0];
-        let valueContentItems = propertyContent.split("}}");
-        valueContentItems = valueContentItems.slice(1);
-        let valueContent = valueContentItems.join("}}");
-        let content = valueContent.split("{{/" + propertyID)[0];
-        let contentAfter = valueContent.split("{{/" + propertyID + "}}").slice(1).join("{{/");
-        // Get values
-        let values = (0, $2865c5ce12fd7c9f$export$fe5b3308000496d5).getValue(propertyID, record);
-        if (!Array.isArray(values)) values = [
-            values
-        ];
-        let partsContent = "";
-        for(let i = 0; i < values.length; i++){
-            let value = values[i];
-            let tempRecord = JSON.parse(JSON.stringify(record));
-            tempRecord = (0, $2865c5ce12fd7c9f$export$fe5b3308000496d5).setValue(tempRecord, propertyID, value);
-            partsContent += $23c99379dceee5e4$var$replacePlaceholdersValues(content, tempRecord);
-        }
-        template = String(contentBefore) + String(partsContent) + String(contentAfter);
-    }
-    return template;
-}
-function $23c99379dceee5e4$var$replacePlaceholdersValues(template, record) {
-    // Replaces placeholders {{ }} by value from record
-    // Looks for {{ property1.property2 | command:propertyID }}
-    let content = template.replace(/{{(.*?)}}/g, (match, keyString)=>{
-        let value = $23c99379dceee5e4$var$_getValue(keyString, record);
-        return value; // Replace with value
-    });
-    content = content.replace("  ", " ");
-    return content;
-}
-function $23c99379dceee5e4$var$_getValue(content, record) {
-    if (!content || content === null || content === "") return null;
-    if (!record || record === null || record === "") return null;
-    let keyPath = $23c99379dceee5e4$var$_getKeyPath(content);
-    let values = (0, $2865c5ce12fd7c9f$export$fe5b3308000496d5).getValue(keyPath, record);
-    let command = $23c99379dceee5e4$var$_getCommand(content);
-    let commandProperty = $23c99379dceee5e4$var$_getCommandProperty(content);
-    if (command && command != null && commandProperty && commandProperty != null) values = (0, $336c234775b67d62$export$35d3dd03f0194c3a)?.[command](values, commandProperty);
-    return values;
-}
-function $23c99379dceee5e4$var$_getKeyPath(value) {
-    if (!value || value === null || value === "") return null;
-    let keyString = value.trim();
-    if (!keyString || keyString === null || keyString === "") return null;
-    // Get key
-    let key = keyString.split("|")[0];
-    key = key.trim(); // Remove any surrounding whitespace
-    if (!key || key === null || key === "") return "";
-    return key;
-}
-function $23c99379dceee5e4$var$_getCommand(value) {
-    if (!value || value === null || value === "") return null;
-    let keyString = value.trim();
-    if (!keyString || keyString === null || keyString === "") return null;
-    // Get commandSection
-    let commandSection = keyString.split("|")?.[1] || null;
-    if (!commandSection || commandSection === null || commandSection === "") return null;
-    commandSection = commandSection.trim(); // Remove any surrounding whitespace
-    if (!commandSection || commandSection === null || commandSection === "") return null;
-    // Get command
-    let command = commandSection.split(":")?.[0];
-    if (!command || command === null || command === "") return null;
-    command = command.trim();
-    if (!command || command === null || command === "") return null;
-    return command;
-}
-function $23c99379dceee5e4$var$_getCommandProperty(value) {
-    if (!value || value === null || value === "") return null;
-    let keyString = value.trim();
-    if (!keyString || keyString === null || keyString === "") return null;
-    // Get commandSection
-    let commandSection = keyString.split("|")?.[1] || null;
-    if (!commandSection || commandSection === null || commandSection === "") return null;
-    commandSection = commandSection.trim(); // Remove any surrounding whitespace
-    if (!commandSection || commandSection === null || commandSection === "") return null;
-    // Get command
-    let commandProperty = commandSection.split(":")?.[1];
-    if (!commandProperty || commandProperty === null || commandProperty === "") return null;
-    commandProperty = commandProperty.trim();
-    if (!commandProperty || commandProperty === null || commandProperty === "") return null;
-    return commandProperty;
-}
-
-
-const $c945f2bbf7fa7d9d$export$f8c0f914c8a0ee10 = {
-    isNull: $c945f2bbf7fa7d9d$var$isNull,
-    isNotNull: $c945f2bbf7fa7d9d$var$isNotNull,
-    isEqual: $c945f2bbf7fa7d9d$var$isEqual,
-    isNotEqual: $c945f2bbf7fa7d9d$var$isNotEqual,
-    isEven: $c945f2bbf7fa7d9d$var$isEven,
-    isOdd: $c945f2bbf7fa7d9d$var$isOdd,
-    isOdd: $c945f2bbf7fa7d9d$var$isOdd
-};
-function $c945f2bbf7fa7d9d$var$isNotNull(value1) {
-    return !$c945f2bbf7fa7d9d$var$isNull(value1);
-}
-function $c945f2bbf7fa7d9d$var$isNull(value1) {
-    if (value1 === 0) return false;
-    if (value1 === undefined) return true;
-    if (value1 === null) return true;
-    if (value1 === "") return true;
-    // If array, removes null values then check if length == 0
-    if (Array.isArray(value1)) {
-        value1 = value1.filter((x)=>$c945f2bbf7fa7d9d$var$isNull(x) == false);
-        if (value1.length == 0) return true;
-        else return false;
-    }
-    // If object, check if it has keys
-    if (typeof value1 === "object" && !Array.isArray(value1) && value1 !== null) {
-        if (Object.keys(value1).length == 0) return true;
-        else return false;
-    }
-    // Catch all
-    return false;
-}
-function $c945f2bbf7fa7d9d$var$isNotEqual(value1, value2) {
-    return !$c945f2bbf7fa7d9d$var$isEqual(value1, value2);
-}
-function $c945f2bbf7fa7d9d$var$isEqual(value1, value2) {
-    // if nulls
-    if ($c945f2bbf7fa7d9d$var$isNull(value1) && $c945f2bbf7fa7d9d$var$isNull(value2)) return true;
-    if ($c945f2bbf7fa7d9d$var$isNull(value1) && $c945f2bbf7fa7d9d$var$isNotNull(value2)) return false;
-    if ($c945f2bbf7fa7d9d$var$isNotNull(value1) && $c945f2bbf7fa7d9d$var$isNull(value2)) return false;
-    // Equality for others
-    try {
-        if (value == value2) return true;
-    } catch  {}
-    // Equality for Thing
-    let v1_record_type = value1?.record_type || value1?.["@type"];
-    let v2_record_type = value2?.record_type || value2?.["@type"];
-    let v1_record_id = value1?.record_id || value1?.["@id"];
-    let v2_record_id = value2?.record_id || value2?.["@id"];
-    if ($c945f2bbf7fa7d9d$var$isNull(v1_record_type) && $c945f2bbf7fa7d9d$var$isNotNull(v2_record_type)) return false;
-    if ($c945f2bbf7fa7d9d$var$isNotNull(v1_record_type) && $c945f2bbf7fa7d9d$var$isNull(v2_record_type)) return false;
-    if ($c945f2bbf7fa7d9d$var$isNull(v1_record_id) && $c945f2bbf7fa7d9d$var$isNotNull(v2_record_id)) return false;
-    if ($c945f2bbf7fa7d9d$var$isNotNull(v1_record_id) && $c945f2bbf7fa7d9d$var$isNull(v2_record_id)) return false;
-    if ($c945f2bbf7fa7d9d$var$isNotNull(v1_record_type) && $c945f2bbf7fa7d9d$var$isNotNull(v2_record_type)) {
-        if ($c945f2bbf7fa7d9d$var$isNotNull(v1_record_id) && $c945f2bbf7fa7d9d$var$isNotNull(v2_record_id)) {
-            if (v1_record_type == v2_record_type && v1_record_id == v2_record_id) return true;
-            else return false;
-        }
-    }
-    // Equality for objects
-    try {
-        if (JSON.stringify(value1) == JSON.stringify(value2)) return true;
-    } catch  {}
-    return false;
-}
-function $c945f2bbf7fa7d9d$var$isEven(value1) {
-    try {
-        if (value1 % 2 == 1) return false;
-        else return true;
-    } catch  {
-        return false;
-    }
-}
-function $c945f2bbf7fa7d9d$var$isOdd(value1) {
-    try {
-        if (value1 % 2 == 0) return false;
-        else return true;
-    } catch  {
-        return false;
-    }
-}
-
-
-
 
 let $5f4f35b6ef9ecbdf$var$DB = [];
 class $5f4f35b6ef9ecbdf$export$1dd6e8119d1f29dd {
@@ -1517,7 +1607,7 @@ class $5f4f35b6ef9ecbdf$export$1dd6e8119d1f29dd {
         this._record["@type"] = value;
     }
     get record_id() {
-        if (krakenNUllHelpers.isNull(this._record?.["@id"])) this._record["@id"], String(crypto.randomUUID());
+        if ((0, $c945f2bbf7fa7d9d$export$f8c0f914c8a0ee10).isNull(this._record?.["@id"])) this._record["@id"], String(crypto.randomUUID());
         return this._record?.["@id"];
     }
     set record_id(value) {
@@ -1561,17 +1651,17 @@ class $5f4f35b6ef9ecbdf$export$2fddb5f9f1c2375e extends $5f4f35b6ef9ecbdf$export
         newObject.record = this.record;
     }
     lt(other) {
-        if (krakenNUllHelpers.isNull(this.endTime) && krakenNUllHelpers.isNull(other.endTime)) return false;
-        if (krakenNUllHelpers.isNull(this.endTime) && (0, $c945f2bbf7fa7d9d$export$f8c0f914c8a0ee10).isNotNull(other.endTime)) return false;
-        if ((0, $c945f2bbf7fa7d9d$export$f8c0f914c8a0ee10).isNotNull(this.endTime) && krakenNUllHelpers.isNull(other.endTime)) return true;
+        if ((0, $c945f2bbf7fa7d9d$export$f8c0f914c8a0ee10).isNull(this.endTime) && (0, $c945f2bbf7fa7d9d$export$f8c0f914c8a0ee10).isNull(other.endTime)) return false;
+        if ((0, $c945f2bbf7fa7d9d$export$f8c0f914c8a0ee10).isNull(this.endTime) && (0, $c945f2bbf7fa7d9d$export$f8c0f914c8a0ee10).isNotNull(other.endTime)) return false;
+        if ((0, $c945f2bbf7fa7d9d$export$f8c0f914c8a0ee10).isNotNull(this.endTime) && (0, $c945f2bbf7fa7d9d$export$f8c0f914c8a0ee10).isNull(other.endTime)) return true;
         if (this.endTime < other.endTime) return true;
         if (this.endTime > other.endTime) return false;
         return false;
     }
     gt(other) {
-        if (krakenNUllHelpers.isNull(this.endTime) && krakenNUllHelpers.isNull(other.endTime)) return false;
-        if (krakenNUllHelpers.isNull(this.endTime) && (0, $c945f2bbf7fa7d9d$export$f8c0f914c8a0ee10).isNotNull(other.endTime)) return false;
-        if ((0, $c945f2bbf7fa7d9d$export$f8c0f914c8a0ee10).isNotNull(this.endTime) && krakenNUllHelpers.isNull(other.endTime)) return true;
+        if ((0, $c945f2bbf7fa7d9d$export$f8c0f914c8a0ee10).isNull(this.endTime) && (0, $c945f2bbf7fa7d9d$export$f8c0f914c8a0ee10).isNull(other.endTime)) return false;
+        if ((0, $c945f2bbf7fa7d9d$export$f8c0f914c8a0ee10).isNull(this.endTime) && (0, $c945f2bbf7fa7d9d$export$f8c0f914c8a0ee10).isNotNull(other.endTime)) return false;
+        if ((0, $c945f2bbf7fa7d9d$export$f8c0f914c8a0ee10).isNotNull(this.endTime) && (0, $c945f2bbf7fa7d9d$export$f8c0f914c8a0ee10).isNull(other.endTime)) return true;
         if (this.endTime > other.endTime) return true;
         if (this.endTime < other.endTime) return false;
         return false;
@@ -1663,11 +1753,316 @@ class $5f4f35b6ef9ecbdf$export$2fddb5f9f1c2375e extends $5f4f35b6ef9ecbdf$export
         this.error = String(error);
         this.endTime = new Date();
     }
+    // -----------------------------------------------------
+    //  Comment 
+    // -----------------------------------------------------
+    getHumanRecord() {
+        let humanRecord = (0, $5abff2bf4ee17cbb$export$da17952f31714a6e).innerValuesToText(this.record);
+        humanRecord.duration = (0, $18d56086b081e2cc$export$15c85b69ec02b47c).human.duration(this.startTime, this.endTime);
+        return humanRecord;
+    }
 }
 const $5f4f35b6ef9ecbdf$export$76d497fdd9c60660 = {
     Thing: $5f4f35b6ef9ecbdf$export$1dd6e8119d1f29dd,
     Action: $5f4f35b6ef9ecbdf$export$2fddb5f9f1c2375e
 };
+
+
+
+
+
+
+
+
+let $c34dce0368b8abc6$var$MAX_WIDTH = 30;
+function $c34dce0368b8abc6$export$7642ec6da7b10b(records, keys, headers) {
+    let content = "";
+    // Duplicate records
+    records = JSON.parse(JSON.stringify(records));
+    // If record, convert properties to array
+    if ((0, $9fc8b212f324f9e3$export$4736c2d1b0001d00).isArray(records) == false) {
+        if ((0, $1fd01b1ecffa6019$export$42f247ccf9267abd).isObject(records) == true) {
+            let values = [];
+            let keys = Object.keys(records);
+            for (let k of keys){
+                let v = records[k];
+                v.propertyID = k;
+                values.push(v);
+            }
+            records = values;
+        }
+    }
+    // Build keys from records keys if missing
+    if ((0, $c945f2bbf7fa7d9d$export$f8c0f914c8a0ee10).isNull(keys)) keys = (0, $9fc8b212f324f9e3$export$4736c2d1b0001d00).getKeys(records);
+    // Build headers from keys if missing
+    if ((0, $c945f2bbf7fa7d9d$export$f8c0f914c8a0ee10).isNull(headers)) headers = keys;
+    // Convert values
+    records = (0, $5abff2bf4ee17cbb$export$da17952f31714a6e).innerValuesToText(records);
+    // Get max length for each keys
+    let keysLength = {};
+    let totalLength = 0;
+    for(let i = 0; i < keys.length; i++){
+        let key = keys[i];
+        let header = headers[i];
+        let values = (0, $9fc8b212f324f9e3$export$4736c2d1b0001d00).getValuesForKey(records, key);
+        keysLength[key] = header.length;
+        for (let v of values){
+            let l = v.length;
+            if (l > keysLength[key]) keysLength[key] = l;
+        }
+        totalLength += keysLength[key] + 2;
+    }
+    // Build table header
+    // Top bar line
+    content += `${"".padEnd(totalLength, "-")}`;
+    content += "\n";
+    // Headings
+    for(let i = 0; i < keys.length; i++){
+        let key = keys[i];
+        let header = headers[i];
+        content += `${header.padEnd(keysLength[key] + 2, " ")}`;
+    }
+    content += "\n";
+    for (let key of keys)content += `${"".padEnd(keysLength[key] + 2, "-")}`;
+    content += "\n";
+    // Build table rows
+    for (let record of records){
+        for (let key of keys){
+            let c = String(record?.[key] || "");
+            if (c.length > $c34dce0368b8abc6$var$MAX_WIDTH) c = c.slice(0, $c34dce0368b8abc6$var$MAX_WIDTH - 3) + "... ";
+            c = c.padEnd(keysLength[key] + 2, " ");
+            content += `${c}`;
+        }
+        content += "\n";
+    }
+    content += `${"".padEnd(totalLength, "-")}`;
+    content += "\n";
+    return content;
+}
+
+
+class $1cc9ca26baaa23b8$var$KrakenLog {
+    /**
+     * KrakenLog
+     * Class containing a series of logs (actions)
+     * Attributes:
+     * -
+     * Methods:
+     *  - log(content, error): addns a new action with given content as name, sets tatus to Completed, unless error then Failed
+     *  - get(filter): provided a json acting as filter, returns actions matching criteria
+     *  - getLactAction(filter): provides last action with given filter
+     */ constructor(collection){
+        this.collection = collection;
+        this.agent = null;
+        this.instrument = null;
+        this.object = null;
+        this.actions = [];
+    }
+    // -----------------------------------------------------
+    //  System methods
+    // -----------------------------------------------------
+    toString() {
+        let records = this.actions.map((x)=>x.getHumanRecord());
+        let keys = [
+            "startTime",
+            "endTime",
+            "duration",
+            "name",
+            "actionStatus"
+        ];
+        return (0, $c34dce0368b8abc6$export$7642ec6da7b10b)(records, keys, keys);
+    }
+    get length() {
+        return this.actions.length;
+    }
+    // -----------------------------------------------------
+    //  Attributes 
+    // -----------------------------------------------------
+    get first() {
+        return this._getFirstAction();
+    }
+    get last() {
+        return this._getLastAction();
+    }
+    // -----------------------------------------------------
+    //  Methods 
+    // -----------------------------------------------------
+    get(filter) {
+        return this._getActions(filter);
+    }
+    getFirst(filter) {
+        return this._getFirstAction(filter);
+    }
+    getLast(filter) {
+        return this._getLastAction(filter);
+    }
+    log(content, error) {
+        return this._addNewLog(content, error);
+    }
+    // -----------------------------------------------------
+    //  System methods
+    // -----------------------------------------------------
+    _getNewAction() {
+        let action = new (0, $5f4f35b6ef9ecbdf$export$2fddb5f9f1c2375e)("log");
+        this.actions.push(action);
+        if ((0, $c945f2bbf7fa7d9d$export$f8c0f914c8a0ee10).isNotNull(this.agent)) action.agent = this.agent;
+        if ((0, $c945f2bbf7fa7d9d$export$f8c0f914c8a0ee10).isNotNull(this.instrument)) action.instrument = this.instrument;
+        if ((0, $c945f2bbf7fa7d9d$export$f8c0f914c8a0ee10).isNotNull(this.object)) action.object = this.object;
+        return action;
+    }
+    _addNewLog(content, error) {
+        let action = this._getNewAction();
+        if ((0, $c945f2bbf7fa7d9d$export$f8c0f914c8a0ee10).isNotNull(error)) action.error = error;
+        else action.setCompleted();
+        if ((0, $c945f2bbf7fa7d9d$export$f8c0f914c8a0ee10).isNotNull(content)) action.name = content;
+        return action;
+    }
+    _getActions(filter) {
+        function sortActions(a, b) {
+            if (a.lt(b)) return 1;
+            else if (a.gt(b)) return -1;
+            else return 0;
+        }
+        let actions = this.actions;
+        actions.sort(sortActions);
+        //
+        if (filter) for (let k of Object.keys(filter))actions = actions.filter((x)=>x?.[k] == filter[k]);
+        return actions;
+    }
+    _getFirstAction(filter) {
+        let actions = this._getActions(filter);
+        if ((0, $c945f2bbf7fa7d9d$export$f8c0f914c8a0ee10).isNotNull(actions)) return actions[0];
+        return null;
+    }
+    _getLastAction(filter) {
+        let actions = this._getActions(filter);
+        if ((0, $c945f2bbf7fa7d9d$export$f8c0f914c8a0ee10).isNotNull(actions)) return actions[actions.length - 1];
+        return null;
+    }
+}
+const $1cc9ca26baaa23b8$export$b276217a9ee3e8fa = $1cc9ca26baaa23b8$var$KrakenLog;
+
+
+
+
+
+
+
+
+
+const $23c99379dceee5e4$export$cc74e2e6d445aa47 = {
+    get: $23c99379dceee5e4$var$replacePlaceholders,
+    replacePlaceholders: $23c99379dceee5e4$var$replacePlaceholders,
+    render: $23c99379dceee5e4$var$replacePlaceholders
+};
+function $23c99379dceee5e4$var$replacePlaceholders(template, record) {
+    template = $23c99379dceee5e4$var$replacePlaceholdersLists(template, record);
+    template = $23c99379dceee5e4$var$replacePlaceholdersValues(template, record);
+    return template;
+}
+function $23c99379dceee5e4$var$replacePlaceholdersLists(template, record) {
+    // Replace simple {{name}} placeholders
+    console.log(template);
+    console.log(typeof template);
+    if (!template || template == null || template === "") return template;
+    while(template.includes("{{ "))template = template.replace("{{ ", "{{");
+    while(template.includes(" }}"))template = template.replace(" }}", "}}");
+    while(template.includes("{{# "))template = template.replace("{{# ", "{{#");
+    while(template.includes("{{/ "))template = template.replace("{{/ ", "{{/");
+    while(template.includes("{{#")){
+        // Get last
+        let parts = template.split("{{#");
+        let propertyContent = parts[parts.length - 1];
+        let contentBefore = parts.slice(0, parts.length - 1).join("{{#");
+        let propertyID = propertyContent.split("}}")[0];
+        let valueContentItems = propertyContent.split("}}");
+        valueContentItems = valueContentItems.slice(1);
+        let valueContent = valueContentItems.join("}}");
+        let content = valueContent.split("{{/" + propertyID)[0];
+        let contentAfter = valueContent.split("{{/" + propertyID + "}}").slice(1).join("{{/");
+        // Get values
+        let values = (0, $2865c5ce12fd7c9f$export$fe5b3308000496d5).getValue(propertyID, record);
+        if (!Array.isArray(values)) values = [
+            values
+        ];
+        let partsContent = "";
+        for(let i = 0; i < values.length; i++){
+            let value = values[i];
+            let tempRecord = JSON.parse(JSON.stringify(record));
+            tempRecord = (0, $2865c5ce12fd7c9f$export$fe5b3308000496d5).setValue(tempRecord, propertyID, value);
+            partsContent += $23c99379dceee5e4$var$replacePlaceholdersValues(content, tempRecord);
+        }
+        template = String(contentBefore) + String(partsContent) + String(contentAfter);
+    }
+    return template;
+}
+function $23c99379dceee5e4$var$replacePlaceholdersValues(template, record) {
+    // Replaces placeholders {{ }} by value from record
+    // Looks for {{ property1.property2 | command:propertyID }}
+    let content = template.replace(/{{(.*?)}}/g, (match, keyString)=>{
+        let value = $23c99379dceee5e4$var$_getValue(keyString, record);
+        return value; // Replace with value
+    });
+    content = content.replace("  ", " ");
+    return content;
+}
+function $23c99379dceee5e4$var$_getValue(content, record) {
+    if (!content || content === null || content === "") return null;
+    if (!record || record === null || record === "") return null;
+    let keyPath = $23c99379dceee5e4$var$_getKeyPath(content);
+    let values = (0, $2865c5ce12fd7c9f$export$fe5b3308000496d5).getValue(keyPath, record);
+    let command = $23c99379dceee5e4$var$_getCommand(content);
+    let commandProperty = $23c99379dceee5e4$var$_getCommandProperty(content);
+    // If command exists, retrive command
+    if (command && command != null && commandProperty && commandProperty != null) values = (0, $336c234775b67d62$export$35d3dd03f0194c3a)?.[command](values, commandProperty);
+    return values;
+}
+function $23c99379dceee5e4$var$_getKeyPath(value) {
+    if (!value || value === null || value === "") return null;
+    let keyString = value.trim();
+    if (!keyString || keyString === null || keyString === "") return null;
+    // Get key
+    let key = keyString.split("|")[0];
+    key = key.trim(); // Remove any surrounding whitespace
+    if (!key || key === null || key === "") return "";
+    return key;
+}
+function $23c99379dceee5e4$var$_getCommand(value) {
+    if (!value || value === null || value === "") return null;
+    let keyString = value.trim();
+    if (!keyString || keyString === null || keyString === "") return null;
+    // Get commandSection
+    let commandSection = keyString.split("|")?.[1] || null;
+    if (!commandSection || commandSection === null || commandSection === "") return null;
+    commandSection = commandSection.trim(); // Remove any surrounding whitespace
+    if (!commandSection || commandSection === null || commandSection === "") return null;
+    // Get command
+    let command = commandSection.split(":")?.[0];
+    if (!command || command === null || command === "") return null;
+    command = command.trim();
+    if (!command || command === null || command === "") return null;
+    return command;
+}
+function $23c99379dceee5e4$var$_getCommandProperty(value) {
+    if (!value || value === null || value === "") return null;
+    let keyString = value.trim();
+    if (!keyString || keyString === null || keyString === "") return null;
+    // Get commandSection
+    let commandSection = keyString.split("|")?.[1] || null;
+    if (!commandSection || commandSection === null || commandSection === "") return null;
+    commandSection = commandSection.trim(); // Remove any surrounding whitespace
+    if (!commandSection || commandSection === null || commandSection === "") return null;
+    // Get command
+    let commandProperty = commandSection.split(":")?.[1];
+    if (!commandProperty || commandProperty === null || commandProperty === "") return null;
+    commandProperty = commandProperty.trim();
+    if (!commandProperty || commandProperty === null || commandProperty === "") return null;
+    return commandProperty;
+}
+
+
+
+
 
 
 class $9be01ebda65f7f50$export$f5bc5036afac6116 {
@@ -1835,23 +2230,25 @@ const $53bcb33ef2023ce8$export$f936470337fdc8d0 = {
     date: (0, $18d56086b081e2cc$export$15c85b69ec02b47c),
     dot: (0, $2865c5ce12fd7c9f$export$fe5b3308000496d5),
     email: (0, $92413447c3a75377$export$bac8020bbb4f7950),
+    extract: (0, $51552dec6bec6edd$export$f886cb3e488af9cc),
+    headings: (0, $f5e690043496127e$export$36b1aac33f5f1b68),
     json: (0, $03899943a5d4eab2$export$94a70d284fcdf065),
+    Logs: (0, $1cc9ca26baaa23b8$export$b276217a9ee3e8fa),
+    null: (0, $c945f2bbf7fa7d9d$export$f8c0f914c8a0ee10),
     number: (0, $135f0c356f6f593e$export$96be39e8128f5891),
     object: (0, $1fd01b1ecffa6019$export$42f247ccf9267abd),
+    simple: (0, $5f4f35b6ef9ecbdf$export$76d497fdd9c60660),
     string: (0, $6955f32358295148$export$efeacd8e2fafd6a1),
+    template: (0, $23c99379dceee5e4$export$cc74e2e6d445aa47),
     textTable: (0, $c34dce0368b8abc6$export$7642ec6da7b10b),
     thing: (0, $9a2a3d97de4234f5$export$c24b4489b93ad8cb),
     Timer: (0, $6e423e9502adc63f$export$7729b59bd32e7982),
     url: (0, $2974f6a85c45961a$export$b881b526c33ee854),
     value: (0, $5abff2bf4ee17cbb$export$da17952f31714a6e),
-    headings: (0, $f5e690043496127e$export$36b1aac33f5f1b68),
-    null: (0, $c945f2bbf7fa7d9d$export$f8c0f914c8a0ee10),
     isNull: (0, $c945f2bbf7fa7d9d$export$f8c0f914c8a0ee10).isNull,
     isNotNull: (0, $c945f2bbf7fa7d9d$export$f8c0f914c8a0ee10).isNotNull,
     isEqual: (0, $c945f2bbf7fa7d9d$export$f8c0f914c8a0ee10).isEqual,
-    isNotEqual: (0, $c945f2bbf7fa7d9d$export$f8c0f914c8a0ee10).isNotEqual,
-    template: (0, $23c99379dceee5e4$export$cc74e2e6d445aa47),
-    simple: (0, $5f4f35b6ef9ecbdf$export$76d497fdd9c60660)
+    isNotEqual: (0, $c945f2bbf7fa7d9d$export$f8c0f914c8a0ee10).isNotEqual
 };
 
 

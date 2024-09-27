@@ -111,6 +111,7 @@ function _getValue(content, record) {
 
     let commandProperty = _getCommandProperty(content);
 
+    // If command exists, retrive command
     if (
         command &&
         command != null &&

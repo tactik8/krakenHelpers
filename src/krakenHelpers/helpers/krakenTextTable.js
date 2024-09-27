@@ -6,6 +6,7 @@ import { krakenThingHelpers } from './krakenThingHelpers.js'
 import { krakenValueHelpers } from './krakenValueHelpers.js'
 import { krakenObjectHelpers } from './krakenObjectHelpers.js'
 
+import { krakenNullHelpers as h} from './krakenNullHelpers.js'
 
 
 let MAX_WIDTH = 30
@@ -36,17 +37,18 @@ export function krakenTextTable(records, keys, headers){
 
     
     // Build keys from records keys if missing
-    if(!keys || keys == null){
+    if(h.isNull(keys)){
         keys = krakenArrayHelpers.getKeys(records)
     }
    
     // Build headers from keys if missing
-    if(!headers || headers == null){
+    if(h.isNull(headers)){
         headers = keys
     }
 
     // Convert values
-    records = krakenValueHelpers.valuesToText(records)
+    records = krakenValueHelpers.innerValuesToText(records)
+    
 
     // Get max length for each keys
     let keysLength = {}
@@ -96,7 +98,7 @@ export function krakenTextTable(records, keys, headers){
     for(let record of records){
         for(let key of keys){
             
-            let c = String(record?.[key]) || ''
+            let c = String(record?.[key] || '' )
             if(c.length > MAX_WIDTH){ c = c.slice(0, MAX_WIDTH -3) + '... '}
             c = c.padEnd(keysLength[key] + 2, ' ')
             content += `${c}`

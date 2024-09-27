@@ -25,6 +25,14 @@ function isNull(value) {
         return true;
     }
 
+
+    // Check if date
+    try{
+        let v = value.getTime()
+        if(!isNaN(v)){ return false }
+    } catch {}
+   
+         
     // If array, removes null values then check if length == 0
     if (Array.isArray(value)) {
         value = value.filter((x) => isNull(x) == false);

@@ -1,5 +1,7 @@
 import { krakenArrayHelpers as array } from "./krakenArrayHelpers.js";
 
+import { krakenNullHelpers as h } from './krakenNullHelpers.js'
+
 export const krakenHeadingsHelpers = {
     heading1: _getHeading1,
     heading2: _getHeading2,
@@ -40,7 +42,7 @@ function _getHeadingX(record, heading) {
 
     let headingPossibilities = config?.[record_type]?.[heading];
 
-    if (!headingPossibilities || headingPossibilities == null) {
+    if (h.isNotNull(headingPossibilities) ) {
         headingPossibilities = config?.["Thing"]?.[heading];
     }
 
@@ -49,7 +51,7 @@ function _getHeadingX(record, heading) {
     for (let hp of headingPossibilities) {
         headingValue = _getValue(record, heading, hp);
 
-        if (headingValue && headingValue != null) {
+        if (h.isNotNull(headingValue)) {
             break;
         }
     }
@@ -142,6 +144,9 @@ function getConfig() {
             headingDescription: ["text", "name", "description"],
             headingDate: ["datePublished", "dateCreated"],
         },
+        QuantitativeValue: {
+            heading1: [["value", "unitText"], ["value", "unitCode"], "@id"],
+        }
     };
 
     return record;

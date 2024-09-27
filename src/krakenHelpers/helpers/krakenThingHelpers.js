@@ -2,8 +2,9 @@
 
 import { krakenArrayHelpers } from './krakenArrayHelpers.js'
 import { krakenObjectHelpers } from './krakenObjectHelpers.js'
+import { krakenNullHelpers as h } from './krakenNullHelpers.js'
 
-
+import { krakenHeadingsHelpers } from './krakenHeadingsHelpers.js'
 
 export const krakenThingHelpers = {
 
@@ -20,8 +21,8 @@ export const krakenThingHelpers = {
 
 function validateThing(value){
 
-    if(!value['@type']){ return false }
-    return true
+    if(h.isNotNull(value?.['@type']) || h.isNotNull(value?.record_type)){ return true }
+    return false
 }
 
 function getRefRecord(value){
@@ -40,8 +41,12 @@ function toText(value){
 
     if(validateThing(value) == false ) { return undefined }
 
-    let record_type = value['@type']
-    let record_id = value['@id']
+
+    return krakenHeadingsHelpers.heading1(value)
+
+    
+    let record_type = value?.['@type'] || value?.record_type
+    let record_id = value?.['@id'] || value?.record_id
 
     
     if(record_type == 'QuantitativeValue'){
@@ -52,20 +57,33 @@ function toText(value){
 
     if(record_type == "DefinedTerm"){
 
-        if(value.name && value.name != null){ return value.name }
-        if(value.termCode && value.termCode != null){ return value.termCode }
+        if(h.isNotNull(value?.name)){ return value.name }
+        if(h.isNotNull(value?.termCode)){ return value.termCode }
         
     }
 
     if(record_type == 'Person'){
 
-        if(value['givenName'] && value['familyName']){
-            return `${value['givenName']} ${value['familyName']}`
+        let givenName = value?.['givenName']
+        let familyName = value?.['familyName']
+
+
+        if(h.isNotNull(givenName) && h.isNotNull(familyName)){
+            return `${givenName} ${familyName}`
         }
     }
 
     if(record_type == 'PostalAddress'){
 
+        let values = []
+        values.push(value?.streetAddress)
+        values.push(value?.addressLocality)
+        values.push(value?.addressRegion)
+        values.push(value?.postalCode)
+        values.push(value?.addressCountry?.name || value?.addressCountry)
+        values = values.filter(x => h.isNotNull(x))
+
+        return values.join(', ')
         
     }
     
@@ -78,7 +96,9 @@ function toText(value){
 
 
 function extractThings(record){
-
+    /**
+     * Returns all child things in record
+     */
     
     let results = []
 
@@ -92,7 +112,7 @@ function extractThings(record){
         }
     } else if(krakenObjectHelpers.isObject(record)){
 
-        if(record?.['@type'] && record?.['@type'] != null){
+        if(h.isNotNull(record?.['@type']) || h.isNotNull(record?.record_type)){
             results.push(record)
         }
         
@@ -107,9 +127,6 @@ function extractThings(record){
     } else {
     }
 
- 
-    
     return results
-    
-    
+       
 }

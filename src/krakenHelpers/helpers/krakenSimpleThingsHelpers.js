@@ -1,9 +1,9 @@
 
 import { krakenDateHelpers } from './krakenDateHelpers.js'
 
-import { krakenNullHelpers } from './krakenNullHelpers.js'
-
-
+import { krakenNullHelpers as h } from './krakenNullHelpers.js'
+import { krakenDateHelpers as d } from "./krakenDateHelpers.js";
+import { krakenValueHelpers as v } from './krakenValueHelpers.js'
 
 
 
@@ -62,7 +62,7 @@ export class KrSimpleThing {
     set record(value){
         this._record = JSON.parse(JSON.stringify(value))
     }
-
+    
     get record_type(){
         return this._record?.['@type']
     }
@@ -71,7 +71,7 @@ export class KrSimpleThing {
     }
 
     get record_id(){
-        if(krakenNUllHelpers.isNull(this._record?.['@id'])){ 
+        if(h.isNull(this._record?.['@id'])){ 
             this._record['@id'] == String(crypto.randomUUID())
         }
         return this._record?.['@id']
@@ -130,9 +130,9 @@ export class KrSimpleAction extends KrSimpleThing {
 
     lt(other){
 
-        if(krakenNUllHelpers.isNull(this.endTime) && krakenNUllHelpers.isNull(other.endTime)){ return false }
-        if(krakenNUllHelpers.isNull(this.endTime) && krakenNullHelpers.isNotNull(other.endTime)){ return false }
-        if(krakenNullHelpers.isNotNull(this.endTime) && krakenNUllHelpers.isNull(other.endTime)){ return true }
+        if(h.isNull(this.endTime) && h.isNull(other.endTime)){ return false }
+        if(h.isNull(this.endTime) && h.isNotNull(other.endTime)){ return false }
+        if(h.isNotNull(this.endTime) && h.isNull(other.endTime)){ return true }
         if(this.endTime < other.endTime){ return true }
         if(this.endTime > other.endTime){ return false }
         return false
@@ -140,9 +140,9 @@ export class KrSimpleAction extends KrSimpleThing {
 
     gt(other){
 
-        if(krakenNUllHelpers.isNull(this.endTime) && krakenNUllHelpers.isNull(other.endTime)){ return false }
-        if(krakenNUllHelpers.isNull(this.endTime) && krakenNullHelpers.isNotNull(other.endTime)){ return false }
-        if(krakenNullHelpers.isNotNull(this.endTime) && krakenNUllHelpers.isNull(other.endTime)){ return true }
+        if(h.isNull(this.endTime) && h.isNull(other.endTime)){ return false }
+        if(h.isNull(this.endTime) && h.isNotNull(other.endTime)){ return false }
+        if(h.isNotNull(this.endTime) && h.isNull(other.endTime)){ return true }
         if(this.endTime > other.endTime){ return true }
         if(this.endTime < other.endTime){ return false }
         return false
@@ -161,7 +161,7 @@ export class KrSimpleAction extends KrSimpleThing {
 
     get status(){
         let value = this.actionStatus || ''
-        if(krakenNullHelpers.isNotNull(value)){ value = value.replace('ActionStatus', '')}
+        if(h.isNotNull(value)){ value = value.replace('ActionStatus', '')}
         return value
     }
 
@@ -184,7 +184,7 @@ export class KrSimpleAction extends KrSimpleThing {
     }
     set result(value){
         this._record.result = value
-        if(krakenNullHelpers.isNotNull(value)){
+        if(h.isNotNull(value)){
             this.actionStatus = 'CompletedActionStatus'
             this.endTime = new Date()
         }
@@ -210,7 +210,7 @@ export class KrSimpleAction extends KrSimpleThing {
     }
     set error(value){
         this._record.error = value
-        if(krakenNullHelpers.isNotNull(value)){
+        if(h.isNotNull(value)){
             this.actionStatus = 'FailedActionStatus'
             this.endTime = new Date()
         }
@@ -255,6 +255,17 @@ export class KrSimpleAction extends KrSimpleThing {
         this.endTime =  new Date()
     }
 
+    // -----------------------------------------------------
+    //  Comment 
+    // -----------------------------------------------------
+
+    getHumanRecord(){
+
+        let humanRecord = v.innerValuesToText(this.record)
+        humanRecord.duration = d.human.duration(this.startTime, this.endTime)
+        
+        return humanRecord   
+    }
 
 }
 
