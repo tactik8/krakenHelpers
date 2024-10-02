@@ -1,12 +1,7 @@
+import { krakenHelpersLight as h} from '../krakenHelpersLight.js'
 
-import { krakenArrayHelpers } from './krakenArrayHelpers.js'
-
-import { krakenDateHelpers } from './krakenDateHelpers.js'
-import { krakenThingHelpers } from './krakenThingHelpers.js'
 import { krakenValueHelpers } from './krakenValueHelpers.js'
-import { krakenObjectHelpers } from './krakenObjectHelpers.js'
 
-import { krakenNullHelpers as h} from './krakenNullHelpers.js'
 
 
 let MAX_WIDTH = 30
@@ -20,8 +15,8 @@ export function krakenTextTable(records, keys, headers){
     records = JSON.parse(JSON.stringify(records))
 
     // If record, convert properties to array
-    if(krakenArrayHelpers.isArray(records) == false){
-        if(krakenObjectHelpers.isObject(records) == true){
+    if(h.array.isArray(records) == false){
+        if(h.object.isObject(records) == true){
 
             let values = []
             let keys = Object.keys(records)
@@ -38,7 +33,7 @@ export function krakenTextTable(records, keys, headers){
     
     // Build keys from records keys if missing
     if(h.isNull(keys)){
-        keys = krakenArrayHelpers.getKeys(records)
+        keys = h.array.getKeys(records)
     }
    
     // Build headers from keys if missing
@@ -59,7 +54,7 @@ export function krakenTextTable(records, keys, headers){
         let key = keys[i]
         let header = headers[i]
     
-        let values = krakenArrayHelpers.getValuesForKey(records, key)
+        let values = h.array.getValuesForKey(records, key)
         keysLength[key] = header.length
 
         for(let v of values){

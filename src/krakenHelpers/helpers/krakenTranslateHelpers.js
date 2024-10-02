@@ -1,4 +1,4 @@
-import { krakenNullHelpers as h } from "./krakenNullHelpers.js";
+import { krakenHelpersLight as h} from '../krakenHelpersLight.js'
 
 export const krakenTranslateHelpers = {
     get: getWord,

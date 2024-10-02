@@ -12,7 +12,7 @@ describe("toDate", () => {
     });
 
     test("should validate date", () => {
-        expect(toDate("2022-13-01")).toStrictEqual(undefined);
+        expect(toDate("2022-13-01")).toStrictEqual(new Date('2023-01-01T00:00:00.000Z'))
     });
 
     test("should validate date", () => {

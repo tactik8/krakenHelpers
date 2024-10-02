@@ -1,29 +1,25 @@
+import { krakenHelpersLight as h } from "../krakenHelpersLight.js";
+import { krakenAnalysisHelpers } from "./krakenAnalysisHelpers.js";
 
-
-import { krakenHelpersLight as h} from '../krakenHelpersLight.js'
-
-import { krakenAnalysisHelpers } from './krakenAnalysisHelpers.js'
-
-export const krakenTemplateHelpers = {
+export const krakenTemplateLiveHelpers = {
     get: renderTemplate,
     replacePlaceholders: renderTemplate,
     render: renderTemplate,
 };
 
-
-function renderTemplate(template, record){
+function renderTemplate(template){
 
 
     template = prepareTemplate(template)
 
-    let renderedTemplate1 = _renderTemplate(template, record)
+    let renderedTemplate1 = _renderTemplate(template)
 
     return renderedTemplate1
 }
 
 
 
-function _renderTemplate(template, record){
+function _renderTemplate(template){
 
     /**
      * beforeContent: the content before the opening tag
@@ -42,14 +38,19 @@ function _renderTemplate(template, record){
     while(h.isNotNull(tag)){
 
         let valueContent = ''
-        let values = h.dot.get(tag.propertyID, record)
 
-        for(let value of h.toArray(values)){
+        let items = tag.propertyID.split('.')
+        for(let item of items){
+            valueContent += `<span class="krProperty" data-propertyID="${item}">`
 
-            let tempRecord = JSON.parse(JSON.stringify(record))
-            h.dot.set(tempRecord, tag.propertyID, value)
-            valueContent += _renderTemplate(tag.contentWithin, tempRecord)
         }
+
+        valueContent += tag.contentWithin
+
+        for(let item of items){
+            valueContent += `</span>`
+        }
+
         content = String(tag.contentBefore) + String(valueContent) + String(tag.contentAfter)
 
         tag = getIterationTag(content)
@@ -60,16 +61,21 @@ function _renderTemplate(template, record){
     tag = getPlaceholderTag(content)
     while(h.isNotNull(tag)){
 
-        let value = h.dot.get(tag.propertyID, record) 
+        let valueContent = ''
+
+        let items = tag.propertyID.split('.')
+        for(let item of items){
+            valueContent += `<span class="krProperty" data-propertyID="${item}">`
+        }
 
 
-        if(h.isNotNull(tag.commandName) && h.isNotNull(tag.commandPropertyID)){
+        for(let item of items){
+            valueContent += `</span>`
+        }
 
-            value = krakenAnalysisHelpers?.[tag.commandName](value, tag.commandPropertyID);
-        } 
+        content = String(tag.contentBefore) + String(valueContent) + String(tag.contentAfter)
 
-        if(h.isNull(value)){ value = ''}
-        content = String(tag.contentBefore) + String(value) + String(tag.contentAfter)
+        
         tag = getPlaceholderTag(content)
     }
 

@@ -1,5 +1,13 @@
+import { krakenNullHelpers} from "./krakenNullHelpers.js";
+import { krakenArrayHelpers} from "./krakenArrayHelpers.js";
 
-import { krakenNullHelpers as h } from "./krakenNullHelpers.js";
+const h = {
+    null: krakenNullHelpers,
+    array: krakenArrayHelpers,
+    isNull: krakenNullHelpers.isNull,
+    isNotNull: krakenNullHelpers.isNotNull,
+    toArray: krakenArrayHelpers.toArray
+}
 
 
 

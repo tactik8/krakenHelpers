@@ -1,4 +1,5 @@
-import { krakenNullHelpers } from './krakenNullHelpers.js'
+
+import { krakenHelpersLight as h} from '../krakenHelpersLight.js'
 
 
 export const krakenExpressHelpers = {
@@ -68,7 +69,7 @@ function getParamsFromReq(req){
     let params = {}
     for(let k in req.params){
         let value = req.params?.[k]
-        if(krakenNullHelpers.isNotNull(value)){
+        if(h.isNotNull(value)){
             params[k] = value
         }
     }

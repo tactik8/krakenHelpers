@@ -1,5 +1,16 @@
-import { krakenArrayHelpers as ka } from "./krakenArrayHelpers.js";
-import { krakenValueHelpers as kv } from "./krakenValueHelpers.js";
+
+import { krakenNullHelpers} from "./krakenNullHelpers.js";
+import { krakenArrayHelpers} from "./krakenArrayHelpers.js";
+import { krakenValueHelpers } from "./krakenValueHelpers.js";
+
+const h = {
+    null: krakenNullHelpers,
+    array: krakenArrayHelpers,
+    isNull: krakenNullHelpers.isNull,
+    isNotNull: krakenNullHelpers.isNotNull,
+    toArray: krakenArrayHelpers,
+    value: krakenValueHelpers
+}
 
 
 export const krakenAnalysisHelpers = {
@@ -20,9 +31,9 @@ export const krakenAnalysisHelpers = {
 
 function analyze(value){
 
-    value = ka.ka.ensureArray(value)
+    value = h.toArray(value)
     
-    let keys = ka.getKeys(value)
+    let keys = h.array.getKeys(value)
 
     let analysis = {}
     for(let k of keys){
@@ -47,12 +58,12 @@ function analyzeValues(value, key) {
         stddev: null
     };
 
-    let values = ka.getValuesForKey(value, key);
+    let values = h.array.getValuesForKey(value, key);
 
     for (let v of values) {
         
         // Get type
-        let t = kv.getType(v)
+        let t = h.value.getType(v)
         analysis.types[t] = (analysis.types[t] || 0) + 1;
 
         if(t && t != null){
@@ -66,7 +77,7 @@ function analyzeValues(value, key) {
 
         
         // Get schema type
-        let tt = kv.getTypeSchemaOrg(v)
+        let tt = h.value.getTypeSchemaOrg(v)
         analysis.typesSchemaOrg[tt] = (analysis.typesSchemaOrg[tt] || 0) + 1;
 
         if(tt && tt != null){
@@ -88,7 +99,7 @@ function analyzeValues(value, key) {
         // get min / max
         analysis.N = getN(value, key)
         analysis.nullN = getNull(value, key)
-        analysis.uniqueN = ka.getUniqueN(value, key)
+        analysis.uniqueN = h.array.getUniqueN(value, key)
         analysis.min = getMin(value, key);
         analysis.max = getMax(value, key);
         analysis.stddev = getStandardDeviation(value, key);
@@ -107,11 +118,11 @@ function analyzeValues(value, key) {
 
 function getFirst(value, key){
 
-    value = ka.ensureArray(value)
-    if(ka.validateArray(value) == false){ return undefined }
+    value = h.array.ensureArray(value)
+    if(h.array.validateArray(value) == false){ return undefined }
 
-    let items = ka.getValuesForKey(value, key)
-    items = ka.ensureArray(items)
+    let items = h.array.getValuesForKey(value, key)
+    items = h.array.ensureArray(items)
     
     let [result] = items.slice(0)
 
@@ -123,11 +134,11 @@ function getFirst(value, key){
 
 function getLast(value, key){
 
-    value = ka.ensureArray(value)
-    if(ka.validateArray(value) == false){ return undefined }
+    value = h.array.ensureArray(value)
+    if(h.array.validateArray(value) == false){ return undefined }
 
-    let items = ka.getValuesForKey(value, key)
-    items = ka.ensureArray(items)
+    let items = h.array.getValuesForKey(value, key)
+    items = h.array.ensureArray(items)
 
     let [result] = items.slice(-1)
 
@@ -140,10 +151,10 @@ function getLast(value, key){
 
 function getMax(value, key){
 
-    value = ka.ensureArray(value)
-    if(ka.validateArray(value) == false){ return undefined }
+    value = h.array.ensureArray(value)
+    if(h.array.validateArray(value) == false){ return undefined }
 
-    let items = ka.getNumbersForKey(value, key)
+    let items = h.array.getNumbersForKey(value, key)
 
     let result = Math.max(...items)
 
@@ -153,11 +164,11 @@ function getMax(value, key){
 
 function getMaxRecord(value, key){
 
-    value = ka.ensureArray(value)
-    if(ka.validateArray(value) == false){ return undefined }
+    value = h.array.ensureArray(value)
+    if(h.array.validateArray(value) == false){ return undefined }
 
     let result = getMax(value, key)
-    let unitCode = ka.getUnitCodesForKey(value, key)
+    let unitCode = h.array.getUnitCodesForKey(value, key)
 
     return getStatsRecord('maxValue', key, result, unitCode)
 
@@ -168,10 +179,10 @@ function getMaxRecord(value, key){
 
 function getMin(value, key){
 
-    value = ka.ensureArray(value)
-    if(ka.validateArray(value) == false){ return undefined }
+    value = h.array.ensureArray(value)
+    if(h.array.validateArray(value) == false){ return undefined }
 
-    let items = ka.getNumbersForKey(value, key)
+    let items = h.array.getNumbersForKey(value, key)
 
     let result = Math.min(...items)
 
@@ -181,11 +192,11 @@ function getMin(value, key){
 
 function getMinRecord(value, key){
 
-    value = ka.ensureArray(value)
-    if(ka.validateArray(value) == false){ return undefined }
+    value = h.array.ensureArray(value)
+    if(h.array.validateArray(value) == false){ return undefined }
 
     let result = getMin(value, key)
-    let unitCode = ka.getUnitCodesForKey(value, key)
+    let unitCode = h.array.getUnitCodesForKey(value, key)
 
     return getStatsRecord('minValue', key, result, unitCode)
 
@@ -195,10 +206,10 @@ function getMinRecord(value, key){
 
 function getN(value, key){
 
-    value = ka.ensureArray(value)
-    if(ka.validateArray(value) == false){ return undefined }
+    value = h.array.ensureArray(value)
+    if(h.array.validateArray(value) == false){ return undefined }
 
-    let items = ka.getNumbersForKey(value, key)
+    let items = h.array.getNumbersForKey(value, key)
 
     let result = items.length
 
@@ -208,11 +219,11 @@ function getN(value, key){
 
 function getNRecord(value, key){
 
-    value = ka.ensureArray(value)
-    if(ka.validateArray(value) == false){ return undefined }
+    value = h.array.ensureArray(value)
+    if(h.array.validateArray(value) == false){ return undefined }
 
     let result = getN(value, key)
-    let unitCode = ka.getUnitCodesForKey(value, key)
+    let unitCode = h.array.getUnitCodesForKey(value, key)
 
     return getStatsRecord('count', key, result, unitCode)
 
@@ -221,10 +232,10 @@ function getNRecord(value, key){
 
 function getSum(value, key){
 
-    value = ka.ensureArray(value)
-    if(ka.validateArray(value) == false){ return undefined }
+    value = h.array.ensureArray(value)
+    if(h.array.validateArray(value) == false){ return undefined }
 
-    let items = ka.getNumbersForKey(value, key)
+    let items = h.array.getNumbersForKey(value, key)
 
     let result = items.reduce((partialSum, a) => partialSum + a, 0);
 
@@ -234,11 +245,11 @@ function getSum(value, key){
 
 function getSumRecord(value, key){
 
-    value = ka.ensureArray(value)
-    if(ka.validateArray(value) == false){ return undefined }
+    value = h.array.ensureArray(value)
+    if(h.array.validateArray(value) == false){ return undefined }
 
     let result = getSum(value, key)
-    let unitCode = ka.getUnitCodesForKey(value, key)
+    let unitCode = h.array.getUnitCodesForKey(value, key)
 
     return getStatsRecord('sum', key, result, unitCode)
 
@@ -247,10 +258,10 @@ function getSumRecord(value, key){
 
 function getAverage(value, key){
 
-    value = ka.ensureArray(value)
-    if(ka.validateArray(value) == false){ return undefined }
+    value = h.array.ensureArray(value)
+    if(h.array.validateArray(value) == false){ return undefined }
 
-    let items = ka.getNumbersForKey(value, key)
+    let items = h.array.getNumbersForKey(value, key)
 
     if(items.length == 0){ return 0 }
 
@@ -263,11 +274,11 @@ function getAverage(value, key){
 
 function getAverageRecord(value, key){
 
-    value = ka.ensureArray(value)
-    if(ka.validateArray(value) == false){ return undefined }
+    value = h.array.ensureArray(value)
+    if(h.array.validateArray(value) == false){ return undefined }
 
     let result = getAverage(value, key)
-    let unitCode = ka.getUnitCodesForKey(value, key)
+    let unitCode = h.array.getUnitCodesForKey(value, key)
 
     return getStatsRecord('average', key, result, unitCode)
 
@@ -277,10 +288,10 @@ function getAverageRecord(value, key){
 
 function getStandardDeviation(value, key){
 
-    value = ka.ensureArray(value)
-    if(ka.validateArray(value) == false){ return undefined }
+    value = h.array.ensureArray(value)
+    if(h.array.validateArray(value) == false){ return undefined }
 
-    let items = ka.getNumbersForKey(value, key)
+    let items = h.array.getNumbersForKey(value, key)
 
     if(items.length == 0){ return 0 }
 
@@ -293,11 +304,11 @@ function getStandardDeviation(value, key){
 
 function getStandardDeviationRecord(value, key){
 
-    value = ka.ensureArray(value)
-    if(ka.validateArray(value) == false){ return undefined }
+    value = h.array.ensureArray(value)
+    if(h.array.validateArray(value) == false){ return undefined }
 
     let result = getStandardDeviation(value, key)
-    let unitCode = ka.getUnitCodesForKey(value, key)
+    let unitCode = h.array.getUnitCodesForKey(value, key)
 
     return getStatsRecord('marginOfError', key, result, unitCode)
 
@@ -305,8 +316,8 @@ function getStandardDeviationRecord(value, key){
 
 function getNull(value, key){
 
-    value = ka.ensureArray(value)
-    if(ka.validateArray(value) == false){ return undefined }
+    value = h.array.ensureArray(value)
+    if(h.array.validateArray(value) == false){ return undefined }
 
     let nullValues = 0
     for(let v of value){
@@ -323,8 +334,8 @@ function getNull(value, key){
 
 function getUniqueN(value, key){
 
-    value = ka.ensureArray(value)
-    if(ka.validateArray(value) == false){ return undefined }
+    value = h.array.ensureArray(value)
+    if(h.array.validateArray(value) == false){ return undefined }
 
 
     let uniqueValues = [...new Set(value)];

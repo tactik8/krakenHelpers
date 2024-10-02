@@ -1,126 +1,154 @@
+import { krakenNullHelpers} from './krakenNullHelpers.js'
+import { krakenArrayHelpers } from './krakenArrayHelpers.js'
+const h = {
+    null: krakenNullHelpers,
+    isNull: krakenNullHelpers.isNull,
+    isNotNull: krakenNullHelpers.isNotNull,
+}
 
 
 export const krakenDotNotationHelpers = {
+    get: getPropertyValueFromDot,
+    set: setPropertyValueFromDot,
+    add: addPropertyValueFromDot,
     toDot: convertToDotNotation,
     fromDot: convertFromDotNotation,
     getValue: getPropertyValueFromDot,
-    setValue: setPropertyValueFromDot
+    setValue: setPropertyValueFromDot,
+    addValue: addPropertyValueFromDot,
 }
+
 
 
 
 function setPropertyValueFromDot(record, key, value){
-
+    
     function _recursiveSet(record, key, value){
 
-        // Get property
-        let keyItems = key.split('.')
-        let keyItem1 = keyItems?.[0]
-
-
-        let property1 = keyItem1.split('[')[0]
-        let position1 = keyItem1.split('[')[1] || null
+        // Set record
+        if(h.isNull(record)){
+            record = {}
+        }
+        
+        // Get property and position from first item of key path
+        let property1 = getCurrentKey(key)
+        let position1 = getCurrentPosition(key)
+        
+        // Get value from property
+        let value1 = record?.[property1]
 
         
-        
-        let value1 = value?.[property1]
+        // If value is array but position not given, assume first item is modified (position 0)
+        if(krakenArrayHelpers.isArray(value1)){
+            position1 = 0
+        }
 
-
-        if(position1 && position1 != null){
-           
-            try{
-                position1 = position1.replace(']', '')
-                position1 = position1.trim()
-                position1 = Number(position1)
-                if(!Array.isArray(value1)){value1 = [value1]}
-                value1 = value1?.[arrayPosition] || null
-            } catch {
-
-            }
+        // Get value from position
+        if(h.isNotNull(position1)){
+            value1 = value1?.[position1]
         }
 
         // Check if done, else recurse
-        if(keyItems.length > 1){
-            let newKeys = keyItems.slice(1)
-            let newKey = newKeys.join('.')
+        let newKey = getNextDotKey(key)
 
-            if(!position1 || position1 == null){
-                if(!value1){ value1 = {}}
+        if(h.isNotNull(newKey)){
+
+            if(h.isNull(position1)){
                 record[property1] = _recursiveSet(value1, newKey, value)
-                return record
             } else {
-                if(!value1){ value1 = []}
-                record[property1][position1] = _recursiveSet(value1, newKey, value) 
-                return record
+                record[property1] = krakenArrayHelpers.toArray(record[property1])
+                record[property1][position1] = _recursiveSet(value1, newKey, value)
             }
-            
         } else {
-
-            if(!position1 || position1 == null){
-                if(!record?.[property1]){ record[property1] = {}}
+            if(h.isNull(position1)){
                 record[property1] = value
-                return record
             } else {
-                if(!record?.[property1]){ record[property1] = []}
-                record[property1][position1] = value 
-                return record
+                record[property1] = krakenArrayHelpers.toArray(record[property1])
+                record[property1][position1] = value
             }
-
         }
-
-
+        return record
     }
-
-
     return _recursiveSet(record, key, value);
+}
+
+
+function addPropertyValueFromDot(record, key, value){
+    /**
+     * Add a value to the current set of values 
+     */
+    let currentValue = getPropertyValueFromDot(key, record)
+    if(h.isNull(currentValue)){
+        return setPropertyValueFromDot(record, key, value)
+    } else {
+        let newValue = krakenArrayHelpers.mergeUnique(currentValue, value)
+        return setPropertyValueFromDot(record, key, newValue)
+    }
+    return true
     
 }
 
 
-function getPropertyValueFromDot(key, value){
+function getPropertyValueFromDot(key, record){
     // Retrieves value by following dot notation
 
 
+    // Swap values if mistake done (inverted parameters)
+    if(typeof record == 'string' && typeof key != 'string'){
 
-    function _recursive(key, value){
+        let tkey = key
+        let trecord = record
+        key = trecord
+        record= tkey
+    }
+    
 
-        // Get property
-        let keyItems = key.split('.')
-        let keyItem1 = keyItems?.[0]
-        
+    function _recursive(key, record){
 
-        let property1 = keyItem1.split('[')[0]
-        let position1 = keyItem1.split('[')[1] || null
-        
-        let value1 = value?.[property1]
 
-        
-        if(position1){
-            try{
-                position1 = position1.replace(']', '')
-                position1 = position1.trim()
-                position1 = Number(position1)
-                if(!Array.isArray(value1)){value1 = [value1]}
-                value1 = value1?.[arrayPosition] || null
-            } catch {
+        // if record is an array of one, convert to object
+        if(krakenArrayHelpers.isArray(record) && record.length == 1){
+            record == record[0]
+        }
 
-            }
+        // if record is null, return null
+        if(h.isNull(record)){
+            return null
         }
         
+        // Get property
+        let property1 = getCurrentKey(key)
+        let position1 = getCurrentPosition(key)
+        
+        
+        let value1 
+
+        // Get value from property
+        value1 = record?.[property1]
+
+        // Convert value to array if position is defined
+        if(h.isNotNull(position1)){
+            value1 = krakenArrayHelpers.toArray(value1)
+            value1 = value1?.[position1] || null
+        } 
+
+        
+
+
         // Check if done, else recurse
-        if(keyItems.length > 1){
-            let newKeys = keyItems.slice(1)
-            let newKey = newKeys.join('.')
+        let newKey = getNextDotKey(key)
+        if(h.isNotNull(newKey)){
+            // If value is array but position not defined, return first item
+            if(h.isNull(position1) && krakenArrayHelpers.isArray(value1)){
+                value1 = value1?.[0] || null
+            } 
             return _recursive(newKey, value1)
         } else {
             return value1
-        }
-        
-        
+        }        
     }
 
-    
-    return _recursive(key, value);
+    return _recursive(key, record);
     
 }
 
@@ -203,4 +231,52 @@ function convertFromDotNotation(dotNotationObj) {
     }
 
     return result;
+}
+
+function getCurrentKey(dotKey){
+
+    if(h.isNull(dotKey)){ return null }
+
+    // Get property
+    let keyItems = dotKey.split('.')
+    let keyItem1 = keyItems?.[0]
+
+    let property1 = keyItem1.split('[')[0]
+    let position1 = keyItem1.split('[')[1] || null
+
+
+    return property1
+
+}
+function getCurrentPosition(dotKey){
+
+    try{
+        // Get property
+        let keyItems = dotKey.split('.')
+        let keyItem1 = keyItems?.[0]
+
+        let property1 = keyItem1.split('[')[0]
+        let position1 = keyItem1.split('[')[1] || null
+
+        position1 = position1.replace(']', '')
+        position1 = position1.trim()
+        position1 = Number(position1)
+
+        return position1
+    } catch { return null }
+
+}
+
+function getNextDotKey(dotKey){
+
+    let keyItems = dotKey.split('.')
+    if(keyItems.length > 1){
+        let newKeys = keyItems.slice(1)
+        let newKey = newKeys.join('.')
+        return newKey
+    } else {
+        return null
+    }
+
+
 }

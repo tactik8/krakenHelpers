@@ -1,6 +1,8 @@
 export const krakenNullHelpers = {
     isNull: isNull,
+    isNUll: isNull,
     isNotNull: isNotNull,
+    isNotNUll: isNotNull,
     isEqual: isEqual,
     isNotEqual: isNotEqual,
     isEven: isEven,
@@ -24,6 +26,12 @@ function isNull(value) {
     if (value === "") {
         return true;
     }
+
+    try{
+        if(value instanceof HTMLElement){
+            return false
+        }
+    } catch {}
 
 
     // Check if date

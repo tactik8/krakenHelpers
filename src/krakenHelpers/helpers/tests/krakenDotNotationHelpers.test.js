@@ -1,6 +1,5 @@
-
-
 import { krakenHelpers as h } from '../../../index.js'
+
 
 let convertFromDotNotation = h.dot.fromDot
 let convertToDotNotation = h.dot.toDot
@@ -329,5 +328,31 @@ describe('convertFromDotNotation', () => {
 
     expect(convertFromDotNotation(input)).toEqual(expectedOutput);
   });
+
+  test('should handle add value', () => {
+    const input = {
+        "@context": "https://schema.org/",
+        "@type": "Thing",
+        "@id": "thing1",
+        "name": "thing1"
+      }
+
+;
+    const expectedOutput = {
+        "@context": "https://schema.org/",
+        "@type": "Thing",
+        "@id": "thing1",
+        "name": [
+          "thing1",
+          "thing2"
+        ]
+      }
+
+
+    
+    expect(h.dot.add(input, 'name', 'thing2')).toEqual(expectedOutput);
+  });
+
+  
 
 });

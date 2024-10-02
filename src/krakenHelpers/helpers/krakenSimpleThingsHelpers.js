@@ -1,281 +1,317 @@
+import { krakenDateHelpers } from "./krakenDateHelpers.js";
 
-import { krakenDateHelpers } from './krakenDateHelpers.js'
+import { krakenHelpersLight as h} from '../krakenHelpersLight.js'
+import { krakenValueHelpers as v } from "./krakenValueHelpers.js";
 
-import { krakenNullHelpers as h } from './krakenNullHelpers.js'
-import { krakenDateHelpers as d } from "./krakenDateHelpers.js";
-import { krakenValueHelpers as v } from './krakenValueHelpers.js'
+import { krakenApiHelpers} from './krakenApiHelpers.js'
+import { krakenFileHelpers } from './krakenFileHelpers.js'
+
+let DB = [];
+
+let CDN_URL = 'https://cdn.krknapi.com'
+let CDN_COLLECTION ='testCdn'
 
 
-
-let DB = []
 
 export class KrSimpleThing {
-    constructor(record_type_or_record, record_id){
+    constructor(record_type_or_record, record_id) {
+        this._record = {};
 
-        this._record = {}
-
-        if(record_type_or_record?.['@type']){
-            this._record = record_type_or_record
+        if (record_type_or_record?.["@type"]) {
+            this._record = record_type_or_record;
         } else {
-            this._record["@type"] = record_type_or_record
-            this._record["@id"] = record_id
+            this._record["@type"] = record_type_or_record;
+            this._record["@id"] = record_id;
         }
-        DB.push(this)
+        DB.push(this);
     }
 
     // -----------------------------------------------------
-    //  Core  
+    //  Core
     // -----------------------------------------------------
 
-    toString(){
-        return `${this.record_type} ${this.record_id}`
+    toString() {
+        return `${this.record_type} ${this.record_id}`;
     }
 
-    toJSON(){
-        return this.record
+    toJSON() {
+        return this.record;
     }
 
-    get json(){
-        return JSON.stringify(this.record, null, 4)
+    get json() {
+        return JSON.stringify(this.record, null, 4);
     }
 
-    new(){
-        let newObject = new Thing_simple()
-        newObject.record = this.record
+    new() {
+        let newObject = new Thing_simple();
+        newObject.record = this.record;
     }
 
-    clone(){
-        let newObject = new Thing_simple()
-        newObject.record = this.record
+    clone() {
+        let newObject = new Thing_simple();
+        newObject.record = this.record;
     }
-
-
-
 
     // -----------------------------------------------------
-    //  Attributes 
+    //  Attributes
     // -----------------------------------------------------
 
-    get record(){
-        return JSON.parse(JSON.stringify(this._record))
+    get record() {
+        return JSON.parse(JSON.stringify(this._record));
     }
-    set record(value){
-        this._record = JSON.parse(JSON.stringify(value))
-    }
-    
-    get record_type(){
-        return this._record?.['@type']
-    }
-    set record_type(value){
-        this._record['@type'] = value
+    set record(value) {
+        this._record = JSON.parse(JSON.stringify(value));
     }
 
-    get record_id(){
-        if(h.isNull(this._record?.['@id'])){ 
-            this._record['@id'] == String(crypto.randomUUID())
+    get record_type() {
+        return this._record?.["@type"];
+    }
+    set record_type(value) {
+        this._record["@type"] = value;
+    }
+
+    get record_id() {
+        if (h.isNull(this._record?.["@id"])) {
+            this._record["@id"] == String(crypto.randomUUID());
         }
-        return this._record?.['@id']
+        return this._record?.["@id"];
     }
-    set record_id(value){
-        this._record['@id'] = value
+    set record_id(value) {
+        this._record["@id"] = value;
     }
 
     // -----------------------------------------------------
-    //  Shortcut Attributes 
+    //  Shortcut Attributes
     // -----------------------------------------------------
 
-    get name(){
-        return this._record?.name
+    get name() {
+        return this._record?.name;
     }
-    set name(value){
-        return this._record.name = value
+    set name(value) {
+        return (this._record.name = value);
     }
 
-    get url(){
-        return this._record?.url
+    get url() {
+        return this._record?.url;
     }
-    set url(value){
-        return this._record.url = value
-    }    
+    set url(value) {
+        return (this._record.url = value);
+    }
 }
-
-
 
 export class KrSimpleAction extends KrSimpleThing {
-    constructor(name, object){
-        super('Action')
-        this.setActive()
-        this.name = name
-        this.object = object
-    }
-
-
-    // -----------------------------------------------------
-    //  Base 
-    // -----------------------------------------------------
-
-    toString(){
-        return `${krakenDateHelpers.date.toText(this.startTime)} ${this.name} ${this.status}`
-    }
-
-    new(){
-        let newObject = new Action_simple()
-        newObject.record = this.record
-    }
-
-    clone(){
-        let newObject = new Action_simple()
-        newObject.record = this.record
-    }
-
-    lt(other){
-
-        if(h.isNull(this.endTime) && h.isNull(other.endTime)){ return false }
-        if(h.isNull(this.endTime) && h.isNotNull(other.endTime)){ return false }
-        if(h.isNotNull(this.endTime) && h.isNull(other.endTime)){ return true }
-        if(this.endTime < other.endTime){ return true }
-        if(this.endTime > other.endTime){ return false }
-        return false
-    }
-
-    gt(other){
-
-        if(h.isNull(this.endTime) && h.isNull(other.endTime)){ return false }
-        if(h.isNull(this.endTime) && h.isNotNull(other.endTime)){ return false }
-        if(h.isNotNull(this.endTime) && h.isNull(other.endTime)){ return true }
-        if(this.endTime > other.endTime){ return true }
-        if(this.endTime < other.endTime){ return false }
-        return false
+    constructor(name, object) {
+        super("Action");
+        this.setActive();
+        this._record.error = null
+        this.name = name;
+        this.object = object;
     }
 
     // -----------------------------------------------------
-    //  Action attributes 
+    //  Base
     // -----------------------------------------------------
 
-    get actionStatus(){
-        return this._record?.actionStatus
-    }
-    set actionStatus(value){
-        this._record.actionStatus = value
+    toString() {
+        return `${krakenDateHelpers.date.toText(this.startTime)} ${this.name} ${this.status}`;
     }
 
-    get status(){
-        let value = this.actionStatus || ''
-        if(h.isNotNull(value)){ value = value.replace('ActionStatus', '')}
-        return value
+    new() {
+        let newObject = new Action_simple();
+        newObject.record = this.record;
     }
 
-    get object(){
-        return this._record?.object
-    }
-    set object(value){
-        this._record.object = value
+    clone() {
+        let newObject = new Action_simple();
+        newObject.record = this.record;
     }
 
-    get instrument(){
-        return this._record?.instrument
-    }
-    set instrument(value){
-        this._record.instrument = value
-    }
-
-    get result(){
-        return this._record?.result
-    }
-    set result(value){
-        this._record.result = value
-        if(h.isNotNull(value)){
-            this.actionStatus = 'CompletedActionStatus'
-            this.endTime = new Date()
+    lt(other) {
+        if (h.isNull(this.endTime) && h.isNull(other.endTime)) {
+            return false;
         }
-
+        if (h.isNull(this.endTime) && h.isNotNull(other.endTime)) {
+            return false;
+        }
+        if (h.isNotNull(this.endTime) && h.isNull(other.endTime)) {
+            return true;
+        }
+        if (this.endTime < other.endTime) {
+            return true;
+        }
+        if (this.endTime > other.endTime) {
+            return false;
+        }
+        return false;
     }
 
-    get startTime(){
-        return this._record?.startTime
-    }
-    set startTime(value){
-        this._record.startTime = value
+    gt(other) {
+        if (h.isNull(this.endTime) && h.isNull(other.endTime)) {
+            return false;
+        }
+        if (h.isNull(this.endTime) && h.isNotNull(other.endTime)) {
+            return false;
+        }
+        if (h.isNotNull(this.endTime) && h.isNull(other.endTime)) {
+            return true;
+        }
+        if (this.endTime > other.endTime) {
+            return true;
+        }
+        if (this.endTime < other.endTime) {
+            return false;
+        }
+        return false;
     }
 
-    get endTime(){
-        return this._record?.endTime
+    // -----------------------------------------------------
+    //  Action attributes
+    // -----------------------------------------------------
+
+    get actionStatus() {
+        return this._record?.actionStatus;
     }
-    set endTime(value){
-        this._record.endTime = value
+    set actionStatus(value) {
+        this._record.actionStatus = value;
     }
 
-    get error(){
-        return this._record?.error
+    get status() {
+        let value = this.actionStatus || "";
+        if (h.isNotNull(value)) {
+            value = value.replace("ActionStatus", "");
+        }
+        return value;
     }
-    set error(value){
-        this._record.error = value
-        if(h.isNotNull(value)){
-            this.actionStatus = 'FailedActionStatus'
-            this.endTime = new Date()
+
+    get object() {
+        return this._record?.object;
+    }
+    set object(value) {
+        this._record.object = value;
+    }
+
+    get instrument() {
+        return this._record?.instrument;
+    }
+    set instrument(value) {
+        this._record.instrument = value;
+    }
+
+    get result() {
+        return this._record?.result;
+    }
+    set result(value) {
+        this._record.result = value;
+        if (h.isNotNull(value)) {
+            this.actionStatus = "CompletedActionStatus";
+            this.endTime = new Date();
         }
     }
 
-    get duration(){
-        return krakenDateHelpers.date.duration(this.startTime, this.endTime)
+    get startTime() {
+        return this._record?.startTime;
+    }
+    set startTime(value) {
+        this._record.startTime = value;
     }
 
-
-    isSuccess(){
-        return this.actionStatus == 'CompletedActionStatus'
+    get endTime() {
+        return this._record?.endTime;
+    }
+    set endTime(value) {
+        this._record.endTime = value;
     }
 
-
-    // -----------------------------------------------------
-    //  Action methods 
-    // -----------------------------------------------------
-
-
-    setPotential(error){
-        this.actionStatus = "PotentialActionStatus"
-        this.error = String(error)
-        this.startTime = null
-        this.endTime = null
+    get error() {
+        return this._record?.error;
+    }
+    set error(value) {
+        this._record.error = value;
+        if (h.isNotNull(value)) {
+            this.actionStatus = "FailedActionStatus";
+            this.endTime = new Date();
+        }
     }
 
-    setActive(error){
-        this.actionStatus = "ActiveActionStatus"
-        this.error = String(error)
-        this.startTime = new Date()
+    get duration() {
+        return krakenDateHelpers.date.duration(this.startTime, this.endTime);
     }
 
-    setCompleted(){
-        this.actionStatus = "CompletedActionStatus"
-        this.endTime =  new Date()
-    }
-
-    setFailed(error){
-        this.actionStatus = "FailedActionStatus"
-        this.error = String(error)
-        this.endTime =  new Date()
+    isSuccess() {
+        return this.actionStatus == "CompletedActionStatus";
     }
 
     // -----------------------------------------------------
-    //  Comment 
+    //  Action methods
     // -----------------------------------------------------
 
-    getHumanRecord(){
-
-        let humanRecord = v.innerValuesToText(this.record)
-        humanRecord.duration = d.human.duration(this.startTime, this.endTime)
-        
-        return humanRecord   
+    setPotential(error) {
+        this.actionStatus = "PotentialActionStatus";
+        this.error = String(error);
+        this.startTime = null;
+        this.endTime = null;
     }
 
+    setActive(error) {
+        this.actionStatus = "ActiveActionStatus";
+        this.error = String(error);
+        this.startTime = new Date();
+    }
+
+    setCompleted() {
+        this.actionStatus = "CompletedActionStatus";
+        this.endTime = new Date();
+    }
+
+    setFailed(error) {
+        this.actionStatus = "FailedActionStatus";
+        this.error = String(error);
+        this.endTime = new Date();
+    }
+
+    // -----------------------------------------------------
+    //  Comment
+    // -----------------------------------------------------
+
+    getHumanRecord() {
+        let humanRecord = v.innerValuesToText(this.record);
+        humanRecord.duration = h.date.human.duration(this.startTime, this.endTime);
+        return humanRecord;
+    }
 }
 
 
+export class KrSimpleFile extends KrSimpleThing {
+    constructor(file) {
+        super("DigitalDocument");
+        this._file = null;
+        this.file = file;
+    }
 
+    get file() {
+        return this._file;
+    }
+    set file(file) {
+        if (!(file instanceof File)) { return }
+        this._file = file;
+        this._record = { ...this._record, ...krakenFileHelpers.getRecord(file) }
+    }
 
+    async apiGet(){
+        this.file = await krakenApiHelpers.getFile(null, this._record.contentUrl)
+    }
+    async apiPost(){
+        let result = await krakenApiHelpers.postFile(CDN_URL, 'files/' + CDN_COLLECTION,  this._file)
+        this._record.contentUrl = result[0].contentUrl
+    }
+
+    async getPreview(){
+        return await krakenFileHelpers.getPreview(this.file)
+    }
+}
 
 export const krakenSimpleThingsHelpers = {
-
     Thing: KrSimpleThing,
-    Action: KrSimpleAction
-
-}
+    Action: KrSimpleAction,
+    File: KrSimpleFile,
+};

@@ -1,19 +1,35 @@
 import { krakenArrayHelpers as array } from "./krakenArrayHelpers.js";
 
-import { krakenNullHelpers as h } from './krakenNullHelpers.js'
+import { krakenHelpersLight as h} from '../krakenHelpersLight.js'
 
 export const krakenHeadingsHelpers = {
+    record: getHeadingRecord,
     heading1: _getHeading1,
     heading2: _getHeading2,
     headingDescription: _getHeadingDescription,
     headingDate: _getHeadingDate,
     headingStatus: _getHeadingStatus,
+    headingImage: _getHeadingImage
 };
+
+
+function getHeadingRecord(record){
+    record._heading1 =  _getHeading1(record)
+    record._heading2 =  _getHeading2(record)
+    record._headingDescription =  _getHeadingDescription(record)
+    record._headingDate =  _getHeadingDate(record)
+    record._headingStatus =  _getHeadingStatus(record)
+    record._headingImage = _getHeadingImage(record)
+    return record
+}
+
 
 function _getHeading1(record) {
     let heading = "heading1";
     return _getHeadingX(record, heading);
 }
+
+
 
 function _getHeading2(record) {
     let heading = "heading2";
@@ -35,6 +51,18 @@ function _getHeadingStatus(record) {
     return _getHeadingX(record, heading);
 }
 
+function _getHeadingImage(record) {
+
+    if(h.isNotNull(record?.contentUrl)){
+        return record?.contentUrl
+    }
+    if(h.isNotNull(record?.image?.contentUrl)){
+        return record?.image?.contentUrl
+    }
+    return null
+
+}
+
 function _getHeadingX(record, heading) {
     let record_type = record["@type"];
 
@@ -42,13 +70,14 @@ function _getHeadingX(record, heading) {
 
     let headingPossibilities = config?.[record_type]?.[heading];
 
-    if (h.isNotNull(headingPossibilities) ) {
+    console.log('p', headingPossibilities)
+    if (h.isNull(headingPossibilities) ) {
         headingPossibilities = config?.["Thing"]?.[heading];
     }
 
     let headingValue = null;
 
-    for (let hp of headingPossibilities) {
+    for (let hp of h.toArray(headingPossibilities)) {
         headingValue = _getValue(record, heading, hp);
 
         if (h.isNotNull(headingValue)) {
@@ -62,6 +91,7 @@ function _getHeadingX(record, heading) {
 function _getValue(record, heading, keys) {
     keys = array.ensureArray(keys);
 
+    console.log('get value', keys)
     let values = [];
     for (let k of keys) {
         let value = record[k];
@@ -113,8 +143,8 @@ function getConfig() {
         },
         Person: {
             heading1: [["givenName", "familyName"], "name", "url", "@id"],
-            heading2: ["author", "url", "@id"],
-            headingDescription: ["articleBody", "text", "description"],
+            heading2: ["title", "email", "url",  "@id"],
+            headingDescription: ["text", "description"],
             headingDate: ["datePublished", "dateCreated"],
             headingStatus: ["actionStatus"],
         },

@@ -1,7 +1,13 @@
+import { krakenNullHelpers} from "./krakenNullHelpers.js";
+import { krakenArrayHelpers} from "./krakenArrayHelpers.js";
 
-
-import { krakenNumberHelpers } from './krakenNumberHelpers.js'
-import { krakenObjectHelpers } from './krakenObjectHelpers.js'
+const h = {
+    null: krakenNullHelpers,
+    array: krakenArrayHelpers,
+    isNull: krakenNullHelpers.isNull,
+    isNotNull: krakenNullHelpers.isNotNull,
+    toArray: krakenArrayHelpers
+}
 
 
 
@@ -10,6 +16,8 @@ export const krakenApiHelpers = {
     get: getApi,
     post: postApi,
     delete: deleteApi,
+    postFile: postApiFile,
+    getFile: getApiFile
     
 }
 
@@ -23,9 +31,13 @@ async function getApi(baseUrl, urlPath,  params){
         }
     };
 
-    urlPath = urlPath || ''
-    
-    let url = new URL(String(urlPath), String(baseUrl));
+
+    let url
+    if(h.isNotNull(urlPath)){
+        url = new URL(String(urlPath), String(baseUrl));
+    } else {
+        url = new URL( String(baseUrl));
+    }
 
     url.search = new URLSearchParams(params);
 
@@ -54,9 +66,12 @@ async function postApi(baseUrl, urlPath,  records){
         body: JSON.stringify(records)
     };
 
-    urlPath = urlPath || ''
-    
-    let url = new URL(String(urlPath), String(baseUrl));
+    let url
+    if(h.isNotNull(urlPath)){
+        url = new URL(String(urlPath), String(baseUrl));
+    } else {
+        url = new URL( String(baseUrl));
+    }
 
     const response = await fetch(url, requestOptions)
 
@@ -68,6 +83,88 @@ async function postApi(baseUrl, urlPath,  records){
     
 }
 
+
+async function getApiFile(filename, baseUrl, urlPath){
+
+    if(h.isNull(filename)){ 
+        let parts = filename = baseUrl.split('/')
+            filename = parts[parts.length-1]
+    }
+    
+    try {
+
+        let url
+        if(h.isNotNull(urlPath)){
+            url = new URL(String(urlPath), String(baseUrl));
+        } else {
+            url = new URL( String(baseUrl));
+        }
+        
+        // Fetch the file from the provided URL
+        const response = await fetch(url);
+
+        // Check if the response is ok (status is in the range 200-299)
+        if (!response.ok) {
+            throw new Error(`Failed to fetch file: ${response.statusText}`);
+        }
+
+        // Convert the response data to a Blob object
+        const blob = await response.blob();
+
+        // Create a File object from the Blob
+        const file = new File([blob], filename, {
+            type: blob.type,
+        });
+
+        return file;
+        
+    } catch (error) {
+        console.error("Error fetching the file:", error);
+        return null;
+    }
+
+    
+}
+
+
+async function postApiFile(baseUrl, urlPath,  file){
+
+    //Post 
+
+    let url
+    if(h.isNotNull(urlPath)){
+        url = new URL(String(urlPath), String(baseUrl));
+    } else {
+        url = new URL( String(baseUrl));
+    }
+
+    const formData = new FormData();
+    formData.append('file', file); // 'file' is the key expected by the API
+
+    try {
+        const response = await fetch(url, {
+            method: 'POST',
+            body: formData,
+            headers: {
+                // Include other headers if needed, such as authentication tokens
+                // 'Authorization': 'Bearer your-token'
+            }
+        });
+
+        if (response.ok) {
+            const result = await response.json();
+            return result;
+        } else {
+            
+        }
+    } catch (error) {
+        
+    }
+
+    return response
+
+}
+
 async function deleteApi(baseUrl, urlPath,  params){
 
     const requestOptionsGet = {
@@ -77,9 +174,12 @@ async function deleteApi(baseUrl, urlPath,  params){
         }
     };
 
-    urlPath = urlPath || ''
-
-    let url = new URL(String(urlPath), String(baseUrl));
+    let url
+    if(h.isNotNull(urlPath)){
+        url = new URL(String(urlPath), String(baseUrl));
+    } else {
+        url = new URL( String(baseUrl));
+    }
 
     url.search = new URLSearchParams(params);
 

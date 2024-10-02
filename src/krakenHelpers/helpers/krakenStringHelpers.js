@@ -5,9 +5,31 @@ import { krakenDotNotationHelpers } from "./krakenDotNotationHelpers.js";
 export const krakenStringHelpers = {
     toCamelCase: toCamelCase,
     fromCamelCase: fromCamelCase,
-    capitalize: capitalizeWords
+    capitalize: capitalizeWords,
+    clean: cleanString
     
 };
+
+
+
+function cleanString(str){
+    /**
+     * Clean up string by removing spaces and non standard charcters
+     */
+    let string = str
+
+    // Remove html codes
+    string =  string.replace(/<\/?[^>]+(>|$)/g, "");
+
+    // Remove next lines
+    string = string.replace('\n', '')
+
+    // remove spaces
+    string = string.trim()
+
+
+    return string
+}
 
 
 

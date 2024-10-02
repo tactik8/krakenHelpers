@@ -1,5 +1,14 @@
-import { krakenNumberHelpers } from './krakenNumberHelpers.js'
-import { krakenObjectHelpers } from './krakenObjectHelpers.js'
+import { krakenNullHelpers} from "./krakenNullHelpers.js";
+import { krakenNumberHelpers} from "./krakenNumberHelpers.js";
+
+let h = {
+    number: krakenNumberHelpers,
+    null: null,
+    isNull: krakenNullHelpers.isNull,
+    isNotNull: krakenNullHelpers.isNotNull,
+    
+}
+
 
 import { krakenDotNotationHelpers } from './krakenDotNotationHelpers.js'
 
@@ -14,7 +23,9 @@ export const krakenArrayHelpers = {
     getKeys: getKeys,
     keys: getKeys,
     getValuesForKey: getValuesForKey,
-    getNumbersForKey: getNumbersForKey
+    getNumbersForKey: getNumbersForKey,
+    merge: merge,
+    mergeUnique: mergeUnique,
     
 }
 
@@ -38,7 +49,7 @@ function validateArray(value){
 
 function ensureArray(value) {
     
-    if(!value || value == null || value == {}){ return [] }
+    if(h.isNull(value)){ return [] }
 
     if (validateArray(value)) {
         return value;
@@ -103,13 +114,13 @@ function getNumbersForKey(value, key){
     let items = getValuesForKey(value, key)
     let results = []
     for(let item of items){
-        let newItem = krakenNumberHelpers.toNumber(item)
-        if(krakenNumberHelpers.isNumber(newItem) == true){
+        let newItem = h.number.toNumber(item)
+        if(h.number.isNumber(newItem) == true){
             results.push(newItem)
         }
         if(item?.['@type'] && item?.['@type'] == 'QuantitativeValue'){
-            let quantItem = krakenNumberHelpers.toNumber(item?.value)
-            if(krakenNumberHelpers.isNumber(quantItem) == true){
+            let quantItem = h.number.toNumber(item?.value)
+            if(h.number.isNumber(quantItem) == true){
                 results.push(quantItem)
             }
         }
@@ -128,4 +139,30 @@ function getUnitCodesForKey(value, key){
         }
     }
     return results    
+}
+
+
+function merge(value1, value2){
+    let v1 = ensureArray(value1)
+    let v2 = ensureArray(value2)   
+
+    if(h.isNull(v1) && h.isNull(v2)){ return [] }
+    if(h.isNull(v1) && h.isNotNull(v2)){ return v2 }
+    if(h.isNotNull(v1) && h.isNull(v2)){ return v1 }
+
+    let newValue = v1.concat(v2)
+    return newValue
+}
+
+function mergeUnique(value1, value2){
+
+    let values = merge(value1, value2)
+    let uniqueValues = []
+    for(let v of values){
+        if(!uniqueValues.includes(v)){
+            uniqueValues.push(v)
+        }
+    }
+    return uniqueValues
+    
 }

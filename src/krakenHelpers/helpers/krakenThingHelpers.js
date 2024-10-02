@@ -1,8 +1,6 @@
 
 
-import { krakenArrayHelpers } from './krakenArrayHelpers.js'
-import { krakenObjectHelpers } from './krakenObjectHelpers.js'
-import { krakenNullHelpers as h } from './krakenNullHelpers.js'
+import { krakenHelpersLight as h} from '../krakenHelpersLight.js'
 
 import { krakenHeadingsHelpers } from './krakenHeadingsHelpers.js'
 
@@ -10,19 +8,30 @@ export const krakenThingHelpers = {
 
     isValid: validateThing,
     isThing: validateThing,
+    isEqual: isEqual,
     validateThing: validateThing,
     getRefRecord: getRefRecord,
+    type: getRecordType,
+    id: getRecordId,
     ref: getRefRecord,
     toText: toText,
-    extractThings: extractThings
+    extractThings: extractThings,
+    record_type: getRecordType,
+    record_id: getRecordId,
+    recordType: getRecordType,
+    recordId: getRecordId,
+   
     
 }
 
 
 function validateThing(value){
 
-    if(h.isNotNull(value?.['@type']) || h.isNotNull(value?.record_type)){ return true }
-    return false
+    if(h.isNull(value)){ return false }
+    if(h.isNull(getRecordType(value))){ return false }
+    if(h.isNull(getRecordId(value))){ return false }
+   
+    return true
 }
 
 function getRefRecord(value){
@@ -30,9 +39,10 @@ function getRefRecord(value){
     if(validateThing(value) == false ) { return undefined }
     
     let result = {
-        "@type": value['@type'],
-        "@id": value['@id']
+        "@type": getRecordType(value),
+        "@id": getRecordId(value)
     }
+
     return result
     
 }
@@ -42,7 +52,7 @@ function toText(value){
     if(validateThing(value) == false ) { return undefined }
 
 
-    return krakenHeadingsHelpers.heading1(value)
+    return h.headings.heading1(value)
 
     
     let record_type = value?.['@type'] || value?.record_type
@@ -102,7 +112,7 @@ function extractThings(record){
     
     let results = []
 
-    if(krakenArrayHelpers.isArray(record)){
+    if(h.array.isArray(record)){
 
         for(let r of record){
             let values = extractThings(r)
@@ -110,7 +120,7 @@ function extractThings(record){
                 results = results.concat(values)
             }
         }
-    } else if(krakenObjectHelpers.isObject(record)){
+    } else if(h.object.isObject(record)){
 
         if(h.isNotNull(record?.['@type']) || h.isNotNull(record?.record_type)){
             results.push(record)
@@ -129,4 +139,39 @@ function extractThings(record){
 
     return results
        
+}
+
+function getRecordType(value){
+
+    let record_type = value?.['@type'] || value?.record_type || null
+    return record_type
+}
+
+function getRecordId(value){
+
+    let record_type = value?.['@id'] || value?.record_id || null
+    return record_type
+}
+
+
+function isEqual(thing1, thing2){
+
+    if(h.isNull(thing1) && h.isNull(thing2)){ return true }
+    if(h.isNull(thing1) && h.isNotNull(thing2)){ return false }
+    if(h.isNotNull(thing1) && h.isNull(thing2)){ return false }
+    
+    let record1 = thing1?.record || thing1
+    let record2 = thing2?.record || thing2
+
+    try {
+        if(JSON.stringify(record1) == JSON.stringify(record2)){
+            return true
+        } else {
+            return false
+        }
+    
+    } catch (error) {
+        return false
+    }
+    
 }
