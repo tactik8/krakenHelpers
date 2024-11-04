@@ -13,60 +13,50 @@
     </head>
 
     <body>
-        <div class="container">
-            <h1>Tests</h1>
-            <hr />
 
-            <h2>Test 1</h2>
-            <div data-record-type="Thing" data-record-id="thing1" id="test1">
-                <div id="test2">{{ name }}</div>
+        <kr-engine>
+            <div class="container">
+    
+    
+                <h2>Test 1  start</h2>
+    
+    
+                
+                <!----------------- Test cards ------------------>
 
-                <div>
-                    <h3>Test { }</h3>
-                    {{name}} 
-                    <ul>
-                        {{#other}}
+               
+                 <h2>Test cards start</h2>
+                 <div class="krThing krDropzone" data-record-type="ItemList" data-record-id="ItemList0">
+
+                     
+                 
                     
-                            <li>
-                                {{name}} 
-                            </li>
-                        
-                        {{/other}}
-                    </ul>
-                </div>
-            </div>
-            <hr />
+                      {{ _heading1 }}
+                    
+                         <div class="krProperty" data-propertyID="itemListElement">
+        
+                             
+                                <kr-card> </kr-card>
+                            
+        
+                         </div>
+                    
+                 </div>
+                     
+             </div>
+    
+                
+            <br><br><br>
 
-           
-            <h2>Test 3</h2>
-            <div id="test3"></div>
+        </kr-engine>
 
-            <h2>Test 2</h2>
-            <div id="test21">
-                <div>
-                    <div>{{name}}</div>
-                    <div>{{other.name}}</div>
-                    <div>{{url}}</div>
-                </div>
 
-                <div>
-                    {{#other}}
-                    <div>{{name}}</div>
 
-                    {{/other}}
-                </div>
-            </div>
-            <hr />
 
-            <h2>Test 4</h2>
-            <div id="test4"></div>
-            <hr />
 
-            <h2>Test 5</h2>
-            <div id="test5"></div>
-            <hr />
-        </div>
 
+
+        
         <script
             src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
             integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"

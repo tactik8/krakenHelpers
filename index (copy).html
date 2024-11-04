@@ -1,0 +1,142 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <title>Bootstrap demo</title>
+        <link
+            href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+            rel="stylesheet"
+            integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH"
+            crossorigin="anonymous"
+        />
+    </head>
+
+    <body>
+
+        <kr-engine>
+        <div class="container">
+
+
+            <h2>Test 1  start</h2>
+
+
+            <!----------------- Test card ------------------>
+            <h2>Test card start</h2>
+            
+            
+                <kr-card data-record-type="Thing" data-record-id="thing1"></kr-card>
+           
+            <h2>Test card end</h2>
+
+            <br><br><br>
+
+            
+            <!----------------- Test cards ------------------>
+
+             <div class="krThing krDropzone" data-record-type="ItemList" data-record-id="ItemList0">
+
+                <h2>Test cards start</h2>
+                <div class="krProperty" data-propertyID="itemListElement">
+
+                     
+                        <kr-card> </kr-card>
+                    
+
+                 </div>
+
+                 
+             </div>
+
+            
+            <br><br><br>
+
+            <!----------------- Test card ------------------>
+            <div id="testNew">
+            <div  class="krThing" data-record-type="Thing" data-record-id="thing1">
+                
+
+                <div class="" data-propertyID="_heading1">
+                    Heading1: <span class="krMain"></span> End
+
+                </div>
+
+                
+                <div class="" data-propertyID="name">
+               
+                </div>
+
+                <div class="krProperty" data-propertyID="other">
+
+                   <div class="krThing">
+
+                        <div class="krProperty" data-propertyID="name">
+
+                        </div>
+                   </div>
+
+                  
+
+                    
+                        
+                </div>
+                
+            </div>  
+            </div>
+
+
+            <h2>Test 1 end </h2>
+
+            <br><br><br><br><br><br><br><br><br>
+            
+            
+            <h2>Test Input element1 start</h2>
+
+            <div class="krThing krDropzone" data-record-type="ItemList" data-record-id="ItemList0">
+
+                <div >
+                     {{#itemListElement}}
+                    
+                    <div class="row">
+                        <div class="border col col-4 ">
+                            Key
+                        </div>
+                        <div class="border col col-8 ">
+                            <div class="row krClickable">
+                                <div class="col col-1 " contenteditable="true">
+                                    {{itemListElement.position}}
+                                </div>
+                                <div class="col col-6 " contenteditable="true">
+                                   {{itemListElement.item.name}}
+                                </div>
+                                <div class="col col-2 krDeleteValue">
+                                    x
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {{/itemListElement}}
+                </div>
+                
+            </div>
+
+            <h2>Test Input element1 end</h2>
+        </div>
+            </kr-engine>
+
+
+
+
+
+
+
+        
+        <script
+            src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
+            crossorigin="anonymous"
+        ></script>
+
+        <script type="module" src="script.js"></script>
+    </body>
+</html>
