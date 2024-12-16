@@ -128,8 +128,9 @@ function setIdToElement(element, id){
         return 
     }
 
-    element.setAttribute('id', h.uuid.new())
-    return
+    let newID = 'element_' + h.uuid.new()
+    
+    element.setAttribute('id', newID)
     
 }
 

@@ -124,6 +124,9 @@ function getHeadingRecord(record, locale){
     record._headingImage = _getHeadingImage(record)
     record._headingDuration = _getHeadingDuration(record)
     record._headingStars = _getHeadingStars(record)
+    record._headingPrice = _getHeadingPrice(record)
+    record._headingPriceUnit = _getHeadingPriceUnit(record)
+    record._headingHtmlInputType = getHtmlInputType(record)
 
     // Recurse for sub records
     for(let k of Object.keys(record)){
@@ -198,6 +201,8 @@ function _getHeadingImage(record) {
 function _getHeadingDuration(record){
 
     let date = _getHeadingDate(record) 
+    if(h.isNull(date)){ return null }
+    
     let duration = h.date.human.duration(date)
     return duration
 }
@@ -205,6 +210,7 @@ function _getHeadingDuration(record){
 function _getHeadingDateSince(record){
 
     let date = _getHeadingDate(record) 
+    if(h.isNull(date)){ return null }
     let duration = h.date.human.duration(date)
     return duration
 
@@ -238,6 +244,100 @@ function _getHeadingStars(record){
     return content
     
 }
+
+function _getHeadingPrice(record){
+
+    if(h.isNull(record?.priceSpecification)){ return null }
+
+    let ps = record?.priceSpecification?.[0] || record?.priceSpecification
+
+    let price = ps?.price
+    let priceCurrency = ps?.priceCurrency
+
+    let content = ''
+
+    if(priceCurrency == 'CAD' || priceCurrency == 'USD'){
+        content = '$'
+    }
+
+    
+    
+    if(h.number.isValid(h.number.toNumber(ps?.price))){
+
+        content += String(ps.price)
+           
+    }
+
+    if(content ==''){
+        content = null
+    }
+    return content
+    
+}
+
+function _getHeadingPriceUnit(record){
+
+    if(h.isNull(record?.priceSpecification)){ return null }
+
+    let ps = record?.priceSpecification?.[0] || record?.priceSpecification
+
+    let content = null
+    if(h.isNotNull(ps?.referenceQuantity?.unitCode)){
+
+        content = ps?.referenceQuantity?.unitCode
+        if(h.isNotNull(content)){
+            content = content.toLowerCase()
+        }
+    }
+
+    return content
+
+}
+
+function getHtmlInputType(record){
+
+    if(record?.['@type'] != 'PropertyValueSpecification'){
+        return
+    }
+
+
+    if(record?.minValue == 0 && record.maxValue==1){
+        return 'checkbox'
+    }
+
+    
+
+    if(h.isNotNull(record?.minValue)){
+        return "number"
+    }
+    if(h.isNotNull(record?.maxValue)){
+        return 'number' 
+    }
+
+    if(h.isNotNull(record?.valueName) && record?.valueName.includes('Date')){
+        return 'datetime-local'
+    }
+
+    if(h.isNotNull(record?.valueName) && record?.valueName.includes('Time')){
+        return 'datetime-local'
+    }
+
+    if(h.isNotNull(record?.valueName) && record?.valueName.toLowerCase().includes('email')){
+        return 'email'
+    }
+
+    if(h.isNotNull(record?.valueName) && record?.valueName.toLowerCase().endsWith('url')){
+        return 'url'
+    }
+
+    if(h.isNotNull(record?.valueName) && record?.valueName.toLowerCase().includes('phone')){
+        return 'phone'
+    }
+    
+   
+    
+}
+
 
 
 function _getHeadingTotal(record){
@@ -332,9 +432,9 @@ function _getValue(record, heading, keys) {
 function getConfig() {
     let record = {
         Thing: {
-            heading1: ["name", "url", ["@type", "@id"]],
+            heading1: ["headline", "name", "url", ["@type", "@id"]],
             heading2: ["url", ["@type", "@id"]],
-            headingDescription: ["description"],
+            headingDescription: ["text", "description"],
             headingDate: [""],
         },
         Article: {
@@ -349,6 +449,11 @@ function getConfig() {
             headingDescription: ["articleBody", "text", "description"],
             headingDate: ["datePublished", "dateCreated"],
             headingStatus: ["actionStatus"],
+        },
+        EditorPart: {
+            heading1: ["propertyID"],
+            heading2: ["value"],
+            headingDescription: ["value"],
         },
         Person: {
             heading1: [["givenName", "familyName"], "name", "url", ["@type", "@id"]],
@@ -365,6 +470,30 @@ function getConfig() {
             headingStatus: ["actionStatus"],
         },
         CreativeWork: {
+            heading1: ["headline", "name", "url", ["@type", "@id"]],
+            heading2: ["author", "url", ["@type", "@id"]],
+            headingDescription: ["articleBody", "text", "description"],
+            headingDate: ["datePublished", "dateCreated"],
+        },
+        HowTo: {
+            heading1: ["headline", "name", "url", ["@type", "@id"]],
+            heading2: ["author", "url", ["@type", "@id"]],
+            headingDescription: ["articleBody", "text", "description"],
+            headingDate: ["datePublished", "dateCreated"],
+        },
+        HowToSection: {
+            heading1: ["headline", "name", "url", ["@type", "@id"]],
+            heading2: ["author", "url", ["@type", "@id"]],
+            headingDescription: ["articleBody", "text", "description"],
+            headingDate: ["datePublished", "dateCreated"],
+        },
+        HowToStep: {
+            heading1: ["headline", "name", "url", ["@type", "@id"]],
+            heading2: ["author", "url", ["@type", "@id"]],
+            headingDescription: ["articleBody", "text", "description"],
+            headingDate: ["datePublished", "dateCreated"],
+        },
+        HowToDirection: {
             heading1: ["headline", "name", "url", ["@type", "@id"]],
             heading2: ["author", "url", ["@type", "@id"]],
             headingDescription: ["articleBody", "text", "description"],

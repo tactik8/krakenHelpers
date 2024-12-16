@@ -28,9 +28,21 @@ function setObserver(element, callbackFn){
        
         }
         if (mutation.type === "childList") {
-          console.log("A child node has been added or removed.");
+          //console.log("A child node has been added or removed.");
         } else if (mutation.type === "attributes") {
-          console.log(`The ${mutation.attributeName} attribute was modified.`);
+          //console.log(`The ${mutation.attributeName} attribute was modified.`);
+        } else if (mutation.type === 'characterData'){
+          //console.log('mutation.type', mutation)
+
+          let action = {
+            "@type": "ReplaceAction",
+            "@id": h.uuid.new(),
+            replacee: mutation.oldValue,
+            replacer: mutation.target.textContent,
+          }
+          callbackFn(action)
+
+          
         }
       }
     };
@@ -40,7 +52,7 @@ function setObserver(element, callbackFn){
     const observer = new MutationObserver(callback);
 
     // Start observing the target node for configured mutations
-    observer.observe(targetNode, config);
+    observer.observe(element, config);
 
     // Later, you can stop observing
     //observer.disconnect();

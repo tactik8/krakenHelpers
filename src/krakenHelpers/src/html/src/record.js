@@ -1,4 +1,5 @@
 
+import { krakenBaseHelpers as h} from '../../base/krakenBaseHelpers.js'
 
 
 export function record(record){
@@ -8,35 +9,35 @@ export function record(record){
         '@id': record["@id"],
         itemListElement: []
     }
-    
-    for(let k of Object.keys()){
-        let record = {
-            'propertyID': k,
-            'value': record[k]
+
+
+    let innerContent = ''
+    for(let k of Object.keys(record)){
+
+        let c =  ` <dt class="col-sm-3">${k}</dt>`
+
+        for(let v of h.toArray(record[k])){
+
+            if(h.isNotNull(v?.['@type'])){
+                v = record(v)
+            } 
+            c +=  ` <dd class="col-sm-9">${record[k]}</dd>`
+            
         }
-        listRecord.itemListElement.push(record)
+        innerContent += c
+
     }
 
 
-    let content =` 
-        <dl class="row">
-            {{#itemListElement}}
-                <dt class="col-sm-3">{{itemListElement.propertyID}}
-                </dt>
-               
-                <dd class="col-sm-9">
-                    {{#itemListElement.value}}
-                         <dl class="row">
-                            {{ itemListElement.value }}
-                         </dl>
-                     {{/itemListElement.value}}
-                </dd>
-            {{/itemListElement}}
-        </dl>
+    let content = `
 
-  <dt class="col-sm-3">Term</dt>
-                    
-                    `
+        <dl class="row">
+            ${innerContent}
+        </dl>    
+    
+    `
+
+    
 
     return content
 

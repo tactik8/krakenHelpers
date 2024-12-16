@@ -1,6 +1,8 @@
 
 import { krakenNullHelpers} from "./krakenNullHelpers.js";
 import { krakenArrayHelpers} from "./krakenArrayHelpers.js";
+import { krakenObjectHelpers} from "./krakenObjectHelpers.js";
+
 import { krakenDotNotationHelpers } from "./krakenDotNotationHelpers.js";
 import { krakenNumberHelpers } from "./krakenNumberHelpers.js";
 import { krakenJsonHelpers } from "./krakenJsonHelpers.js";
@@ -10,6 +12,7 @@ import { krakenStringOperationHelpers } from "./krakenStringOperationHelpers.js"
 const h = {
     null: krakenNullHelpers,
     array: krakenArrayHelpers,
+    object: krakenObjectHelpers,
     isNull: krakenNullHelpers.isNull,
     isNotNull: krakenNullHelpers.isNotNull,
     toArray: krakenArrayHelpers.toArray,
@@ -72,11 +75,16 @@ function _renderTemplate(template, record, depth = 0){
         let propertyID = h.stringOperation.get(tag.contentTag )?.[0]?.propertyID || null
         values = h.stringOperation.execute(record, tag.contentTag )
         
-
         // If record has many values, iterate through each ones
         for(let value of h.toArray(values)){
             let tempRecord = JSON.parse(JSON.stringify(record))
-            h.dot.set(tempRecord, propertyID, value)
+
+            if(h.isNotNull(propertyID)){
+                 h.dot.set(tempRecord, propertyID, value)
+            } else {
+                tempRecord = value
+            }
+            //h.dot.set(tempRecord, propertyID, value)
             valueContent += _renderTemplate(tag.contentWithin, tempRecord, depth += 1)
         }
         content = String(tag.contentBefore) + String(valueContent) + String(tag.contentAfter)
@@ -96,6 +104,12 @@ function _renderTemplate(template, record, depth = 0){
         let value = h.stringOperation.execute(record, tag.contentTag )
         if(h.isNull(value)){ value = ''}
 
+        // Convert to json if array or object
+        if(h.isArray(value) || h.object.isValid(value)){
+            value = JSON.stringify(value)
+        }
+
+        
         content = String(tag.contentBefore) + String(value) + String(tag.contentAfter)
 
         tag = getPlaceholderTag(content)
@@ -111,6 +125,10 @@ function _renderTemplate(template, record, depth = 0){
 function prepareTemplate(template){
 
 
+    if(h.isNull(template)){
+        return ''
+    }
+    
     while(template.includes('{{ ')){
         template = template.replaceAll('{{ ', '{{')
     }

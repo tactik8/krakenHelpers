@@ -6,6 +6,7 @@ import { krakenAnalysisHelpers} from './krakenAnalysisHelpers.js';
 const h = {
     null: krakenNullHelpers,
     isNull: krakenNullHelpers.isNull,
+    isNotNull: krakenNullHelpers.isNotNull,
     analysis: krakenAnalysisHelpers
 }
 
@@ -129,6 +130,14 @@ function executeOperation(records, operation){
         return h.analysis.stdev(records, operation.propertyID)
     }
 
+    if(operation.operator == 'transpose'){
+        return h.analysis.transpose(records, operation.propertyID)
+    }
+
+    if(operation.operator == 'with'){
+        return h.analysis.getValues(records, operation.propertyID)
+    }
+
     return records
 }
 
@@ -200,14 +209,16 @@ function _getOperationConfig(part){
     let configStr = part.split(':')?.[1] || null
 
     // if contains ==, assume it is not command
-    if(!configStr.includes('=')){
+    if(h.isNotNull(configStr) && !configStr.includes('=')){
         return null
     }
 
 
     // Split the config string by ','
-
-    let configParts = configStr.split(',')
+    let configParts = []
+    if(h.isNotNull(configStr)){
+        configParts = configStr.split(',')
+    }
 
     // Build config record 
     let configRecord = {}
@@ -259,7 +270,7 @@ function _getOperationPropertyID(part){
 
 
     // if contains =, assume it is not poropertyID
-    if(propertyID.includes('=')){
+    if(h.isNotNull(propertyID) && propertyID.includes('=')){
         return null
     }
 
@@ -268,7 +279,7 @@ function _getOperationPropertyID(part){
 
 
     // Check if commas 
-    if(propertyID.includes(',')){
+    if(h.isNotNull(propertyID) && propertyID.includes(',')){
         propertyID = propertyID.split(',')
         propertyID = propertyID.map(x => _cleanString(x))
     }

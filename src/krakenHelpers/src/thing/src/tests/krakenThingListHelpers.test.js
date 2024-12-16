@@ -4,6 +4,9 @@ import { krakenThingSystemHelpers as system } from "../krakenThingSystemHelpers.
 
 describe("krakenThingListHelpers", () => {
 
+
+    
+    
     let itemlist = {
         "@type": "ItemList",
         "@id": "ItemList0",
@@ -89,6 +92,7 @@ describe("krakenThingListHelpers", () => {
     let record = system.toThing(itemlist)
 
 
+
     test("is valid", () => {
 
         expect(h.isValid(record)).toBe(true);
@@ -101,9 +105,10 @@ describe("krakenThingListHelpers", () => {
 
     test("clone", () => {
 
+        
         let il1 = h.clone(record)
 
-        expect(h.isValid(il1)).not.toBe(record);
+        expect(h.isSame(il1, record)).not.toBe(true);
         
         expect(h.isValid(il1)).toBe(true);
 

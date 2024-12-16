@@ -10,6 +10,9 @@ import { krakenLocalizationHelpers } from './src/localization/krakenLocalization
 import { krakenSimpleHtmlHelpers} from './src/html/krakenSimpleHtmlHelpers.js'
 
 import { krakenThingHelpers } from './src/thing/krakenThingHelpers.js'    
+import { krakenHttpHelpers } from './src/http/krakenHttpHelpers.js'    
+
+import { krakenElementHelpers } from './src/element/krakenElementHelpers.js'    
 
 
 export const krakenHelpers = {
@@ -19,6 +22,9 @@ export const krakenHelpers = {
     html: krakenSimpleHtmlHelpers,
     localization: krakenLocalizationHelpers,
     thing: krakenThingHelpers,
+    http: krakenHttpHelpers,
+    element: krakenElementHelpers,
+
 
     // shortcuts
     isNull: krakenBaseHelpers.null.isNull,
@@ -31,6 +37,7 @@ export const krakenHelpers = {
     isDate: krakenBaseHelpers.date.isDate,
     isNumber: krakenBaseHelpers.number.isNumber,
     uuid: krakenBaseHelpers.uuid,
+    wait: krakenBaseHelpers.wait,
 
     
 }

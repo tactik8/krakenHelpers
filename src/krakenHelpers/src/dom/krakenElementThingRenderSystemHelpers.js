@@ -121,7 +121,7 @@ function renderElements(element, record, conditions, TEMPLATEDB) {
     return action;
 }
 
-function _renderThingElement(element, value, TEMPLATEDB) {
+function _renderThingElement(element, record, TEMPLATEDB) {
     /**
      * Updates the element with the value
      * @param {Object} element
@@ -130,7 +130,7 @@ function _renderThingElement(element, value, TEMPLATEDB) {
      */
 
     let action = new h.base.classes.Action(
-        `Render elements ${value?.["@type"]} ${value?.["@id"]}`,
+        `Render elements ${record?.["@type"]} ${record?.["@id"]}`,
     );
 
     // Get current thing element
@@ -141,77 +141,88 @@ function _renderThingElement(element, value, TEMPLATEDB) {
         return action;
     }
 
-    
-    // Create main element if missing
-    let propertyMainElement = h.dom.thing.part.main.get(thingElement);
-    if (h.isNull(propertyMainElement)) {
-        propertyMainElement = h.dom.thing.part.add(thingElement, "main", "");
+    // Use custom element render mechanism if classList contains 'krElement'
+    if (element.classList.contains("krElement")){
+        element.render()
+        action.setCompleted();
+        return action
     }
 
+    
+    
     // Set type and id
     thingElement.setAttribute(
         "data-record-type",
-        value?.["@type"] || value?.record_type,
+        record?.["@type"] || record?.record_type,
     );
     thingElement.setAttribute(
         "data-record-id",
-        value?.["@id"] || value?.record_id,
+        record?.["@id"] || record?.record_id,
     );
 
     // Retrieve property elements
     let propertyElements = h.dom.thing.traverse.children.properties.get(thingElement);
 
     
-    // Render thing from template if not already on the document
+    // Render thing from stcratch if no propertyelements identified
     let templateID = element.getAttribute("data-templateID");
+    let template = TEMPLATEDB?.[templateID] || ''
+    if(propertyElements.length == 0 || (template && template.includes('{{'))){
+        _renderNonExistantThingElement(element, record, TEMPLATEDB)
+        propertyElements = h.dom.thing.traverse.children.properties.get(element);
+    } 
 
 
-    // Test to see if need to render template 
-    let template = thingElement?._template || h.dom.thing.templateDB.get(templateID)
-    let mainPart = h.dom.thing.part.main.get(thingElement);
-    
-    let c1 = h.isNotNull(template) && template.includes('{{')
-    let c2 = propertyElements.length == 0
- 
-
-    if(c1 || c2 ){
-
-        console.log('*******')
-        let mainPart = h.dom.thing.part.main.get(thingElement);
-        
-        // Get headings from record
-        let headingRecord = h.thing.record.get(value)
-        headingRecord = h.base.heading.addHeadings(headingRecord)
-        headingRecord = h.base.json.simplify(headingRecord)
-
-        // Render template and set as content
-        let htmlContent = h.base.template.get(template, headingRecord);
-        mainPart.innerHTML = htmlContent;
-        h.dom.thing.init.init(mainPart, TEMPLATEDB);
-        propertyElements = h.dom.thing.traverse.children.properties.get(mainPart);
-       
-    }
-
-    // Render if contains {{
-    mainPart = h.dom.thing.part.main.get(thingElement);
-    if(mainPart.innerHTML.includes('{{')){
-        let headingRecord = h.thing.record.get(value)
-        headingRecord = h.base.heading.addHeadings(headingRecord)
-        headingRecord = h.base.json.simplify(headingRecord)
-        
-        mainPart.innerHTML = h.base.template.get(mainPart.innerHTML, headingRecord);
-        h.dom.thing.init.init(mainPart, TEMPLATEDB);
-        propertyElements = h.dom.thing.traverse.children.properties.get(mainPart);
-    }
-
-    // Render individual properties
+    // Render individual property elements
     for (let p of propertyElements) {
-        action.instrument = _renderPropertyElement(p, value, null, TEMPLATEDB);
+        h.dom.thing.property.record_type.set(p, record?.['@type'] || record.record_type)
+        h.dom.thing.property.record_id.set(p, record?.['@id'] || record.record_id)
+        action.instrument = _renderPropertyElement(p, record, null, TEMPLATEDB);
     }
 
     action.close()
     return action;
 }
+
+function _renderNonExistantThingElement(element, record, TEMPLATEDB){
+    /**
+     * Render a thing element if not already on the document
+     */
+
+    
+    let templateID = element.getAttribute("data-templateID");
+    let template = TEMPLATEDB?.[templateID] || ''
+    
+
+    // Get headings from record
+    let headingRecord = h.thing.record.get(record)
+    headingRecord = h.base.heading.addHeadings(headingRecord)
+    headingRecord = h.base.json.simplify(headingRecord)
+
+    
+    // Render template and set as content
+    let htmlContent = h.base.template.get(template, headingRecord);
+    element.innerHTML = htmlContent;
+
+
+    let mainPart = h.dom.thing.part.main.get(element)
+    if(h.isNull(mainPart)){ return }
+
+    let mainPartTemplateID = mainPart.getAttribute("data-templateID");
+    let mainPartTemplate = TEMPLATEDB?.[mainPartTemplateID] || ''
+    
+
+    // Render template and set as content
+    mainPart.innerHTML = h.base.template.get(mainPartTemplate, headingRecord);
+    
+
+
+    
+    return
+}
+
+
+
 
 function _renderPropertyElement(element, record, template, TEMPLATEDB) {
     /**
@@ -238,17 +249,38 @@ function _renderPropertyElement(element, record, template, TEMPLATEDB) {
         return action
     }
 
+    // Use custom element render mechanism if classList contains 'krElement'
+    if (element.classList.contains("krElement")){
+        element.render()
+        action.setCompleted();
+        return action
+    }
+
+
+    
     // Get propertyValues (pvs)
     let propertyID = element.getAttribute("data-propertyID");
-    
+
     let pvs = h.thing.propertyValues.get(record, propertyID)
     pvs = h.toArray(pvs)
 
     // Get template 
     let templateID = element.getAttribute("data-templateID");
-    template = h.dom.thing.templateDB.get(templateID) //TEMPLATEDB?.[templateID] || template;
+    template = TEMPLATEDB?.[templateID] 
 
+    // Set template if not set
+    let values = h.dom.thing.traverse.children.values.get(element)
+    if(h.isNull(values)){
+        element.innerHTML = template
+    }
 
+    // Get value template
+    
+    let mainPart = h.dom.thing.part.main.get(element)
+    let mainPartTemplateID = mainPart.getAttribute("data-templateID");
+    let valueTemplate = TEMPLATEDB?.[mainPartTemplateID] 
+
+    // Render value template
     
     // Create main element if missing
     let propertyMainElement = h.dom.thing.part.main.get(element);
@@ -289,23 +321,17 @@ function _renderPropertyElement(element, record, template, TEMPLATEDB) {
 
         // Create new element if missing
         if(h.isNull(ve)){
-            
-            // Prepopulate template with values (in case there are {{ }} )
-            let content = template //h.template.get(template, newRecord);
-            
-            
+                        
             // Generate new value element
-            ve = _newValueElement(pv, record,  content, propertyID, TEMPLATEDB);
+            ve = _newValueElement(pv, record,  valueTemplate, propertyID, TEMPLATEDB);
             
             
             // Render sub things if any
             h.dom.thing.traverse.children.things
                 .get(ve)
-                .map((x) => _renderThingElement(x, pv?.object?.value, null, TEMPLATEDB));
-            // Render sub properties if any
-            h.dom.thing.traverse.children.properties
-                .get(ve)
-                .map((x) => _renderPropertyElement(x, pv?.object?.value, null, TEMPLATEDB));
+                .map((x) => _renderThingElement(x, pv?.object?.value, TEMPLATEDB));
+
+           
         }
 
         
@@ -337,52 +363,59 @@ function _newValueElement(pv, record, template, propertyID, TEMPLATEDB) {
      * @returns {Object} The new value element
      */
 
-   
-    let value = pv?.object?.value || value
-    let newValueElement = document.createElement("span");
+    let value = pv
+    if(h.isNotNull(pv?.object?.value)){
+        value = pv?.object?.value
+    }
+
+    if(h.isNotNull(value?._system)){
+        value = value?._system
+    }
+    
+    
+    let temp = document.createElement("span");
+    temp.innerHTML = h.base.template.render(template, record)
+
+    // Get valueElement from template
+    let newValueElement = h.dom.thing.traverse.children.values.get(temp)?.[0] || temp
+
+    
+    
     h.dom.thing.property.type.setAsValue(newValueElement);    
+    h.dom.thing.property.record_type.set(newValueElement, record?.['@type'] || record.record_type)
+    h.dom.thing.property.record_id.set(newValueElement, record?.['@id'] || record.record_id)
+
     h.dom.thing.property.propertyID.set(newValueElement, propertyID)
-    h.dom.thing.property.propertyID.set(newValueElement, pv?.['@id'])
-    h.dom.thing.property.valueHash.set(newValueElement, value )
+    h.dom.thing.property.valueID.set(newValueElement, pv?.['@id'])
+    h.dom.thing.property.valueHash.set(newValueElement, h.base.hash.get(value))
 
 
-    template = template.trim()
-    if (h.isNull(template)) {
-        newValueElement.textContent = value;
-    } else {
-        newValueElement.innerHTML = template;
-        let main = h.dom.thing.part.main.get(newValueElement);
-        if(main){
-            main.innerHTML = value;
-            for(let t of h.dom.thing.children.things.get(main)){
-                h.dom.thing.property.ref.set(t, value)
-            }
+    // If value not an object, assign to main
+    if (!h.thing.isThing(value)) {
+
+        let mainPart = h.dom.thing.part.main.get(newValueElement) || newValueElement;
+        mainPart.textContent = value
+        return newValueElement
+    }
+
+
+    // Render template and set as content
+    //newValueElement.innerHTML = h.base.template.get(template, record)
+
+    // Get value
+    let main = h.dom.thing.part.main.get(newValueElement) || newValueElement;
+
+    // if children, assign value
+    let c = h.dom.thing.traverse.children.things.get(main)
+
+    if(h.isNotNull(c)){
+        for(let t of c){
+            h.dom.thing.property.ref.set(t, value)
         }
+    } else {
+        main.innerHTML = value;
     }
-
     
-
-
-
-    if(newValueElement.innerHTML.includes('{{')){
-        
-        let headingRecord = h.thing.record.get(value)
-        headingRecord = h.base.heading.addHeadings(headingRecord)
-        headingRecord = h.base.json.simplify(headingRecord)
-        newValueElement.innerHTML = h.base.template.get(newValueElement.innerHTML, headingRecord);
-    }
-
-
-    h.dom.thing.init.init(newValueElement, TEMPLATEDB);
-
-    
-    for (let t of h.dom.thing.traverse.children.things.get(newValueElement)) {
-        t.setAttribute("data-record-type", value?.["@type"]);
-        t.setAttribute("data-record-id", value?.["@id"]);
-    }
-
-
-
     
     return newValueElement;
 }

@@ -8,12 +8,15 @@ import { krakenHelpers as h} from '../../krakenHelpers/krakenHelpers.js'
 export class KrElementBase extends HTMLElement {
     constructor() {
         super();
+
+        this.isInitialized = false
+        this.krClass = 'krElementBase';
         this._thing = null
         this._record = null
-
+        this.krType = 'krThing'
         this._template = h.html.itemlist()
-        
-        
+
+        this.classList.add(this.krType)
         
     }
 
@@ -24,21 +27,33 @@ export class KrElementBase extends HTMLElement {
     //  Draw 
     // -----------------------------------------------------
 
-    init(){
+    async init(){
+
+
+        console.log('init element', this.krClass)
+        
+        this.setAttribute('data-templateID', this.krClass)
+
+        if(h.isNull(this.record_type) || h.isNull(this.record_id)){ 
+            return 
+        }
+
+        if(this.isInitialized == true){
+            return 
+        }
+
+        while(this?.engine?.isInitialized != true){
+            await new Promise(resolve => setTimeout(resolve, 100));
+        }
+
+        // Add template
+        await this.engine.addTemplateAsync(this.krClass, this._template, this.krType)
+
+        console.log('template completed', this.krClass)
 
         
-        
-        
-        this.classList.add('krThing')
-        
-        this.innerHTML = this._template
+        await this.render()
 
-        
-        //h.dom.thing.init(this)
-
-        //let headingrecord = h.localization.headings.record.get(this.record);
-
-        //h.dom.thing.render(this, headingrecord)
         
     }
 
@@ -51,13 +66,12 @@ export class KrElementBase extends HTMLElement {
 
     get thingElement(){
 
-        console.log('thingElement')
          return h.dom.thing.traverse.current.thing.get(this)
     }
 
     
     get record_type(){
-        return h.dom.thing.property.record_type.get(this.thingElement)
+        return h.dom.thing.property.record_type.get(this)
     }
 
     set record_type(value){
@@ -70,6 +84,14 @@ export class KrElementBase extends HTMLElement {
 
     set record_id(value){
         return h.dom.thing.property.record_id.set(this, value)
+    }
+
+    get propertyID(){
+        return h.dom.thing.property.propertyID.get(this)
+    }
+
+    set propertyID(value){
+        return h.dom.thing.property.propertyID.set(this, value)
     }
 
     get ref(){
@@ -89,52 +111,204 @@ export class KrElementBase extends HTMLElement {
     
     
     get record(){
-        return getRecord()
+        /**
+         * Returns the record
+         * @returns {Object} The record
+         * 
+         */
+
+        return this.getRecord()
+
+
+    }
+
+
+    async getRecord(){
+
+        if(h.isNotNull(this.engine)){
+
+            while(this.engine.isInitialized!=true){
+                await new Promise(resolve => setTimeout(resolve, 1000));
+            }
+
+            return this.engine.get(this.record_type, this.record_id)
+        }
+
         return this._record
     }
 
     set record(value){
-        this.ref = value
-        return this._record = value
+        /**
+         * Sets the record
+         * @param {Object} value The record
+         * 
+         */
+
+        
+        this.ref = value.ref || value
+
+        if(h.isNotNull(this.engine)){
+            return this.engine.set(value)
+        }
+
+        
+        this._record = value
     }
 
-    get thing(){
-        return this._thing
+    
+
+
+    // -----------------------------------------------------
+    //  Sections 
+    // -----------------------------------------------------
+
+    getSectionGeneric(classNameToGet, classNameToStop){
+        /**
+         * Returns the section with the given class name, stopping when reaching 
+         */
+
+        // Defaults to current classname
+        if(h.isNull(classNameToStop)){
+            classNameToStop = this.krClass
+        }
+
+        
+        /* Selects .test1 but excludes elements that are inside .test2 */
+        let cssSelector = `.${classNameToGet}:not(.${classNameToStop} .${classNameToGet}) `
+        
+        let section = this.querySelector(cssSelector)
+        return section
     }
 
-    set thing(value){
-        return this._thing = value
+
+    potentialActionSection(){
+        /**
+         * Returns the potential action section
+         * @returns {HTMLElement} The potential action section
+         * @returns {null} If no potential action section is found
+         */
+        return this.getSectionGeneric('krPotentialAction')
+        
     }
 
-    render(){
 
+    
+
+    // -----------------------------------------------------
+    //  Neighbors 
+    // -----------------------------------------------------
+
+    get engine(){
+      /**
+       * Retrieves the engine element if exists
+       * @returns {Object} The engine element
+       */  
+
+
+        return this.closest('kr-engine') || null
+        
+    }
+
+
+
+    // -----------------------------------------------------
+    //  Storage 
+    // -----------------------------------------------------
+
+    
+
+    getFromStorage(){
+        /**
+         * Retrieves the record from storage
+         * @returns {Object} The record
+         */
+
+        if(h.isNull(this.record_type) || h.isNull(this.record_id)){
+            return false
+        }
+
+        this.thing = this.engine.get(this.record_type, this.record_id)
+        this.record = this.thing.record
+        
+    }
+    
+    saveToStorage(){
+        /**
+         * Saves the record to storage
+         * @returns {void}
+         * 
+         */
+
+        if(h.isNotNull(this.engine)){
+            return this.engine.setAttribute(this.record)
+        }
+        
+    }
+    
+
+    // -----------------------------------------------------
+    //  Comment 
+    // -----------------------------------------------------
+
+    
+
+    
+    async render(){
+
+        
 
         if(h.isNull(this.record_type) || h.isNull(this.record_id)){
             return
         }
 
-        console.log('element render')
-        let db = this.closest('kr-engine')
+        await this.engine.renderThingAsync(this.ref)
 
-        let systemRecord = db.get(this.record_type, this.record_id)
+        console.log('render completed', this.krClass)
+        return
 
-        let simpleRecord = h.thing.record.get(systemRecord)
-
-        console.log('ss', simpleRecord)
-        let headingRecord = h.base.heading.addHeadings(simpleRecord)
-
-        let content = h.base.template.get(this._template, headingRecord)
-
-        console.log(content)
         
-        this.innerHTML = content
+        if(h.isNotNull(this.engine)){
+            
+
+            // Wait for engine to be initialized
+            while(this.engine.isInitialized != true){
+                await new Promise(resolve => setTimeout(resolve, 100));
+            }
+
+            try{
+            
+                let systemRecord = this.engine.get(this.record_type, this.record_id)
         
+                let simpleRecord = h.thing.record.get(systemRecord)
+        
+                let headingRecord = h.base.heading.addHeadings(simpleRecord)
+
+
+                
+                //h.dom.thing.renderSystem(this, headingRecord)                
+                //let content = h.base.template.get(this._template, headingRecord)
+                
+                //this.innerHTML = content
+        
+            } catch(error){
+            }
+        }
+
+        this.isInitialized = true
     }
+
+
+    // -----------------------------------------------------
+    //  Comment 
+    // -----------------------------------------------------
 
     
     connectedCallback() {
+
+        
         this.init()
-        this.render()
+        
+
     }
 
     disconnectedCallback() {}
@@ -143,6 +317,7 @@ export class KrElementBase extends HTMLElement {
 
     attributeChangedCallback(name, oldValue, newValue) {
 
+        this.init()
         if(name == 'data-record-type'){
             this.render()
             

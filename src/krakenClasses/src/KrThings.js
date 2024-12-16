@@ -64,8 +64,10 @@ export class KrThings {
 
         // Add to db and get version in db
         this._db = h.thing.push(this._db, record)
-        record = h.thing.get(this._db, record)
+
         
+        record = h.thing.get(this._db, record)
+
         // Add children to db
         let children = h.thing.children.get(record)  
 
@@ -152,6 +154,19 @@ export class KrThings {
 
 
 
+    // -----------------------------------------------------
+    //  Comment 
+    // -----------------------------------------------------
+
+    executeAction(action){
+        /**
+         * Executes an action
+         */
+
+        
+
+        
+    }
 
     
 }

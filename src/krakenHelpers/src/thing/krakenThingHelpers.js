@@ -6,8 +6,13 @@ import { krakenThingPropertyValueHelpers  } from "./src/krakenThingPropertyValue
 
 import {krakenThingListHelpers} from './src/krakenThingListHelpers.js'
 
+import { krakenThingActionExecutionHelpers } from './src/krakenThingActionExecutionHelpers.js'
+
 export const krakenThingHelpers = {
 
+
+    pvh: krakenThingPropertyValueHelpers,
+    
     list: krakenThingListHelpers,
     pv: krakenThingPropertyValueHelpers,
 
@@ -21,6 +26,7 @@ export const krakenThingHelpers = {
     isEmpty: krakenThingSystemHelpers.isEmpty,
     keys: krakenThingSystemHelpers.keys,
     clone: krakenThingSystemHelpers.clone,
+    copy: krakenThingSystemHelpers.copy,
     hash: krakenThingSystemHelpers.hash,
 
     // Constructor
@@ -113,4 +119,9 @@ export const krakenThingHelpers = {
     sort: krakenThingSystemHelpers.sort,
     filter: krakenThingSystemHelpers.filter,
     mergeLists: krakenThingSystemHelpers.mergeLists,
+
+
+    // Execution
+    execute: krakenThingActionExecutionHelpers.execute,
+    
 };

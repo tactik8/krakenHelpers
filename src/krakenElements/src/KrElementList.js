@@ -25,19 +25,24 @@ export class KrElementList extends HTMLElement {
     // -----------------------------------------------------
 
     init(){
+        /**
+         * Initializes the element
+         * 
+         */
 
         
-        this.record = getRecord()
+        
+        
         this.classList.add('krThing')
-        
-        this.innerHTML = h.html.itemlist()
+        this.classList.add('krDropzone')
 
+
+        let itemTemplate = ` <div class="krThing krDraggable" data-record-type="{{itemListElement.item.@type}}" data-record-id="{{itemListElement.item.@id}}"> ${h.html.card('', 'itemListElement.item')} </div>
+        `
+        this.innerHTML = h.html.itemlist('', '', itemTemplate)
         
         h.dom.thing.init(this)
 
-        let headingrecord = h.localization.headings.record.get(this.record);
-
-        h.dom.thing.render(this, headingrecord)
         
     }
 
@@ -81,7 +86,7 @@ export class KrElementList extends HTMLElement {
     
     
     get record(){
-        return getRecord()
+        //return getRecord()
         return this._record
     }
 

@@ -37,6 +37,7 @@ async function getApi(baseUrl, urlPath,  params){
 
     url.search = new URLSearchParams(params);
 
+    url = String(url)
     const response = await fetch(url, requestOptionsGet)
 
     if(response.status != 200 && response.status != 201 && response.status && 202){  
@@ -50,7 +51,7 @@ async function getApi(baseUrl, urlPath,  params){
 }
 
 
-async function postApi(baseUrl, urlPath,  records){
+async function postApi(baseUrl, urlPath, records){
 
     //Post 
 
@@ -62,6 +63,7 @@ async function postApi(baseUrl, urlPath,  records){
         body: JSON.stringify(records)
     };
 
+
     let url
     if(h.isNotNull(urlPath)){
         url = new URL(String(urlPath), String(baseUrl));
@@ -69,13 +71,15 @@ async function postApi(baseUrl, urlPath,  records){
         url = new URL( String(baseUrl));
     }
 
+
+    url = String(url)
     const response = await fetch(url, requestOptions)
 
     if(response.status != 200 && response.status != 201 && response.status != 202){  
         throw new Error(String(response.status) + ' ' + response.statusText);
     }
 
-    return response
+    return response.json()
     
 }
 

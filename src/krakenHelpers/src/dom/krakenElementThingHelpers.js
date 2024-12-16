@@ -78,14 +78,14 @@ function isValid(element){
     
 }
 
-function init(element){
+function init(element, TEMPLATEDB, force=false){
     /**
      * Initializes an element
      * @param {Object} element
      * @returns {Object} The element
      */
 
-    return krakenElementThingInitHelpers.init(element, TEMPLATEDB)
+    return krakenElementThingInitHelpers.init(element, TEMPLATEDB, force)
     
 }
 
@@ -115,7 +115,7 @@ function render(element, record, conditions){
 }
 
 
-function renderSystem(element, record, conditions){
+function renderSystem(element, record, conditions, TEMPLATEDB){
     /**
      * Sets the record of an element
      * @param {Object} element

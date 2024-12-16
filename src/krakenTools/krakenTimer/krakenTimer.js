@@ -1,3 +1,5 @@
+
+
 export class KrTimer {
     constructor() {
         this.startTimes = new Map();  // Store start times for labels

@@ -347,29 +347,48 @@ function gt(pv1, pv2){
         throw new Error('Value provided is not pv');
     }
 
-    
-    
-
 
     let propertyIDs = ['credibility', 'observationDate', 'createdDate', 'position']
 
-    let result
-
-   
+    let result 
+    
     for(let propertyID of propertyIDs){
 
         
         let value1 = pv1?.metadata?.[propertyID]
         let value2 = pv2?.metadata?.[propertyID]
-        
-        if(h.isNull(value1) && h.isNotNull(value2)) { result = false }
-        if(h.isNotNull(value1) && h.isNull(value2)) { result = true }
 
-        if(h.isNotNull(value1) && h.isNotNull(value2) && value1 != value2){
+
+        if(h.isNull(value1) && h.isNull(value2)) { continue }
+        if(h.isNull(value1) && h.isNotNull(value2)) { return false }
+        if(h.isNotNull(value1) && h.isNull(value2)) { return true }
+
+        if(propertyID.includes('Date')){
+
+
+            if(h.date.isValid(value1) && !h.date.isValid(value2)){
+                return true
+            }
+            if(!h.date.isValid(value1) && h.date.isValid(value2)){
+                return false
+            }
+            if(!h.date.isValid(value1) && !h.date.isValid(value2)){
+                continue
+            }
+            
+            if(h.date.gt(value1, value2) == true){ return true }
+            if(h.date.eq(value1, value2) == true){ continue }
+            if(h.date.lt(value1, value2) == false){ return false }
+            
+
+        } else {
             result = value1 > value2 
+            if(value1 > value2){ return true }
+            if(value1 == value2){ continue }
+            if(value1 < value2){ return false }
+            
         }
-
-        if(result){ return result }
+       
        
     }
     return false
@@ -406,6 +425,7 @@ function lt(pv1, pv2){
 
     let propertyIDs = ['credibility', 'observationDate', 'createdDate', 'position']
 
+    let result
 
     for(let propertyID of propertyIDs){
 
@@ -416,8 +436,29 @@ function lt(pv1, pv2){
         if(h.isNull(value1) && h.isNotNull(value2)) { return true }
         if(h.isNotNull(value1) && h.isNull(value2)) { return false }
 
-        if(value1 < value2){ return true }
-        if(value1 > value2){ return false }
+        if(propertyID.includes('Date')){
+
+
+            if(h.date.isValid(value1) && !h.date.isValid(value2)){
+                return false
+            }
+            if(!h.date.isValid(value1) && h.date.isValid(value2)){
+                return true
+            }
+            if(!h.date.isValid(value1) && !h.date.isValid(value2)){
+                continue
+            }
+            if(h.date.lt(value1, value2) == true) { return true }
+            if(h.date.eq(value1, value2) == true){ continue }
+            if(h.date.gt(value1, value2) == false){ return false }
+            
+            
+        } else {
+            if(value1 < value2){ return true }
+            if(value1 == value2){ continue }
+            if(value1 > value2){ return false }
+        }
+
     }
     return false
 
@@ -447,7 +488,7 @@ function create(actionType, propertyID, value, metadata, replacee){
                 "value": value
             },
             "metadata": {
-                "createdDate": h.date.toDate(metadata?.createdDate) || new Date(),
+                "createdDate": h.date.toDate(metadata?.createdDate || new Date()),
                 "position": h.number.toNumber(metadata?.position)  || null,
                 "credibility": h.number.toNumber(metadata?.credibility)  || null,
                 "observationDate": h.date.toDate(metadata?.observationDate)  || null,
@@ -512,6 +553,14 @@ function override(pv1, pv2){
      * Returns true if pv1 override pv2
      */
 
+    // Error handling
+    if(pv1?.['@id'] == pv2?.['@id']){ 
+        return false 
+    }
+    
+    if(pv1?.object.propertyID != pv2?.object.propertyID){
+        return false
+    }
 
     // Error handling
     if(h.isNull(pv1)){
@@ -543,13 +592,17 @@ function override(pv1, pv2){
     
     // Get record id
     if(recordType1 == 'replaceaction'){
+        
         let c1 = gt(pv1, pv2)
-        let c2 = h.isNull(pv1?.replacee)
+        
+        let c2 = h.isNull(pv1?.replacee || null)
         let c3 = pv1?.replacee == pv2?.object?.value         
         let c4 = h.isNotNull(pv1?.object?.value?.['@type'] )
         let c5 = h.isNotNull(pv1?.object?.value?.['@id'] )
         let c6 =  pv1?.object?.value?.['@type'] == pv2?.object?.value?.['@type']
         let c7 =  pv1?.object?.value?.['@id'] == pv2?.object?.value?.['@id']
+
+       
         return c1 && (c2 || c3 || (c4 && c5 && c6 && c7))
     }
 
@@ -584,7 +637,9 @@ function compile(pvs){
 
     // Remove pvs canceled by this pv
     for(let pv of pvs){
+        
         results = results.filter(x => (override(pv, x) == false))
+        
     }
 
     // Remove delete pvs

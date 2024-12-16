@@ -106,7 +106,7 @@ function getMethodFromReq(req){
 }
 
 function getDomainFromReq(req){
-    return req.method
+    return req.hostname
 }
 
 function getUrlFromReq(req){
@@ -196,6 +196,21 @@ function getDeviceRecordFromReq(req){
 }
 
 function getAgentRecordFromReq(req){
-    let record = {}
+    /**
+     * Returns the agent record
+     */
+
+
+    
+    
+    let record = {
+        '@type': "Person",
+        "@id": h.uuid.new(),
+        "knowsLanguage": req.headers['accept-language'],
+        
+    }
+
     return record
+    
+     
 }

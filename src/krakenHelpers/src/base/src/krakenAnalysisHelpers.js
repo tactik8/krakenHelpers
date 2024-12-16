@@ -4,6 +4,8 @@ import { krakenArrayHelpers} from "./krakenArrayHelpers.js";
 import { krakenDotNotationHelpers } from "./krakenDotNotationHelpers.js";
 import { krakenNumberHelpers } from "./krakenNumberHelpers.js";
 import { krakenJsonHelpers } from "./krakenJsonHelpers.js";
+import { krakenUuidHelpers } from "./krakenUuidHelpers.js";
+import { krakenObjectHelpers } from "./krakenObjectHelpers.js";
 
 
 const h = {
@@ -15,7 +17,10 @@ const h = {
     isArray: krakenArrayHelpers.isArray,
     dot: krakenDotNotationHelpers,
     number: krakenNumberHelpers,
-    json: krakenJsonHelpers
+    json: krakenJsonHelpers,
+    object: krakenObjectHelpers,
+    isObject: krakenObjectHelpers.isValid,
+    uuid: krakenUuidHelpers
 }
 
 
@@ -34,6 +39,7 @@ export const krakenAnalysisHelpers = {
     last: getLast,
     filter: filter,
     getValues: getValues,
+    transpose: transpose,
     //runOperations: runOperations
 };
 
@@ -165,6 +171,71 @@ function getValues(value, key){
 }
 
 
+function transpose(record, key){
+    /**
+     * Converts a record to list of PVs
+     * 
+     */
+
+
+    if(h.isArray(record)){
+        return record.map(x => transpose(x))
+    }
+
+
+    record = JSON.parse(JSON.stringify(record))
+
+
+    if(h.isNull(key)){
+        
+        return recordToPropertyValue(record)
+    }
+
+    let v = getValues(record, key)
+
+    let pvs = recordToPropertyValue(v)
+
+    let result = h.dot.set(record, key, pvs)
+    
+    return result
+    
+}
+
+function recordToPropertyValue(record){
+    /**
+     * Convert record to list of pv
+     * 
+     */
+
+    if(h.isArray(record)){
+        return record.map(x => recordToPropertyValue(x))
+    }
+
+
+    if(!h.isObject(record)){
+        console.log('ERROR - not an object', record)
+        return record
+    }
+
+    
+    let pvs = []
+    for(let k in record){
+        
+        let pv = {
+            "@type": "PropertyValue",
+            "@id": h.uuid.new(),
+            "propertyID": k,
+            "value": record[k]
+        }
+        pvs.push(pv)
+    }
+    
+    return pvs
+    
+}
+
+
+
 function filter(value, conditions){
     /**
      * Filters a series of records
@@ -175,7 +246,12 @@ function filter(value, conditions){
      */
 
     // Convert string to conditions (key=bob1 -> {'key': 'bob1'})
+
+  
     if(typeof conditions == 'string'){
+
+
+        
         let newConditions = {}
         newConditions[conditions.split('=')?.[0]] = conditions.split('=')?.[1]
         conditions = newConditions
@@ -186,13 +262,113 @@ function filter(value, conditions){
 
         let passes = true
         for(let c in conditions){
-            if(h.dot.get(c, v) != conditions[c]){
-                passes = false
-                break
+
+            let v1 = h.dot.get(c, v)
+            let c1 = conditions[c]
+            
+            let operation = 'eq'
+           
+            
+            if(c1.split(' ')?.[0] == 'ne'){
+                c1 = c1.slice(3)
+                operation = 'ne'
             }
+
+            if(c1.split(' ')?.[0] == 'gt'){
+                c1 = c1.slice(3)
+                operation = 'gt'
+            }
+
+            if(c1.split(' ')?.[0] == 'lt'){
+                c1 = c1.slice(3)
+                operation = 'lt'
+            }
+
+            if(c1.split(' ')?.[0] == 'ge'){
+                c1 = c1.slice(3)
+                operation = 'ge'
+            }
+
+            if(c1.split(' ')?.[0] == 'le'){
+                c1 = c1.slice(3)
+                operation = 'le'
+            }
+
+            if(c1.split(' ')?.[0] == 'isNull'){
+                c1 = c1.slice(7)
+                operation = 'isNull'
+            }
+
+            if(c1.split(' ')?.[0] == 'notNull'){
+                c1 = c1.slice(7)
+                operation = 'notNull'
+            }
+        
+            
+            
+          
+
+            if(operation == 'eq'){
+                if((v1 == c1) == false){
+                    passes = false
+                    break
+                }
+            }
+
+            if(operation == 'ne'){
+                if((v1 != c1) == false){
+                    passes = false
+                    break
+                }
+            }
+
+            if(operation == 'gt'){
+                if(!(v1 > c1)){
+                    passes = false
+                    break
+                }
+            }
+
+            if(operation == 'lt'){
+                if(!(v1 < c1)){
+                    passes = false
+                    break
+                }
+            }
+
+            if(operation == 'ge'){
+                if(!(v1 >= c1)){
+                    passes = false
+                    break
+                }
+            }
+
+            if(operation == 'le'){
+                if(!(v1 <= c1)){
+                    passes = false
+                    break
+                }
+            }
+
+            if(operation == 'notNull'){
+                if(!(h.isNotnull(v1))){
+                    passes = false
+                    break
+                }
+            }
+
+            if(operation == 'isNull'){
+                if(!(h.isNull(v1))){
+                    passes = false
+                    break
+                }
+            }
+
+            
+            
         }
         if(passes){
-                filteredItems.push(v)
+            filteredItems.push(v)
         }
         
     }
@@ -347,7 +523,7 @@ function getSumProduct(value, key1, key2, sigFig=2){
     for(let i=0; i< value.length; i++ ){
         let value1 = h.dot.get(value[i], key1)
         let value2 = h.dot.get(value[i], key2)
-        if(h.number.isNumber(value1) && h.number.isNumber(value2)){
+        if(h.number.isValid(value1) && h.number.isValid(value2)){
             let v = value1 * value2
             result += h.number.round(v, sigFig) 
             

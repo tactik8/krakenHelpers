@@ -1,11 +1,16 @@
 
 import { actionMenu } from './actionMenu.js';
 import {line } from './line.js'
+import { krakenBaseHelpers as h} from '../../base/krakenBaseHelpers.js'
+
+export function listitem(classlist, itemContent, prefixes){
 
 
-export function listitem(itemContent, prefixes){
+    // Handle classes
+    let classes = h.toArray(classlist).join(' ')
+    
 
-
+    // Handle prefixes
     prefixes = prefixes || [];
 
     let prefix = prefixes.join('.')
@@ -19,7 +24,7 @@ export function listitem(itemContent, prefixes){
 
     return `
 
-        <div class=" mt-1 mb-1">
+        <div class=" mt-1 mb-1 ${classes || ''}">
             <nav>
                 <div class="row d-flex align-items-center">
     
@@ -37,18 +42,24 @@ export function listitem(itemContent, prefixes){
     
                         
                     <div class="col col-auto order-2 order-sm-3 text-center">
+                        <span class="krProperty" data-propertyID="position">
                         {{ ${prefix}position }}
+                        </span>
                     </div>
                     
     
                      <div class="col col-12 col-sm-1 flex-sm-grow-1 order-5 order-sm-3" >
+                        
+                        <span class="krProperty" data-propertyID="item">
                         <main>
                             ${itemContent}
                         </main>
+                        </span>
                     </div>
                 
                     
                     <div class="col col-auto order-3 order-sm-4 ms-auto text-end">
+                        
                         ${actionMenu(prefixes)}
                     </div>
         

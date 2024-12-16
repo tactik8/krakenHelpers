@@ -2,6 +2,7 @@
 
 import { krakenHelpers as h} from '../../krakenHelpers/krakenHelpers.js'
 import { krakenElementThingRecordHelpers } from '../../krakenHelpers/src/dom/krakenElementThingRecordHelpers.js'
+import { KrThing } from './KrThing.js'
 
 
 import { KrThings } from './KrThings.js'
@@ -12,7 +13,10 @@ export class KrElementEngine{
 
         this._db = new KrThings(true)
 
-        this._templateDB = {}
+        this._templateDB = {
+            "a": "aaa"
+        }
+        this.isInitialized=false
 
 
         this._registeredThings = new h.base.classes.Cache()
@@ -24,10 +28,33 @@ export class KrElementEngine{
 
     init(){
 
+        // Initialize things
          h.dom.thing.init(this._element, this._templateDB)
+
+        // Initialize inputs
+        this.isInitialized=true
+
+        
+      
     }
 
 
+
+    // -----------------------------------------------------
+    //  Comment 
+    // -----------------------------------------------------
+
+
+   
+
+
+    // -----------------------------------------------------
+    //  Comment 
+    // -----------------------------------------------------
+
+    
+
+    
     get(record_or_record_type, record_id){
         /**
          * Gets a thing
@@ -35,7 +62,18 @@ export class KrElementEngine{
          * @param {String} record_id The record id
          * @returns {Object} The thing
          */
-        return this._db.get(record_or_record_type, record_id)
+        let thing =  this._db.get(record_or_record_type, record_id)
+
+
+        // Retrieve from api if missing
+
+        if(h.isNull(thing)){
+            let record = h.base.storage.get(record)
+            thing = new KrThing(record)
+        }
+
+        return thing
+        
     }
 
     
@@ -47,12 +85,16 @@ export class KrElementEngine{
         // Add thing to thing db
         let thing = this._db.set(record)
 
+        // Add thing to storage
+        h.base.storage.set(thing.system)
+
+        
         // Suscribe to thing event listener
         this.registerThing(this._db.getAll())
 
         // Render thing
         this.renderThing(thing)
-        
+
         //
         return thing
         
@@ -98,11 +140,13 @@ export class KrElementEngine{
 
         
         for(let t of things){
-            this.renderThing(t)
+            if(t){
+                this.renderThing(t)
+            }
         }
     }
 
-    renderThing(thing){
+    renderThing(record_or_record_type, record_id){
         /**
          * Renders the thing
          * @param {Object} thing The thing
@@ -110,21 +154,59 @@ export class KrElementEngine{
          * 
          */
 
-        thing = this._db.get(thing)
+
+        // Render thing
+
+        let newThing = this._db.get(record_or_record_type, record_id)
+       
+        let systemRecord = newThing?.system
+
+        if(h.isNotNull(systemRecord)){
+            h.dom.thing.renderSystem(this._element, systemRecord, null, this._templateDB)
+            
+            h.dom.thing.event.register(this._element)
+            
+        } else {
+        }
 
 
-        
+        // Render thing childrens
+        //for(let t of newThing?.children || []){
+           // this.renderThing(t)
+            
+       // }
 
-        
-        h.dom.thing.renderSystem(this._element, thing.system)
         
     }
 
+    addTemplate(templateID, template, elementKrType="krThing"){
+        /**
+         * Adds a template
+         * @param {String} templateID The template id
+         * @param {String} template The template
+         */
+
+        let force = true
+        let temp = document.createElement('div')
+        temp.setAttribute('data-templateID', templateID)
+        temp.classList.add(elementKrType)
+        temp.innerHTML = template
+        h.dom.thing.init(temp, this._templateDB, force)
+
+        return
+        
+    }
 
     thingEventCallback(action){
 
-        console.log('New callback', action.object)
 
+        // Store in storage
+
+        if(h.isNotNull(action.object?.system)){
+            h.base.storage.set(action.object?.system)
+        }
+
+        // Render
         this.renderThing(action.object)
         
     }

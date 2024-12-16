@@ -97,8 +97,24 @@ export class KrThing{
          * Provides abstraction for event handling and cleanup 
          */
         //this._eventMonitoringCache = h.thing.hash(this._system)
-        
+
+
         return this._system
+        
+        let clone = h.thing.copy(this._system)
+
+
+        for(let pv of clone._propertyValues){
+            if(pv?.object?.value instanceof KrThing){
+                pv.object.value = pv.object.value.system
+            }
+        }
+
+        
+        
+        return this.system
+        
+        
     }
 
     set system(value){
@@ -236,7 +252,7 @@ export class KrThing{
          * 
          */
 
-        return h.thing.children(this.system)
+        return h.thing.children.get(this.system)
         
     }
 
@@ -323,7 +339,7 @@ export class KrThing{
          * @param {String} propertyID The propertyID
          * @returns {Object} The record value for a given property
          */
-        return h.thing.value.get(this.system, propertyID)
+        return h.thing.propertyValue.get(this.system, propertyID)
     }
 
     getPropertyValues(propertyID){
@@ -332,7 +348,7 @@ export class KrThing{
          * @param {String} propertyID The propertyID
          * @returns {Object} The record value for a given property
          */
-        this.system = h.thing.value.set(this.system, propertyID, value, metadata)
+        return h.thing.propertyValues.get(this.system, propertyID)
     }
 
     
@@ -424,14 +440,15 @@ export class KrThing{
     // -----------------------------------------------------
 
 
-    insert(value){
+    insert(value, position){
         /**
          * Inserts a value into the list
          * @param {Object} value The value
          *    
          */
 
-        this.system = h.thing.list.insert(this.system, value)
+        console.log('Insert', value, position)
+        this.system = h.thing.list.insert(this.system, value, position)
     }
 
     get position(){

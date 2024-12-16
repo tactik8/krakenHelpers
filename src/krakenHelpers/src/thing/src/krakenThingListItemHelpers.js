@@ -168,7 +168,6 @@ function getPosition(value){
     if(h.isNull(result)){
         return null
     }
-    
     return result
     
 }
@@ -180,7 +179,7 @@ function setPosition(value, position){
      * @returns {Number} The position
      */
 
-    if(!isValid(value)){ return null }
+    if(!isValid(value)){ throw new Error('Invalid thing') }
     return th.value.set(value, 'position', position) 
 
 }

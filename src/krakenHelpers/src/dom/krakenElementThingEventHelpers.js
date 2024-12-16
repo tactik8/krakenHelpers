@@ -24,14 +24,18 @@ function registerEvents(element, db, TEMPLATEDB) {
     /**
      * Registers events on an element
      * @param {Object} element
+     * @param {Object} db: the db containing things records
+     * @param {Object} TEMPLATEDB: the db containing the templates
      * @returns {Object} The element
      *
      * classes:
      *     - krDropzone:
      *     - krDraggable:
-     *     - krClickable:
+     *     - krClickable:    
+     *     - krSelectable: allows an item to be selected
      */
 
+    return 
     let classList = {
         //Drag and drop
         krDrag: {
@@ -55,7 +59,7 @@ function registerEvents(element, db, TEMPLATEDB) {
         // Generic draggable
         krDraggable: {
             eventFn: krakenElementEventHelpers.generic.setDraggable,
-            callbackFn: addToList,
+            callbackFn: null,  // addToList,
             params: { db: db, TEMPLATEDB: TEMPLATEDB },
         },
 
@@ -72,6 +76,7 @@ function registerEvents(element, db, TEMPLATEDB) {
 
     // Register
     for (let k in classList) {
+        
         if (h.isNull(DB?.[k])) {
             console.log(k);
             DB[k] = {};
@@ -82,9 +87,15 @@ function registerEvents(element, db, TEMPLATEDB) {
 
         let elements = element.querySelectorAll(`.${k}`);
         for (let e of elements) {
-            if (h.isNull(DB?.[k]?.[e?.id])) {
+            if(h.isNull(e.id)){ e.id = h.uuid.new()}
+            
+            if (DB?.[k]?.[e?.id] != true) {
+
+                console.log('c')
                 fn(e, callbackFn, params);
                 DB[k][e.id] = true;
+            } else {
+                console.log('not null', DB?.[k]?.[e?.id])
             }
         }
     }

@@ -10,6 +10,10 @@ export const krakenElementEventHelpers = {
         setDraggable: setDragDropDraggableElement,
         setDropzone: setDragDropDropzoneElement,
     },
+    dragDropReordering: {
+        setDraggable: setDragDropDraggableReorderingElement,
+        setDropzone: setDragDropDropzoneReorderingElement,
+    },
     generic: {
         setDraggable: setDraggableGenericElement,
         setDropzone: setDropzoneGenericElement,
@@ -24,6 +28,114 @@ export const krakenElementEventHelpers = {
 //  Register events 
 // -----------------------------------------------------
 
+
+
+// -----------------------------------------------------
+//  Drag drop reordering
+// -----------------------------------------------------
+
+function setDragDropDraggableReorderingElement(element, elementHandle, callbackFn, params) {
+    
+
+    // If no handle provided, considers entire element is draggable
+    console.log(elementHandle)
+    elementHandle = elementHandle || element
+    
+    //elementHandle.draggable = true;
+
+    elementHandle.addEventListener("mousedown", (event) => {
+        
+        //event.preventDefault();
+        //event.stopPropagation();
+        element.draggable = true
+
+        console.log('mousedown')
+    });
+    
+    elementHandle.addEventListener("mouseup", (event) => {
+
+        //event.preventDefault();
+        //event.stopPropagation();
+        element.draggable = false
+
+    });
+    
+    element.addEventListener("dragstart", (event) => {
+        //event.preventDefault();
+        event.stopPropagation();
+        event.dataTransfer.setData("text/plain", element.id);
+        element.style.opacity = '0.4';
+    });
+    
+    element.addEventListener("dragend", (event) => {
+        //event.preventDefault();
+        event.stopPropagation();
+        event.dataTransfer.setData("text/plain", element.id);
+        element.style.opacity = '1';
+        element.draggable = false
+    });
+
+}
+
+function setDragDropDropzoneReorderingElement(element, callbackFn, params) {
+    element.addEventListener("dragover", (event) => {
+        event.preventDefault();
+        //event.stopPropagation();
+    });
+
+    element.addEventListener("dragenter", (event) => {
+        event.preventDefault();
+        //event.stopPropagation();
+        event.currentTarget.classList.add('dragover')
+        
+        
+    })
+    
+    element.addEventListener("dragleave", (event) => {
+        event.preventDefault();
+        //event.stopPropagation();
+        event.currentTarget.classList.remove('dragover')
+        
+        
+    })
+    
+    
+    element.addEventListener("drop", (event) => {
+        event.preventDefault();
+        event.stopPropagation();
+
+        let draggedElementID = event.dataTransfer.getData("text/plain");
+        let dropzoneElementID = event.currentTarget?.id;
+
+        let draggedElement = document.getElementById(draggedElementID)
+        let dropzoneElement =event.currentTarget
+
+        // Move dragged element before dropzone
+        dropzoneElement.before(draggedElement)
+        
+        let action = new h.classes.Action("Dragdrop - drop");
+        action.object = {
+            "@type": "WebPageElement",
+            "@id": draggedElementID,
+            name: "Draggable element",
+        };
+        action.instrument = {
+            "@type": "WebPageElement",
+            "@id": dropzoneElementID,
+            name: "Dropzone element",
+        };
+        action.setCompleted();
+
+        if (callbackFn){
+            callbackFn(action, params);
+        }
+
+        // Remove all dragover
+        for(let e of document.querySelectorAll('.dragover')){
+            e.classList.remove('dragover')
+        }
+    });
+}
 
 
 // -----------------------------------------------------
@@ -124,7 +236,7 @@ function setDropzoneGenericElement(element, callbackFn, params) {
 
 
     
-    element.draggable = true;
+    //element.draggable = true;
 
     element.addEventListener("dragover", (event) => {
         event.preventDefault();

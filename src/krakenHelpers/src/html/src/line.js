@@ -13,7 +13,7 @@ export function line( prefixes=[]) {
     }
 
     
-    return ` <div class="row align-items-center " >
+    return ` <div class="row align-items-center mt-2 mb-2" >
 
                 <div class="col col-12 col-sm-6 col-md-2">
                    

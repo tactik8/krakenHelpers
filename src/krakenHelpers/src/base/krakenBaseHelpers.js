@@ -2,6 +2,8 @@
 import { krakenAnalysisHelpers } from './src/krakenAnalysisHelpers.js'
 import { krakenArrayHelpers } from './src/krakenArrayHelpers.js'
 import { krakenBaseThingHelpers } from './src/krakenBaseThingHelpers.js'
+import { krakenColorHelpers } from './src/krakenColorHelpers.js'
+
 import { krakenDateHelpers } from './src/krakenDateHelpers.js'
 import { krakenDotNotationHelpers } from './src/krakenDotNotationHelpers.js'
 import { krakenEmailHelpers } from './src/krakenEmailHelpers.js'
@@ -22,16 +24,27 @@ import { krakenTemplateHelpers } from './src/krakenTemplateHelpers.js'
 import { krakenTestHelpers } from './src/krakenTestHelpers.js'
 import { krakenTextTable } from './src/krakenTextTable.js'
 
+import { krakenUriTemplateHelpers } from './src/krakenUriTemplateHelpers.js'
+
 import { krakenUrlHelpers } from './src/krakenUrlHelpers.js'
 import { krakenUuidHelpers} from './src/krakenUuidHelpers.js'
+import { krakenElementStyleHelpers} from './src/krakenElementStyleHelpers.js'
+
+
+
+
 
 export const krakenBaseHelpers = {
 
     analysis: krakenAnalysisHelpers,
     array: krakenArrayHelpers,
     classes: krakenSimpleThingHelpers,
+    color: krakenColorHelpers,
     date: krakenDateHelpers,
     dot: krakenDotNotationHelpers,
+    element: {
+        style: krakenElementStyleHelpers,
+    },
     email:krakenEmailHelpers,
     hash: krakenHashHelpers,
     heading: krakenHeadingHelpers,
@@ -48,6 +61,7 @@ export const krakenBaseHelpers = {
     test: krakenTestHelpers,
     textTable: krakenTextTable,
     thing: krakenBaseThingHelpers,
+    uri: krakenUriTemplateHelpers,
     url: krakenUrlHelpers,
     uuid: krakenUuidHelpers,
 
@@ -62,6 +76,11 @@ export const krakenBaseHelpers = {
     isDate: krakenDateHelpers.isValid,
     toDate: krakenDateHelpers.toDate,
     isNumber: krakenNumberHelpers.isValid,
+    wait: wait,
     
-    
+}
+
+
+function wait(seconds) {
+    return new Promise(resolve => setTimeout(resolve, seconds * 1000));
 }

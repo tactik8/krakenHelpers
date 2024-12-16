@@ -88,7 +88,7 @@ function getPartsOfElement(element, partName) {
     let bodies = traverse.children.elements.get(
         element,
         classToGet,
-        'kr' + nextElementType,
+        ['krThing', 'krProperty', 'krValue']
     );
 
     // Return

@@ -3,6 +3,7 @@ import { krakenBaseHelpers as h } from "../../base/krakenBaseHelpers.js";
 
 export const krakenThingPropertyValueSpecificationHelpers = {
     test: test,
+    testSimple: testRecord,
     testDetailed: testDetailed,
     tests: {
         valueRequired: _testConditionValueRequired,

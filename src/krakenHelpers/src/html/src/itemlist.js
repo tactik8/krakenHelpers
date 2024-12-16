@@ -2,9 +2,17 @@
 import { actionMenu } from './actionMenu.js';
 
 import { listitem } from './listitem.js';
+import { krakenBaseHelpers as h} from '../../base/krakenBaseHelpers.js'
 
-export function itemlist(content, prefixes=[]){
 
+export function itemlist(classlist, classlistListItem, content, prefixes=[]){
+
+
+    // Handle classes
+    let classes = h.toArray(classlist).join(' ')
+
+
+    //
     prefixes = prefixes || [];
 
     prefixes = prefixes.filter(x => x !== undefined && x !== null)
@@ -20,7 +28,7 @@ export function itemlist(content, prefixes=[]){
     
     let result = `
 
-        <div class="container checkboxParent">
+        <div class="container checkboxParent ${classes || ''}">
 
             <div class="row border-top border-bottom align-items-center" >
 
@@ -50,12 +58,14 @@ export function itemlist(content, prefixes=[]){
 
         
             {{ #itemListElement }}
+
                 
-                   ${ listitem(content, prefixes.concat('itemListElement')) }
+                   ${ listitem(classlistListItem, content, prefixes.concat(['itemListElement'])) }
+              
                
             {{ /itemListElement }}
 
-
+                
             <div class="row mt-2 mb-2 border-bottom align-items-center">
 
             </div>

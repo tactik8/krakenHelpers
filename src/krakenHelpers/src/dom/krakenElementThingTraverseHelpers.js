@@ -439,6 +439,7 @@ function getChildrenElementsAll(
         return undefined;
     }
 
+    classesToStop = []
     //
     let results = getChildrenElements(
         element,

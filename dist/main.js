@@ -671,6 +671,87 @@ function $409d3194b75b4893$var$objectToDotNotation(obj, parentPrefix = "") {
 }
 
 
+const $a7df578a06d5a361$export$9694b2d66de56464 = {
+    /**
+     * UUID helpers
+     * 
+     */ isValid: $a7df578a06d5a361$var$isValid,
+    toString: $a7df578a06d5a361$var$toString,
+    new: $a7df578a06d5a361$var$getNew
+};
+// -----------------------------------------------------
+//  Constructor 
+// -----------------------------------------------------
+function $a7df578a06d5a361$var$getNew() {
+    /**
+     * Returns a new uuid
+     * @returns {String} The uuid
+     */ let value = String(crypto.randomUUID());
+    return value;
+}
+// -----------------------------------------------------
+//  Base 
+// -----------------------------------------------------
+function $a7df578a06d5a361$var$isValid(value) {
+    /**
+     * Check if value is a valid UUID
+     * @param {String} value
+     * @returns {Boolean}
+     */ return h.isString(value) && h.isUuid(value);
+}
+function $a7df578a06d5a361$var$toString(value) {
+    /**
+     * Returns a string representation of the UUID
+     * @param {String} value
+     * @returns {String}
+     */ return String(value);
+}
+
+
+const $e787032c49c8ddee$export$42f247ccf9267abd = {
+    isObject: $e787032c49c8ddee$var$isObject,
+    isValid: $e787032c49c8ddee$var$isObject,
+    getKeys: $e787032c49c8ddee$var$getKeys,
+    keys: $e787032c49c8ddee$var$getKeys,
+    toString: $e787032c49c8ddee$var$toString,
+    toStirng: $e787032c49c8ddee$var$toString,
+    merge: $e787032c49c8ddee$var$merge
+};
+function $e787032c49c8ddee$var$isObject(value) {
+    return typeof value === "object" && !Array.isArray(value) && value !== null;
+}
+function $e787032c49c8ddee$var$getKeys(value) {
+    if ($e787032c49c8ddee$var$isObject(value) == false) return [];
+    let keys = Object.keys(value);
+    keys.sort();
+    return keys;
+}
+function $e787032c49c8ddee$var$toString(value) {
+    if ($e787032c49c8ddee$var$isObject(value) == false) return [];
+    if (value["@type"]) return `${value["@type"]}/${value["@id"]}`;
+    else {
+        let keys = Object.keys(value);
+        if (keys.length == 0) return "{}";
+        return `{"${keys[0]}": "${value[keys[0]]}", ... }`;
+    }
+}
+function $e787032c49c8ddee$var$merge(target, source) {
+    /**
+     * Merges two objects together
+     * @param {Object} target
+     * @param {Object} source
+     * @returns {Object} The merged object
+     * 
+     */ if ($e787032c49c8ddee$var$isObject(target) == false) return null;
+    if ($e787032c49c8ddee$var$isObject(source) == false) return target;
+    let result = {
+        ...target,
+        ...source
+    };
+    return result;
+}
+
+
 const $8e7de55ecf14d868$var$h = {
     null: (0, $41e9b357c493982e$export$f8c0f914c8a0ee10),
     array: (0, $2092c12a98cb2c2e$export$4736c2d1b0001d00),
@@ -680,7 +761,10 @@ const $8e7de55ecf14d868$var$h = {
     isArray: (0, $2092c12a98cb2c2e$export$4736c2d1b0001d00).isArray,
     dot: (0, $2cf68f4048a6f85f$export$fe5b3308000496d5),
     number: (0, $44ebc265e2335159$export$96be39e8128f5891),
-    json: (0, $409d3194b75b4893$export$94a70d284fcdf065)
+    json: (0, $409d3194b75b4893$export$94a70d284fcdf065),
+    object: (0, $e787032c49c8ddee$export$42f247ccf9267abd),
+    isObject: (0, $e787032c49c8ddee$export$42f247ccf9267abd).isValid,
+    uuid: (0, $a7df578a06d5a361$export$9694b2d66de56464)
 };
 const $8e7de55ecf14d868$export$35d3dd03f0194c3a = {
     analyzeValues: $8e7de55ecf14d868$var$analyzeValues,
@@ -695,7 +779,8 @@ const $8e7de55ecf14d868$export$35d3dd03f0194c3a = {
     first: $8e7de55ecf14d868$var$getFirst,
     last: $8e7de55ecf14d868$var$getLast,
     filter: $8e7de55ecf14d868$var$filter,
-    getValues: $8e7de55ecf14d868$var$getValues
+    getValues: $8e7de55ecf14d868$var$getValues,
+    transpose: $8e7de55ecf14d868$var$transpose
 };
 function $8e7de55ecf14d868$var$analyze(value) {
     /**
@@ -773,6 +858,39 @@ function $8e7de55ecf14d868$var$getValues(value, key) {
     let result = $8e7de55ecf14d868$var$h.dot.get(key, value);
     return result;
 }
+function $8e7de55ecf14d868$var$transpose(record, key) {
+    /**
+     * Converts a record to list of PVs
+     * 
+     */ if ($8e7de55ecf14d868$var$h.isArray(record)) return record.map((x)=>$8e7de55ecf14d868$var$transpose(x));
+    record = JSON.parse(JSON.stringify(record));
+    if ($8e7de55ecf14d868$var$h.isNull(key)) return $8e7de55ecf14d868$var$recordToPropertyValue(record);
+    let v = $8e7de55ecf14d868$var$getValues(record, key);
+    let pvs = $8e7de55ecf14d868$var$recordToPropertyValue(v);
+    let result = $8e7de55ecf14d868$var$h.dot.set(record, key, pvs);
+    return result;
+}
+function $8e7de55ecf14d868$var$recordToPropertyValue(record) {
+    /**
+     * Convert record to list of pv
+     * 
+     */ if ($8e7de55ecf14d868$var$h.isArray(record)) return record.map((x)=>$8e7de55ecf14d868$var$recordToPropertyValue(x));
+    if (!$8e7de55ecf14d868$var$h.isObject(record)) {
+        console.log("ERROR - not an object", record);
+        return record;
+    }
+    let pvs = [];
+    for(let k in record){
+        let pv = {
+            "@type": "PropertyValue",
+            "@id": $8e7de55ecf14d868$var$h.uuid.new(),
+            "propertyID": k,
+            "value": record[k]
+        };
+        pvs.push(pv);
+    }
+    return pvs;
+}
 function $8e7de55ecf14d868$var$filter(value, conditions) {
     /**
      * Filters a series of records
@@ -789,9 +907,86 @@ function $8e7de55ecf14d868$var$filter(value, conditions) {
     let filteredItems = [];
     for (let v of $8e7de55ecf14d868$var$h.array.toArray(value)){
         let passes = true;
-        for(let c in conditions)if ($8e7de55ecf14d868$var$h.dot.get(c, v) != conditions[c]) {
-            passes = false;
-            break;
+        for(let c in conditions){
+            let v1 = $8e7de55ecf14d868$var$h.dot.get(c, v);
+            let c1 = conditions[c];
+            let operation = "eq";
+            if (c1.split(" ")?.[0] == "ne") {
+                c1 = c1.slice(3);
+                operation = "ne";
+            }
+            if (c1.split(" ")?.[0] == "gt") {
+                c1 = c1.slice(3);
+                operation = "gt";
+            }
+            if (c1.split(" ")?.[0] == "lt") {
+                c1 = c1.slice(3);
+                operation = "lt";
+            }
+            if (c1.split(" ")?.[0] == "ge") {
+                c1 = c1.slice(3);
+                operation = "ge";
+            }
+            if (c1.split(" ")?.[0] == "le") {
+                c1 = c1.slice(3);
+                operation = "le";
+            }
+            if (c1.split(" ")?.[0] == "isNull") {
+                c1 = c1.slice(7);
+                operation = "isNull";
+            }
+            if (c1.split(" ")?.[0] == "notNull") {
+                c1 = c1.slice(7);
+                operation = "notNull";
+            }
+            if (operation == "eq") {
+                if (v1 == c1 == false) {
+                    passes = false;
+                    break;
+                }
+            }
+            if (operation == "ne") {
+                if (v1 != c1 == false) {
+                    passes = false;
+                    break;
+                }
+            }
+            if (operation == "gt") {
+                if (!(v1 > c1)) {
+                    passes = false;
+                    break;
+                }
+            }
+            if (operation == "lt") {
+                if (!(v1 < c1)) {
+                    passes = false;
+                    break;
+                }
+            }
+            if (operation == "ge") {
+                if (!(v1 >= c1)) {
+                    passes = false;
+                    break;
+                }
+            }
+            if (operation == "le") {
+                if (!(v1 <= c1)) {
+                    passes = false;
+                    break;
+                }
+            }
+            if (operation == "notNull") {
+                if (!$8e7de55ecf14d868$var$h.isNotnull(v1)) {
+                    passes = false;
+                    break;
+                }
+            }
+            if (operation == "isNull") {
+                if (!$8e7de55ecf14d868$var$h.isNull(v1)) {
+                    passes = false;
+                    break;
+                }
+            }
         }
         if (passes) filteredItems.push(v);
     }
@@ -878,7 +1073,7 @@ function $8e7de55ecf14d868$var$getSumProduct(value, key1, key2, sigFig = 2) {
     for(let i = 0; i < value.length; i++){
         let value1 = $8e7de55ecf14d868$var$h.dot.get(value[i], key1);
         let value2 = $8e7de55ecf14d868$var$h.dot.get(value[i], key2);
-        if ($8e7de55ecf14d868$var$h.number.isNumber(value1) && $8e7de55ecf14d868$var$h.number.isNumber(value2)) {
+        if ($8e7de55ecf14d868$var$h.number.isValid(value1) && $8e7de55ecf14d868$var$h.number.isValid(value2)) {
             let v = value1 * value2;
             result += $8e7de55ecf14d868$var$h.number.round(v, sigFig);
         }
@@ -978,85 +1173,6 @@ function $8e7de55ecf14d868$var$getStatsRecord(statType, property, value, unitCod
 
 
 
-const $e787032c49c8ddee$export$42f247ccf9267abd = {
-    isObject: $e787032c49c8ddee$var$isObject,
-    isValid: $e787032c49c8ddee$var$isObject,
-    getKeys: $e787032c49c8ddee$var$getKeys,
-    keys: $e787032c49c8ddee$var$getKeys,
-    toString: $e787032c49c8ddee$var$toString,
-    toStirng: $e787032c49c8ddee$var$toString,
-    merge: $e787032c49c8ddee$var$merge
-};
-function $e787032c49c8ddee$var$isObject(value) {
-    return typeof value === "object" && !Array.isArray(value) && value !== null;
-}
-function $e787032c49c8ddee$var$getKeys(value) {
-    if ($e787032c49c8ddee$var$isObject(value) == false) return [];
-    let keys = Object.keys(value);
-    keys.sort();
-    return keys;
-}
-function $e787032c49c8ddee$var$toString(value) {
-    if ($e787032c49c8ddee$var$isObject(value) == false) return [];
-    if (value["@type"]) return `${value["@type"]}/${value["@id"]}`;
-    else {
-        let keys = Object.keys(value);
-        if (keys.length == 0) return "{}";
-        return `{"${keys[0]}": "${value[keys[0]]}", ... }`;
-    }
-}
-function $e787032c49c8ddee$var$merge(target, source) {
-    /**
-     * Merges two objects together
-     * @param {Object} target
-     * @param {Object} source
-     * @returns {Object} The merged object
-     * 
-     */ if ($e787032c49c8ddee$var$isObject(target) == false) return null;
-    if ($e787032c49c8ddee$var$isObject(source) == false) return target;
-    let result = {
-        ...target,
-        ...source
-    };
-    return result;
-}
-
-
-const $a7df578a06d5a361$export$9694b2d66de56464 = {
-    /**
-     * UUID helpers
-     * 
-     */ isValid: $a7df578a06d5a361$var$isValid,
-    toString: $a7df578a06d5a361$var$toString,
-    new: $a7df578a06d5a361$var$getNew
-};
-// -----------------------------------------------------
-//  Constructor 
-// -----------------------------------------------------
-function $a7df578a06d5a361$var$getNew() {
-    /**
-     * Returns a new uuid
-     * @returns {String} The uuid
-     */ let value = String(crypto.randomUUID());
-    return value;
-}
-// -----------------------------------------------------
-//  Base 
-// -----------------------------------------------------
-function $a7df578a06d5a361$var$isValid(value) {
-    /**
-     * Check if value is a valid UUID
-     * @param {String} value
-     * @returns {Boolean}
-     */ return h.isString(value) && h.isUuid(value);
-}
-function $a7df578a06d5a361$var$toString(value) {
-    /**
-     * Returns a string representation of the UUID
-     * @param {String} value
-     * @returns {String}
-     */ return String(value);
-}
 
 
 const $5e269851126f2bb1$var$h = {
@@ -1669,6 +1785,151 @@ function $5e269851126f2bb1$var$filterRecordList(records, conditions) {
 
 
 
+const $b5f9b848b00b349e$export$b4c3eca70a61f421 = {
+    hexToRgb: $b5f9b848b00b349e$var$hexToRgb,
+    rgbToHex: $b5f9b848b00b349e$var$rgbToHex,
+    hexToHsl: $b5f9b848b00b349e$var$hexToHsl,
+    hslToHex: $b5f9b848b00b349e$var$hslToHex,
+    palette: {
+        complementary: $b5f9b848b00b349e$var$complementaryColor,
+        lighter: $b5f9b848b00b349e$var$lighterColor,
+        darker: $b5f9b848b00b349e$var$darkerColor
+    }
+};
+function $b5f9b848b00b349e$var$hexToRgb(hex) {
+    // Expand shorthand form (e.g. "03F") to full form (e.g. "0033FF")
+    var shorthandRegex = /^#?([a-f\d])([a-f\d])([a-f\d])$/i;
+    hex = hex.replace(shorthandRegex, function(m, r, g, b) {
+        return r + r + g + g + b + b;
+    });
+    var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+    return result ? {
+        r: parseInt(result[1], 16),
+        g: parseInt(result[2], 16),
+        b: parseInt(result[3], 16)
+    } : null;
+}
+function $b5f9b848b00b349e$var$componentToHex(c) {
+    var hex = c.toString(16);
+    return hex.length == 1 ? "0" + hex : hex;
+}
+function $b5f9b848b00b349e$var$rgbToHex(r, g, b) {
+    /**
+     * Convert an RGB color value to HEX
+     * @param {Number| String} r The red color value or the entire color string
+     * @param {Number} g The green color value
+     * @param {Number} b The blue color value
+     * @returns {String} The corresponding HEX color value
+     */ if ((0, $41e9b357c493982e$export$f8c0f914c8a0ee10).isNull(g) && (0, $41e9b357c493982e$export$f8c0f914c8a0ee10).isNull(b) && r.includes(",")) {
+        r = r.replace("(", "");
+        r = r.replace(")", "");
+        let rgb = r.split(",");
+        r = Number(rgb[0].trim());
+        g = Number(rgb[1].trim());
+        b = Number(rgb[2].trim());
+    }
+    return "#" + $b5f9b848b00b349e$var$componentToHex(r) + $b5f9b848b00b349e$var$componentToHex(g) + $b5f9b848b00b349e$var$componentToHex(b);
+}
+function $b5f9b848b00b349e$var$hexToHsl(hex) {
+    hex = hex.replace("#", "");
+    let r = parseInt(hex.substring(0, 2), 16) / 255;
+    let g = parseInt(hex.substring(2, 4), 16) / 255;
+    let b = parseInt(hex.substring(4, 6), 16) / 255;
+    let max = Math.max(r, g, b);
+    let min = Math.min(r, g, b);
+    let h, s, l = (max + min) / 2;
+    if (max === min) h = s = 0; // achromatic
+    else {
+        let d = max - min;
+        s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+        switch(max){
+            case r:
+                h = (g - b) / d + (g < b ? 6 : 0);
+                break;
+            case g:
+                h = (b - r) / d + 2;
+                break;
+            case b:
+                h = (r - g) / d + 4;
+                break;
+        }
+        h *= 60;
+    }
+    return [
+        Math.round(h),
+        Math.round(s * 100),
+        Math.round(l * 100)
+    ];
+}
+function $b5f9b848b00b349e$var$hslToHex(h, s, l) {
+    s /= 100;
+    l /= 100;
+    let c = (1 - Math.abs(2 * l - 1)) * s;
+    let x = c * (1 - Math.abs(h / 60 % 2 - 1));
+    let m = l - c / 2;
+    let r = 0, g = 0, b = 0;
+    if (h >= 0 && h < 60) {
+        r = c;
+        g = x;
+        b = 0;
+    } else if (h >= 60 && h < 120) {
+        r = x;
+        g = c;
+        b = 0;
+    } else if (h >= 120 && h < 180) {
+        r = 0;
+        g = c;
+        b = x;
+    } else if (h >= 180 && h < 240) {
+        r = 0;
+        g = x;
+        b = c;
+    } else if (h >= 240 && h < 300) {
+        r = x;
+        g = 0;
+        b = c;
+    } else if (h >= 300 && h < 360) {
+        r = c;
+        g = 0;
+        b = x;
+    }
+    r = Math.round((r + m) * 255).toString(16).padStart(2, "0");
+    g = Math.round((g + m) * 255).toString(16).padStart(2, "0");
+    b = Math.round((b + m) * 255).toString(16).padStart(2, "0");
+    return `#${r}${g}${b}`;
+}
+function $b5f9b848b00b349e$var$complementaryColor(hexColor) {
+    /**
+     * Returns complementary color of a given hex color
+     * @param {String} hexColor Hex color
+     * @returns {String} Complementary color
+     */ const [h, s, l] = $b5f9b848b00b349e$var$hexToHsl(hexColor);
+    const complementary = $b5f9b848b00b349e$var$hslToHex((h + 180) % 360, s, l);
+    return complementary;
+}
+function $b5f9b848b00b349e$var$lighterColor(hexColor, increment) {
+    /**
+     * Returns lighter color of a given hex color
+     * @param {String} hexColor Hex color
+     * @param {Number} increment Increment
+     * @returns {String} Lighter color
+     */ const [h, s, l] = $b5f9b848b00b349e$var$hexToHsl(hexColor);
+    let newColor = $b5f9b848b00b349e$var$hslToHex(h, s, Math.min(l + increment * 10, 100));
+    return newColor;
+}
+function $b5f9b848b00b349e$var$darkerColor(hexColor, increment) {
+    /**
+     * Returns lighter color of a given hex color
+     * @param {String} hexColor Hex color
+     * @param {Number} increment Increment
+     * @returns {String} Lighter color
+     */ const [h, s, l] = $b5f9b848b00b349e$var$hexToHsl(hexColor);
+    let newColor = $b5f9b848b00b349e$var$hslToHex(h, s, Math.min(l - increment * 10, 100));
+    return newColor;
+}
+
+
+
 
 const $535b3f5b0bcb555a$var$h = {
     null: (0, $41e9b357c493982e$export$f8c0f914c8a0ee10),
@@ -1682,6 +1943,9 @@ const $535b3f5b0bcb555a$export$15c85b69ec02b47c = {
     isDate: $535b3f5b0bcb555a$var$isValid,
     isValid: $535b3f5b0bcb555a$var$isValid,
     isValidText: $535b3f5b0bcb555a$var$isValidText,
+    eq: $535b3f5b0bcb555a$var$eq,
+    lt: $535b3f5b0bcb555a$var$lt,
+    gt: $535b3f5b0bcb555a$var$gt,
     getDuration: $535b3f5b0bcb555a$var$getDuration,
     duration: $535b3f5b0bcb555a$var$getDuration,
     getDurationRecord: $535b3f5b0bcb555a$var$getDurationRecord,
@@ -1775,6 +2039,35 @@ function $535b3f5b0bcb555a$var$toDate(value) {
         } catch  {}
     }
     return null;
+}
+function $535b3f5b0bcb555a$var$eq(date1, date2) {
+    /**
+     * Returns true if two dates are equal
+     * @param {Date} date1
+     * @param {Date} date2
+     * @return {bool} isEqual
+     */ if (!date1 || !date2) return false;
+    if (date1 == null || date2 == null) return false;
+    if (date1.getTime() == date2.getTime()) return true;
+    return false;
+}
+function $535b3f5b0bcb555a$var$lt(date1, date2) {
+    /**
+     * Returns true if date1 is greater than date2
+     * @param {Date} date1
+     * @param {Date} date2
+     * @return {bool} isGreater
+     */ if (!$535b3f5b0bcb555a$var$isValid(date1) || !$535b3f5b0bcb555a$var$isValid(date2)) return false;
+    return date1 < date2;
+}
+function $535b3f5b0bcb555a$var$gt(date1, date2) {
+    /**
+     * Returns true if date1 is greater than date2
+     * @param {Date} date1
+     * @param {Date} date2
+     * @return {bool} isGreater
+     */ if (!$535b3f5b0bcb555a$var$isValid(date1) || !$535b3f5b0bcb555a$var$isValid(date2)) return false;
+    return date1 > date2;
 }
 function $535b3f5b0bcb555a$var$getDuration(date1, date2) {
     /**
@@ -2185,6 +2478,9 @@ function $2969a9bd2c7ad243$var$getHeadingRecord(record, locale) {
     record._headingImage = $2969a9bd2c7ad243$var$_getHeadingImage(record);
     record._headingDuration = $2969a9bd2c7ad243$var$_getHeadingDuration(record);
     record._headingStars = $2969a9bd2c7ad243$var$_getHeadingStars(record);
+    record._headingPrice = $2969a9bd2c7ad243$var$_getHeadingPrice(record);
+    record._headingPriceUnit = $2969a9bd2c7ad243$var$_getHeadingPriceUnit(record);
+    record._headingHtmlInputType = $2969a9bd2c7ad243$var$getHtmlInputType(record);
     // Recurse for sub records
     for (let k of Object.keys(record))record[k] = $2969a9bd2c7ad243$var$getHeadingRecord(record[k], locale);
     record = (0, $409d3194b75b4893$export$94a70d284fcdf065).simplify(record);
@@ -2230,11 +2526,13 @@ function $2969a9bd2c7ad243$var$_getHeadingImage(record) {
 }
 function $2969a9bd2c7ad243$var$_getHeadingDuration(record) {
     let date = $2969a9bd2c7ad243$var$_getHeadingDate(record);
+    if ($2969a9bd2c7ad243$var$h.isNull(date)) return null;
     let duration = $2969a9bd2c7ad243$var$h.date.human.duration(date);
     return duration;
 }
 function $2969a9bd2c7ad243$var$_getHeadingDateSince(record) {
     let date = $2969a9bd2c7ad243$var$_getHeadingDate(record);
+    if ($2969a9bd2c7ad243$var$h.isNull(date)) return null;
     let duration = $2969a9bd2c7ad243$var$h.date.human.duration(date);
     return duration;
 }
@@ -2253,6 +2551,38 @@ function $2969a9bd2c7ad243$var$_getHeadingStars(record) {
         runningScore += 1;
     }
     return content;
+}
+function $2969a9bd2c7ad243$var$_getHeadingPrice(record) {
+    if ($2969a9bd2c7ad243$var$h.isNull(record?.priceSpecification)) return null;
+    let ps = record?.priceSpecification?.[0] || record?.priceSpecification;
+    let price = ps?.price;
+    let priceCurrency = ps?.priceCurrency;
+    let content = "";
+    if (priceCurrency == "CAD" || priceCurrency == "USD") content = "$";
+    if ($2969a9bd2c7ad243$var$h.number.isValid($2969a9bd2c7ad243$var$h.number.toNumber(ps?.price))) content += String(ps.price);
+    if (content == "") content = null;
+    return content;
+}
+function $2969a9bd2c7ad243$var$_getHeadingPriceUnit(record) {
+    if ($2969a9bd2c7ad243$var$h.isNull(record?.priceSpecification)) return null;
+    let ps = record?.priceSpecification?.[0] || record?.priceSpecification;
+    let content = null;
+    if ($2969a9bd2c7ad243$var$h.isNotNull(ps?.referenceQuantity?.unitCode)) {
+        content = ps?.referenceQuantity?.unitCode;
+        if ($2969a9bd2c7ad243$var$h.isNotNull(content)) content = content.toLowerCase();
+    }
+    return content;
+}
+function $2969a9bd2c7ad243$var$getHtmlInputType(record) {
+    if (record?.["@type"] != "PropertyValueSpecification") return;
+    if (record?.minValue == 0 && record.maxValue == 1) return "checkbox";
+    if ($2969a9bd2c7ad243$var$h.isNotNull(record?.minValue)) return "number";
+    if ($2969a9bd2c7ad243$var$h.isNotNull(record?.maxValue)) return "number";
+    if ($2969a9bd2c7ad243$var$h.isNotNull(record?.valueName) && record?.valueName.includes("Date")) return "datetime-local";
+    if ($2969a9bd2c7ad243$var$h.isNotNull(record?.valueName) && record?.valueName.includes("Time")) return "datetime-local";
+    if ($2969a9bd2c7ad243$var$h.isNotNull(record?.valueName) && record?.valueName.toLowerCase().includes("email")) return "email";
+    if ($2969a9bd2c7ad243$var$h.isNotNull(record?.valueName) && record?.valueName.toLowerCase().endsWith("url")) return "url";
+    if ($2969a9bd2c7ad243$var$h.isNotNull(record?.valueName) && record?.valueName.toLowerCase().includes("phone")) return "phone";
 }
 function $2969a9bd2c7ad243$var$_getHeadingTotal(record) {}
 function $2969a9bd2c7ad243$var$_getHeadingX(record, heading) {
@@ -2305,6 +2635,7 @@ function $2969a9bd2c7ad243$var$getConfig() {
     let record = {
         Thing: {
             heading1: [
+                "headline",
                 "name",
                 "url",
                 [
@@ -2320,6 +2651,7 @@ function $2969a9bd2c7ad243$var$getConfig() {
                 ]
             ],
             headingDescription: [
+                "text",
                 "description"
             ],
             headingDate: [
@@ -2376,6 +2708,17 @@ function $2969a9bd2c7ad243$var$getConfig() {
             ],
             headingStatus: [
                 "actionStatus"
+            ]
+        },
+        EditorPart: {
+            heading1: [
+                "propertyID"
+            ],
+            heading2: [
+                "value"
+            ],
+            headingDescription: [
+                "value"
             ]
         },
         Person: {
@@ -2443,6 +2786,118 @@ function $2969a9bd2c7ad243$var$getConfig() {
             ]
         },
         CreativeWork: {
+            heading1: [
+                "headline",
+                "name",
+                "url",
+                [
+                    "@type",
+                    "@id"
+                ]
+            ],
+            heading2: [
+                "author",
+                "url",
+                [
+                    "@type",
+                    "@id"
+                ]
+            ],
+            headingDescription: [
+                "articleBody",
+                "text",
+                "description"
+            ],
+            headingDate: [
+                "datePublished",
+                "dateCreated"
+            ]
+        },
+        HowTo: {
+            heading1: [
+                "headline",
+                "name",
+                "url",
+                [
+                    "@type",
+                    "@id"
+                ]
+            ],
+            heading2: [
+                "author",
+                "url",
+                [
+                    "@type",
+                    "@id"
+                ]
+            ],
+            headingDescription: [
+                "articleBody",
+                "text",
+                "description"
+            ],
+            headingDate: [
+                "datePublished",
+                "dateCreated"
+            ]
+        },
+        HowToSection: {
+            heading1: [
+                "headline",
+                "name",
+                "url",
+                [
+                    "@type",
+                    "@id"
+                ]
+            ],
+            heading2: [
+                "author",
+                "url",
+                [
+                    "@type",
+                    "@id"
+                ]
+            ],
+            headingDescription: [
+                "articleBody",
+                "text",
+                "description"
+            ],
+            headingDate: [
+                "datePublished",
+                "dateCreated"
+            ]
+        },
+        HowToStep: {
+            heading1: [
+                "headline",
+                "name",
+                "url",
+                [
+                    "@type",
+                    "@id"
+                ]
+            ],
+            heading2: [
+                "author",
+                "url",
+                [
+                    "@type",
+                    "@id"
+                ]
+            ],
+            headingDescription: [
+                "articleBody",
+                "text",
+                "description"
+            ],
+            headingDate: [
+                "datePublished",
+                "dateCreated"
+            ]
+        },
+        HowToDirection: {
             heading1: [
                 "headline",
                 "name",
@@ -3229,6 +3684,7 @@ function $9133dd066da6fc7c$var$capitalizeWords(input) {
 const $91ff8b8350f98bed$var$h = {
     null: (0, $41e9b357c493982e$export$f8c0f914c8a0ee10),
     isNull: (0, $41e9b357c493982e$export$f8c0f914c8a0ee10).isNull,
+    isNotNull: (0, $41e9b357c493982e$export$f8c0f914c8a0ee10).isNotNull,
     analysis: (0, $8e7de55ecf14d868$export$35d3dd03f0194c3a)
 };
 const $91ff8b8350f98bed$export$d6addebc9e19c4be = {
@@ -3271,6 +3727,8 @@ function $91ff8b8350f98bed$var$executeOperation(records, operation) {
     if (operation.operator == "first") return $91ff8b8350f98bed$var$h.analysis.first(records, operation.propertyID);
     if (operation.operator == "last") return $91ff8b8350f98bed$var$h.analysis.last(records, operation.propertyID);
     if (operation.operator == "stdev") return $91ff8b8350f98bed$var$h.analysis.stdev(records, operation.propertyID);
+    if (operation.operator == "transpose") return $91ff8b8350f98bed$var$h.analysis.transpose(records, operation.propertyID);
+    if (operation.operator == "with") return $91ff8b8350f98bed$var$h.analysis.getValues(records, operation.propertyID);
     return records;
 }
 function $91ff8b8350f98bed$var$getOperations(str) {
@@ -3311,9 +3769,10 @@ function $91ff8b8350f98bed$var$_getOperationConfig(part) {
     if (!part.includes(":")) return null;
     let configStr = part.split(":")?.[1] || null;
     // if contains ==, assume it is not command
-    if (!configStr.includes("=")) return null;
+    if ($91ff8b8350f98bed$var$h.isNotNull(configStr) && !configStr.includes("=")) return null;
     // Split the config string by ','
-    let configParts = configStr.split(",");
+    let configParts = [];
+    if ($91ff8b8350f98bed$var$h.isNotNull(configStr)) configParts = configStr.split(",");
     // Build config record 
     let configRecord = {};
     for (let c of configParts){
@@ -3340,10 +3799,10 @@ function $91ff8b8350f98bed$var$_getOperationPropertyID(part) {
     if (!part.includes(":")) propertyID = part;
     else propertyID = part.split(":")?.[1] || null;
     // if contains =, assume it is not poropertyID
-    if (propertyID.includes("=")) return null;
+    if ($91ff8b8350f98bed$var$h.isNotNull(propertyID) && propertyID.includes("=")) return null;
     propertyID = $91ff8b8350f98bed$var$_cleanString(propertyID);
     // Check if commas 
-    if (propertyID.includes(",")) {
+    if ($91ff8b8350f98bed$var$h.isNotNull(propertyID) && propertyID.includes(",")) {
         propertyID = propertyID.split(",");
         propertyID = propertyID.map((x)=>$91ff8b8350f98bed$var$_cleanString(x));
     }
@@ -3512,9 +3971,11 @@ function $60acc9b7f6444d63$var$prepareTemplate(template) {
 
 
 
+
 const $a762e458f5ffc61b$var$h = {
     null: (0, $41e9b357c493982e$export$f8c0f914c8a0ee10),
     array: (0, $2092c12a98cb2c2e$export$4736c2d1b0001d00),
+    object: (0, $e787032c49c8ddee$export$42f247ccf9267abd),
     isNull: (0, $41e9b357c493982e$export$f8c0f914c8a0ee10).isNull,
     isNotNull: (0, $41e9b357c493982e$export$f8c0f914c8a0ee10).isNotNull,
     toArray: (0, $2092c12a98cb2c2e$export$4736c2d1b0001d00).toArray,
@@ -3554,7 +4015,9 @@ function $a762e458f5ffc61b$var$_renderTemplate(template, record, depth = 0) {
         // If record has many values, iterate through each ones
         for (let value of $a762e458f5ffc61b$var$h.toArray(values)){
             let tempRecord = JSON.parse(JSON.stringify(record));
-            $a762e458f5ffc61b$var$h.dot.set(tempRecord, propertyID, value);
+            if ($a762e458f5ffc61b$var$h.isNotNull(propertyID)) $a762e458f5ffc61b$var$h.dot.set(tempRecord, propertyID, value);
+            else tempRecord = value;
+            //h.dot.set(tempRecord, propertyID, value)
             valueContent += $a762e458f5ffc61b$var$_renderTemplate(tag.contentWithin, tempRecord, depth += 1);
         }
         content = String(tag.contentBefore) + String(valueContent) + String(tag.contentAfter);
@@ -3565,12 +4028,15 @@ function $a762e458f5ffc61b$var$_renderTemplate(template, record, depth = 0) {
     while($a762e458f5ffc61b$var$h.isNotNull(tag)){
         let value = $a762e458f5ffc61b$var$h.stringOperation.execute(record, tag.contentTag);
         if ($a762e458f5ffc61b$var$h.isNull(value)) value = "";
+        // Convert to json if array or object
+        if ($a762e458f5ffc61b$var$h.isArray(value) || $a762e458f5ffc61b$var$h.object.isValid(value)) value = JSON.stringify(value);
         content = String(tag.contentBefore) + String(value) + String(tag.contentAfter);
         tag = $a762e458f5ffc61b$var$getPlaceholderTag(content);
     }
     return content;
 }
 function $a762e458f5ffc61b$var$prepareTemplate(template) {
+    if ($a762e458f5ffc61b$var$h.isNull(template)) return "";
     while(template.includes("{{ "))template = template.replaceAll("{{ ", "{{");
     while(template.includes(" }}"))template = template.replaceAll(" }}", "}}");
     return template;
@@ -3665,8 +4131,295 @@ const $5f18a9d192f60010$export$dc6226f18ea4e006 = {
     getOrganization: $5f18a9d192f60010$var$getOrganization,
     getAction: $5f18a9d192f60010$var$getAction,
     getSystemRecord: $5f18a9d192f60010$var$getSystemRecord,
-    getPropertyValue: $5f18a9d192f60010$var$getPropertyValue
+    getPropertyValue: $5f18a9d192f60010$var$getPropertyValue,
+    action: $5f18a9d192f60010$var$getAction,
+    article: $5f18a9d192f60010$var$getArticle,
+    creativeWork: $5f18a9d192f60010$var$creativeWork,
+    howTo: $5f18a9d192f60010$var$howTo,
+    itemList: $5f18a9d192f60010$var$getItemList,
+    list: $5f18a9d192f60010$var$getItemList,
+    listItem: $5f18a9d192f60010$var$getListItem,
+    offer: $5f18a9d192f60010$var$offer,
+    offerCatalog: $5f18a9d192f60010$var$offerCatalog,
+    organization: $5f18a9d192f60010$var$getOrganization,
+    person: $5f18a9d192f60010$var$getPerson,
+    potentialAction: $5f18a9d192f60010$var$potentialAction,
+    product: $5f18a9d192f60010$var$product,
+    propertyValue: $5f18a9d192f60010$var$getPropertyValue,
+    thing: $5f18a9d192f60010$var$getThing
 };
+function $5f18a9d192f60010$var$creativeWork(n) {
+    return {
+        "@type": "CreativeWork",
+        "@id": "CreativeWork_" + String(n),
+        headline: "Headline - Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
+        text: "Text - Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.",
+        image: {
+            "@context": "https://schema.org/",
+            "@type": "ImageObject",
+            "@id": "image1",
+            name: "image_1",
+            contentUrl: "https://placehold.co/600x400"
+        },
+        potentialAction: [
+            {
+                "@type": "action",
+                "@id": "action_1",
+                name: "action_1_name",
+                url: "#"
+            }
+        ]
+    };
+}
+function $5f18a9d192f60010$var$offer(n = 0) {
+    return {
+        "@type": "Offer",
+        "@id": "Offer_" + String(n),
+        additionalProperty: [
+            {
+                "@type": "Propertyvalue",
+                "@id": "PropertyValue_1_" + String(n),
+                "propertyID": "PropertyValue_1",
+                "value": "Additional offer property 1_" + String(n)
+            },
+            {
+                "@type": "Propertyvalue",
+                "@id": "PropertyValue_2_" + String(n),
+                "propertyID": "PropertyValue_2",
+                "value": "Additional offer property 2_" + String(n)
+            },
+            {
+                "@type": "Propertyvalue",
+                "@id": "PropertyValue_3_" + String(n),
+                "propertyID": "PropertyValue_3",
+                "value": "Additional offer property 3_" + String(n)
+            },
+            {
+                "@type": "Propertyvalue",
+                "@id": "PropertyValue_4_" + String(n),
+                "propertyID": "PropertyValue_4",
+                "value": "Additional offer property 4_" + String(n)
+            }
+        ],
+        name: "Offer_per_month_" + String(n),
+        itemOffered: {
+            "@type": "Service",
+            "@id": "Service_" + String(n),
+            name: "Service_" + String(n)
+        },
+        offeredBy: {
+            "@type": "Organization",
+            "@id": "organization_" + String(n),
+            name: "organization_" + String(n)
+        },
+        priceSpecification: {
+            "@type": "UnitPriceSpecification",
+            price: "25",
+            priceCurrency: "USD",
+            referenceQuantity: {
+                "@type": "QuantitativeValue",
+                value: "1",
+                unitCode: "MON"
+            }
+        },
+        potentialAction: [
+            {
+                "@type": "Action",
+                "@id": "action_1_" + String(n),
+                "name": "Buy now",
+                "url": "https://www.test.com"
+            }
+        ]
+    };
+}
+function $5f18a9d192f60010$var$offerCatalog(no = 3, n = 0) {
+    let record = {
+        "@type": "OfferCatalog",
+        "@id": "OfferCatalog_" + String(n),
+        "name": "OfferCatalog_" + String(n),
+        "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
+        itemListElement: []
+    };
+    for(let i = 0; i < no; i++){
+        let item = {
+            "@type": "ListItem",
+            "@id": "ListItem_" + String(n) + "_" + String(i),
+            item: $5f18a9d192f60010$var$offer(i)
+        };
+        record.itemListElement.push(item);
+    }
+    return record;
+}
+function $5f18a9d192f60010$var$howTo(n) {
+    return {
+        "@context": "https://schema.org",
+        "@type": "HowTo",
+        name: "HowTo name - Lorem ipsum dolor sit amet.",
+        headline: "Headline - Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
+        text: "Text - Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt.",
+        estimatedCost: {
+            "@type": "MonetaryAmount",
+            currency: "USD",
+            value: "20"
+        },
+        totalTime: "PT30M",
+        tool: [
+            {
+                "@type": "HowToTool",
+                name: "Tool 1"
+            },
+            {
+                "@type": "HowToTool",
+                name: "Tool 2",
+                image: {
+                    "@context": "https://schema.org/",
+                    "@type": "ImageObject",
+                    "@id": "image1",
+                    name: "image_1",
+                    contentUrl: "https://placehold.co/600x400"
+                }
+            }
+        ],
+        supply: {
+            "@type": "HowToSupply",
+            name: "Supply1",
+            image: {
+                "@context": "https://schema.org/",
+                "@type": "ImageObject",
+                "@id": "image1",
+                name: "image_1",
+                contentUrl: "https://placehold.co/600x400"
+            }
+        },
+        step: [
+            {
+                "@type": "HowToStep",
+                position: "1",
+                headline: "Headline - Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
+                text: "Text - Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut.",
+                image: {
+                    "@context": "https://schema.org/",
+                    "@type": "ImageObject",
+                    "@id": "image1",
+                    name: "image_1",
+                    contentUrl: "https://placehold.co/600x400"
+                },
+                itemListElement: [
+                    {
+                        "@type": "HowToDirection",
+                        position: "1",
+                        text: "Position your wheel wedges in front of the front tires if a rear tire is flat, or behind the rear tires if a front tire is flat"
+                    },
+                    {
+                        "@type": "HowToTip",
+                        position: "2",
+                        text: "You don't want the car to move while you're working on it."
+                    }
+                ]
+            },
+            {
+                "@type": "HowToStep",
+                position: "2",
+                headline: "Headline - Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
+                text: "Text - Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut.",
+                image: {
+                    "@context": "https://schema.org/",
+                    "@type": "ImageObject",
+                    "@id": "image1",
+                    name: "image_1",
+                    contentUrl: "https://placehold.co/600x400"
+                },
+                itemListElement: [
+                    {
+                        "@type": "HowToDirection",
+                        position: "1",
+                        text: "Position your wheel wedges in front of the front tires if a rear tire is flat, or behind the rear tires if a front tire is flat"
+                    },
+                    {
+                        "@type": "HowToTip",
+                        position: "2",
+                        text: "You don't want the car to move while you're working on it."
+                    }
+                ]
+            },
+            {
+                "@type": "HowToStep",
+                position: "3",
+                headline: "Headline - Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
+                text: "Text - Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut.",
+                image: {
+                    "@context": "https://schema.org/",
+                    "@type": "ImageObject",
+                    "@id": "image1",
+                    name: "image_1",
+                    contentUrl: "https://placehold.co/600x400"
+                },
+                itemListElement: [
+                    {
+                        "@type": "HowToDirection",
+                        position: "1",
+                        text: "Position your wheel wedges in front of the front tires if a rear tire is flat, or behind the rear tires if a front tire is flat"
+                    },
+                    {
+                        "@type": "HowToTip",
+                        position: "2",
+                        text: "You don't want the car to move while you're working on it."
+                    }
+                ]
+            },
+            {
+                "@type": "HowToStep",
+                position: "4",
+                headline: "Headline - Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
+                text: "Text - Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut.",
+                image: {
+                    "@context": "https://schema.org/",
+                    "@type": "ImageObject",
+                    "@id": "image1",
+                    name: "image_1",
+                    contentUrl: "https://placehold.co/600x400"
+                },
+                itemListElement: [
+                    {
+                        "@type": "HowToDirection",
+                        position: "1",
+                        text: "Position your wheel wedges in front of the front tires if a rear tire is flat, or behind the rear tires if a front tire is flat"
+                    },
+                    {
+                        "@type": "HowToTip",
+                        position: "2",
+                        text: "You don't want the car to move while you're working on it."
+                    }
+                ]
+            },
+            {
+                "@type": "HowToStep",
+                position: "5",
+                headline: "Headline - Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
+                text: "Text - Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut.",
+                image: {
+                    "@context": "https://schema.org/",
+                    "@type": "ImageObject",
+                    "@id": "image1",
+                    name: "image_1",
+                    contentUrl: "https://placehold.co/600x400"
+                },
+                itemListElement: [
+                    {
+                        "@type": "HowToDirection",
+                        position: "1",
+                        text: "Position your wheel wedges in front of the front tires if a rear tire is flat, or behind the rear tires if a front tire is flat"
+                    },
+                    {
+                        "@type": "HowToTip",
+                        position: "2",
+                        text: "You don't want the car to move while you're working on it."
+                    }
+                ]
+            }
+        ]
+    };
+}
 function $5f18a9d192f60010$var$getThing(n) {
     let n0 = String(n);
     let record = {
@@ -3698,13 +4451,13 @@ function $5f18a9d192f60010$var$getItemList(noItems, n = 0) {
      * Returns a list of n items
      * @param {Number} n
      * @returns {Array} The list
-     * 
+     *
      */ let n0 = String(n);
     let record = {
         "@type": "ItemList",
-        "@id": `ItemList${n0}`,
-        "name": `ItemList${n0}`,
-        "itemListElement": []
+        "@id": `ItemList${n}`,
+        name: `ItemList${n}`,
+        itemListElement: []
     };
     for(let i = 0; i < noItems; i++){
         let listItem = $5f18a9d192f60010$var$getListItem(i);
@@ -3725,14 +4478,14 @@ function $5f18a9d192f60010$var$getListItem(n = 0) {
      * Returns an item
      * @param {Number} n
      * @returns {Array} The list
-     * 
+     *
      */ let n0 = String(n);
     let record = {
         "@type": "ListItem",
         "@id": `ListItem${n0}`,
-        "name": `ListItem${n0}`,
-        "position": n,
-        "item": $5f18a9d192f60010$var$getThing(n)
+        name: `ListItem${n0}`,
+        position: n,
+        item: $5f18a9d192f60010$var$getThing(n)
     };
     return record;
 }
@@ -3741,16 +4494,16 @@ function $5f18a9d192f60010$var$getPerson(n = 0) {
     let record = {
         "@type": "Person",
         "@id": `person${n0}`,
-        "givenName": `givenName${n0}`,
-        "familyName": `familyName${n0}`,
-        "email": `givenName${n0}_familyName${n0}@organization${n0}.com`,
-        "telephone": `1-514-111-222${n0}`,
-        "hasOccupation": {
+        givenName: `givenName${n0}`,
+        familyName: `familyName${n0}`,
+        email: `givenName${n0}_familyName${n0}@organization${n0}.com`,
+        telephone: `1-514-111-222${n0}`,
+        hasOccupation: {
             "@type": "Occupation",
             "@id": `occupation${n0}`,
-            "name": `occupation${n0}`
+            name: `occupation${n0}`
         },
-        "worksfor": $5f18a9d192f60010$var$getOrganization(n)
+        worksfor: $5f18a9d192f60010$var$getOrganization(n)
     };
     return record;
 }
@@ -3759,8 +4512,8 @@ function $5f18a9d192f60010$var$getOrganization(n) {
     let record = {
         "@type": "Organization",
         "@id": `testOrganization${n0}`,
-        "name": `testOrganization${n0}`,
-        "url": `https:\/\/www.testOrganization${n0}.com`
+        name: `testOrganization${n0}`,
+        url: `https:\/\/www.testOrganization${n0}.com`
     };
     return record;
 }
@@ -3769,13 +4522,13 @@ function $5f18a9d192f60010$var$getAction(n) {
     let record = {
         "@type": "action",
         "@id": `action${n0}`,
-        "name": `action${n0}`,
-        "actionStatus": "ActiveActionStatus",
-        "startTime": "",
-        "endTime": "",
-        "object": "",
-        "result": "",
-        "instrument": ""
+        name: `action${n0}`,
+        actionStatus: "ActiveActionStatus",
+        startTime: "",
+        endTime: "",
+        object: "",
+        result: "",
+        instrument: ""
     };
     return record;
 }
@@ -3783,63 +4536,63 @@ function $5f18a9d192f60010$var$getSystemRecord() {
     let record = {
         "@type": "Thing",
         "@id": "thing1",
-        "_id": "567e0725-a4b7-4a15-a5e5-39a2751bc09f",
-        "_version": "2.0",
-        "_dbCollection": null,
-        "_dbId": null,
-        "_record_type": "Thing",
-        "_record_id": "thing1",
-        "_headings": [],
-        "_refs": [],
-        "_propertyValues": [
+        _id: "567e0725-a4b7-4a15-a5e5-39a2751bc09f",
+        _version: "2.0",
+        _dbCollection: null,
+        _dbId: null,
+        _record_type: "Thing",
+        _record_id: "thing1",
+        _headings: [],
+        _refs: [],
+        _propertyValues: [
             {
                 "@type": "ReplaceAction",
                 "@id": "67120ec1-89ce-4644-ba45-e5f534cf2570",
-                "actionStatus": "CompletedActionStatus",
-                "valid": true,
-                "object": {
+                actionStatus: "CompletedActionStatus",
+                valid: true,
+                object: {
                     "@type": "PropertyValue",
-                    "propertyID": "@type",
-                    "value": "Thing"
+                    propertyID: "@type",
+                    value: "Thing"
                 },
-                "metadata": {
-                    "createdDate": new Date(),
-                    "position": 5
+                metadata: {
+                    createdDate: new Date(),
+                    position: 5
                 }
             },
             {
                 "@type": "ReplaceAction",
                 "@id": "8a363b93-46ac-4fe1-a4ed-c74b9fa890cc",
-                "actionStatus": "CompletedActionStatus",
-                "valid": true,
-                "object": {
+                actionStatus: "CompletedActionStatus",
+                valid: true,
+                object: {
                     "@type": "PropertyValue",
-                    "propertyID": "@id",
-                    "value": "thing1"
+                    propertyID: "@id",
+                    value: "thing1"
                 },
-                "metadata": {
-                    "createdDate": new Date(),
-                    "position": 7
+                metadata: {
+                    createdDate: new Date(),
+                    position: 7
                 }
             },
             {
                 "@type": "ReplaceAction",
                 "@id": "71c07e54-506d-49d2-a273-6d6a9e8ed1bd",
-                "actionStatus": "CompletedActionStatus",
-                "valid": true,
-                "object": {
+                actionStatus: "CompletedActionStatus",
+                valid: true,
+                object: {
                     "@type": "PropertyValue",
-                    "propertyID": "name",
-                    "value": "thing1"
+                    propertyID: "name",
+                    value: "thing1"
                 },
-                "metadata": {
-                    "createdDate": new Date(),
-                    "position": 9
+                metadata: {
+                    createdDate: new Date(),
+                    position: 9
                 }
             }
         ],
-        "_createdDate": new Date(),
-        "name": "thing1"
+        _createdDate: new Date(),
+        name: "thing1"
     };
     return record;
 }
@@ -3849,20 +4602,194 @@ function $5f18a9d192f60010$var$getPropertyValue(propertyID, value) {
      */ let record = {
         "@type": "ReplaceAction",
         "@id": `propertyValue${propertyID}`,
-        "actionStatus": "CompletedActionStatus",
-        "valid": true,
-        "object": {
+        actionStatus: "CompletedActionStatus",
+        valid: true,
+        object: {
             "@type": "PropertyValue",
             "@id": `pv_${propertyID}_1`,
-            "propertyID": propertyID,
-            "value": `${value}`
+            propertyID: propertyID,
+            value: `${value}`
         },
-        "metadata": {
-            "createdDate": new Date(),
-            "position": 9
+        metadata: {
+            createdDate: new Date(),
+            position: 9
         }
     };
     return record;
+}
+function $5f18a9d192f60010$var$getArticle(n) {
+    return {
+        "@type": "CreativeWork",
+        "@id": "Article1",
+        headline: "Headline 1",
+        author: {
+            "@type": "Person",
+            "@id": "person_1",
+            givenName: "givenName_1",
+            familyName: "familyName_1",
+            email: "test@test.com",
+            telephone: "1-514-111-2222",
+            jobTitle: "Job_title_1",
+            hasOccupation: {
+                "@type": "Occupation",
+                "@id": "occupation_1",
+                name: "occupation_1"
+            },
+            worksfor: {
+                "@type": "Organization",
+                "@id": "organization_1",
+                name: "test_org_1",
+                url: "https://www.test.com"
+            }
+        },
+        image: {
+            "@context": "https://schema.org/",
+            "@type": "ImageObject",
+            "@id": "image1",
+            name: "image_1",
+            contentUrl: "https://placehold.co/600x400"
+        },
+        text: "Text 1 - Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.",
+        hasPart: [
+            {
+                "@type": "CreativeWork",
+                "@id": "SubArticle1",
+                headline: "Sub headline 1",
+                text: "text 1-1 - Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."
+            },
+            {
+                "@type": "CreativeWork",
+                "@id": "SubArticle2",
+                headline: "Sub headline 2",
+                text: "text 1-2 - Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."
+            }
+        ]
+    };
+}
+function $5f18a9d192f60010$var$product(n) {
+    return {
+        "@context": "https://schema.org",
+        "@type": "Product",
+        aggregateRating: {
+            "@type": "AggregateRating",
+            ratingValue: "3.5",
+            reviewCount: "11"
+        },
+        description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.",
+        name: "Product name 1",
+        image: {
+            "@context": "https://schema.org/",
+            "@type": "ImageObject",
+            "@id": "image1",
+            name: "image_1",
+            contentUrl: "https://placehold.co/600x400"
+        },
+        offers: {
+            "@type": "Offer",
+            availability: "https://schema.org/InStock",
+            price: "55.00",
+            priceCurrency: "USD"
+        },
+        positiveNotes: [
+            {
+                "@type": "ListItem",
+                "@id": "positiveNote0",
+                position: 0,
+                item: {
+                    "@type": "CreativeWork",
+                    "@id": "positiveNote0Item",
+                    headline: "Positive note 1",
+                    text: "lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
+                    image: {
+                        "@context": "https://schema.org/",
+                        "@type": "ImageObject",
+                        "@id": "image0",
+                        name: "image_0",
+                        contentUrl: "https://placehold.co/600x400"
+                    }
+                }
+            },
+            {
+                "@type": "ListItem",
+                "@id": "positiveNote1",
+                position: 1,
+                item: {
+                    "@type": "CreativeWork",
+                    "@id": "positiveNote1Item",
+                    headline: "Positive note 1",
+                    text: "lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
+                    image: {
+                        "@context": "https://schema.org/",
+                        "@type": "ImageObject",
+                        "@id": "image1",
+                        name: "image_1",
+                        contentUrl: "https://placehold.co/600x400"
+                    }
+                }
+            },
+            {
+                "@type": "ListItem",
+                "@id": "positiveNote2",
+                position: 2,
+                item: {
+                    "@type": "CreativeWork",
+                    "@id": "positiveNote2Item",
+                    headline: "Positive note 3",
+                    text: "lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
+                    image: {
+                        "@context": "https://schema.org/",
+                        "@type": "ImageObject",
+                        "@id": "image2",
+                        name: "image_2",
+                        contentUrl: "https://placehold.co/600x400"
+                    }
+                }
+            },
+            {
+                "@type": "ListItem",
+                "@id": "positiveNote3",
+                position: 3,
+                item: {
+                    "@type": "CreativeWork",
+                    "@id": "positiveNote3Item",
+                    headline: "Positive note 3",
+                    text: "lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
+                    image: {
+                        "@context": "https://schema.org/",
+                        "@type": "ImageObject",
+                        "@id": "image3",
+                        name: "image_3",
+                        contentUrl: "https://placehold.co/600x400"
+                    }
+                }
+            }
+        ]
+    };
+}
+function $5f18a9d192f60010$var$potentialAction(n = 0) {
+    return {
+        "@type": "Action",
+        "@id": "action_" + String(n),
+        "name": "action_" + String(n),
+        "description": "lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
+        "actionStatus": "PotentialActionStatus",
+        "name_input": {
+            "@type": "PropertyValueSpecification",
+            "valueName": "name"
+        },
+        "email_input": {
+            "@type": "PropertyValueSpecification",
+            "valueName": "email"
+        },
+        "approval_input": {
+            "@type": "PropertyValueSpecification",
+            "valueName": "approval",
+            "description": "By clicking on this, you agree to give your first born child.",
+            "minValue": 0,
+            "maxValue": 1,
+            "required": "true"
+        }
+    };
 }
 
 
@@ -3962,6 +4889,176 @@ function $cdf51dc5a05f8897$export$7642ec6da7b10b(records, keys, headers) {
 
 
 
+const $1a629a767d5efe2d$var$h = {
+    isNull: (0, $41e9b357c493982e$export$f8c0f914c8a0ee10).isNull,
+    isNotNull: (0, $41e9b357c493982e$export$f8c0f914c8a0ee10).isNotNull,
+    null: (0, $41e9b357c493982e$export$f8c0f914c8a0ee10)
+};
+const $1a629a767d5efe2d$export$bf6c5252d3a48e2b = {
+    /**
+     * uri template helpers
+     * Convert to from uri template
+     *
+     * 
+     */ uriToPvs: $1a629a767d5efe2d$var$convertUriTemplateToSchema,
+    pvsToUri: $1a629a767d5efe2d$var$convertSchemaToUriTemplate
+};
+function $1a629a767d5efe2d$var$convertSchemaToUriTemplate(record) {
+    /**
+     * Convert a schema to a uri template
+     * 
+     */ let items = [];
+    let keys = Object.keys(record);
+    for (let key of keys){
+        let value = record[key];
+        let item;
+        switch(key){
+            case "valueRequired":
+                if (value == true) item = `required`;
+                break;
+            case "defaultValue":
+                item = `default=${value}`;
+                break;
+            case "valueName":
+                item = `name=${value}`;
+                break;
+            case "readonlyValue":
+                item = `readonly=${value}`;
+                break;
+            case "multipleValues":
+                item = `multiple=${value}`;
+                break;
+            case "valueMinLength":
+                item = `minlength=${value}`;
+                break;
+            case "valueMaxLength":
+                item = `maxlength=${value}`;
+                break;
+            case "valuePattern":
+                item = `pattern=${value}`;
+                break;
+            case "minValue":
+                item = `min=${value}`;
+                break;
+            case "maxValue":
+                item = `max=${value}`;
+                break;
+            case "stepValue":
+                item = `step=${value}`;
+                break;
+            default:
+                break;
+        }
+        if (item) items.push(item);
+    }
+    // Filter empty items
+    items = items.filter((x)=>x && x != null);
+    // Combine items
+    let uriTemplate = items.join(" ");
+    return uriTemplate;
+}
+function $1a629a767d5efe2d$var$convertUriTemplateToSchema(uriTemplate) {
+    /**
+     * Converts a uri template to a schema property value specific ation
+     * {
+            "@type": "PropertyValueSpecification",
+            "@id": "86719a5e-c87d-4d69-8920-47e7f59c3ea8",
+            "defaultValue": null,
+            "readonlyValue": null,
+            "valueRequired": true,
+            "multipleValues": false,
+            "minValue": null,
+            "maxValue": null,
+            "valueMinLength": null,
+            "valueMaxLength": null,
+            "valuePattern": null,
+            "stepValue": null,
+            "valueName": null,
+        }
+        
+
+     */ if (typeof uriTemplate !== "string") throw new TypeError("uriTemplate must be a string");
+    // Extract placeholders from the URI template
+    let items = uriTemplate.split(" ");
+    let pvs = {
+        "@type": "PropertyValueSpecification"
+    };
+    for (let item of items){
+        let key = item.split("=")?.[0] || null;
+        key = key.trim();
+        key = key.toLowerCase();
+        let value = item.split("=")?.[1] || null;
+        value = value || "";
+        value = value.trim();
+        switch(key){
+            case "required":
+                value = Boolean(value || true);
+                pvs.valueRequired = value;
+                break;
+            case "default":
+                value = Boolean(value);
+                pvs.defaultValue = value;
+                break;
+            case "name":
+                value = value.replaceAll('"', "");
+                value = value.replaceAll("'", "");
+                pvs.valueName = value;
+                break;
+            case "readonly":
+                value = Boolean(value);
+                pvs.readonlyValue = value;
+                break;
+            case "multiple":
+                value = Boolean(value);
+                pvs.multipleValues = value;
+                break;
+            case "minlength":
+                value = value.replaceAll('"', "");
+                value = value.replaceAll("'", "");
+                value = Number(value);
+                pvs.valueMinLength = value;
+                break;
+            case "maxlength":
+                value = value.replaceAll('"', "");
+                value = value.replaceAll("'", "");
+                value = Number(value);
+                pvs.valueMaxLength = value;
+                break;
+            case "valuePattern":
+                value = value.replaceAll('"', "");
+                value = value.replaceAll("'", "");
+                pvs.valuePattern = value;
+                break;
+            case "min":
+                value = value.replaceAll('"', "");
+                value = value.replaceAll("'", "");
+                value = Number(value);
+                pvs.minValue = value;
+                break;
+            case "max":
+                value = value.replaceAll('"', "");
+                value = value.replaceAll("'", "");
+                value = Number(value);
+                pvs.maxValue = value;
+                break;
+            case "step":
+                value = value.replaceAll('"', "");
+                value = value.replaceAll("'", "");
+                value = Number(value);
+                pvs.stepValue = value;
+                break;
+            default:
+                break;
+        }
+    }
+    // Assign entire content as default value if no value is set
+    if (Object.keys(pvs).length <= 1) pvs.defaultValue = uriTemplate;
+    // Return the PVS
+    return pvs;
+}
+
+
+
 const $c105aeb290c96594$export$b881b526c33ee854 = {
     isValid: $c105aeb290c96594$var$isValid,
     toString: $c105aeb290c96594$var$toString,
@@ -4034,12 +5131,30 @@ function $c105aeb290c96594$var$getDomain(value) {
 
 
 
+const $6098d21b5dc1ee14$export$4f5a3571c6e0d8ae = {
+    add: $6098d21b5dc1ee14$var$addStyle
+};
+function $6098d21b5dc1ee14$var$addStyle(content) {
+    /**
+     * Add style to document
+     * @param {string} content
+     * @returns {void}
+     */ var styleSheet = document.createElement("style");
+    styleSheet.textContent = content;
+    document.head.appendChild(styleSheet);
+}
+
+
 const $2fa9c1db583d4d31$export$439bf78a2cc516f5 = {
     analysis: (0, $8e7de55ecf14d868$export$35d3dd03f0194c3a),
     array: (0, $2092c12a98cb2c2e$export$4736c2d1b0001d00),
     classes: (0, $7043b2674c61d7a1$export$168f34c82020a71),
+    color: (0, $b5f9b848b00b349e$export$b4c3eca70a61f421),
     date: (0, $535b3f5b0bcb555a$export$15c85b69ec02b47c),
     dot: (0, $2cf68f4048a6f85f$export$fe5b3308000496d5),
+    element: {
+        style: (0, $6098d21b5dc1ee14$export$4f5a3571c6e0d8ae)
+    },
     email: (0, $72ab74e9bdfc8a51$export$bac8020bbb4f7950),
     hash: (0, $650a87c2d2146f16$export$c43cb89937ee8d5c),
     heading: (0, $2969a9bd2c7ad243$export$2e72560dcbb9783c),
@@ -4056,6 +5171,7 @@ const $2fa9c1db583d4d31$export$439bf78a2cc516f5 = {
     test: (0, $5f18a9d192f60010$export$dc6226f18ea4e006),
     textTable: (0, $cdf51dc5a05f8897$export$7642ec6da7b10b),
     thing: (0, $5e269851126f2bb1$export$b28abe9e4076f605),
+    uri: (0, $1a629a767d5efe2d$export$bf6c5252d3a48e2b),
     url: (0, $c105aeb290c96594$export$b881b526c33ee854),
     uuid: (0, $a7df578a06d5a361$export$9694b2d66de56464),
     // Shortcuts
@@ -4068,8 +5184,12 @@ const $2fa9c1db583d4d31$export$439bf78a2cc516f5 = {
     isObject: (0, $e787032c49c8ddee$export$42f247ccf9267abd).isValid,
     isDate: (0, $535b3f5b0bcb555a$export$15c85b69ec02b47c).isValid,
     toDate: (0, $535b3f5b0bcb555a$export$15c85b69ec02b47c).toDate,
-    isNumber: (0, $44ebc265e2335159$export$96be39e8128f5891).isValid
+    isNumber: (0, $44ebc265e2335159$export$96be39e8128f5891).isValid,
+    wait: $2fa9c1db583d4d31$var$wait
 };
+function $2fa9c1db583d4d31$var$wait(seconds) {
+    return new Promise((resolve)=>setTimeout(resolve, seconds * 1000));
+}
 
 
 
@@ -4166,8 +5286,8 @@ function $c8b0dc629c726d48$var$setIdToElement(element, id) {
      * @param {String} id Uses uuid if null
      */ if ((0, $2fa9c1db583d4d31$export$439bf78a2cc516f5).isNull(element)) return null;
     if ((0, $2fa9c1db583d4d31$export$439bf78a2cc516f5).isNotNull(element.getAttribute("id"))) return;
-    element.setAttribute("id", (0, $2fa9c1db583d4d31$export$439bf78a2cc516f5).uuid.new());
-    return;
+    let newID = "element_" + (0, $2fa9c1db583d4d31$export$439bf78a2cc516f5).uuid.new();
+    element.setAttribute("id", newID);
 }
 function $c8b0dc629c726d48$var$getRecordType(element) {
     /**
@@ -4523,6 +5643,10 @@ const $2adfa4e445ef1d89$export$631b1a0163af1868 = {
         setDraggable: $2adfa4e445ef1d89$var$setDragDropDraggableElement,
         setDropzone: $2adfa4e445ef1d89$var$setDragDropDropzoneElement
     },
+    dragDropReordering: {
+        setDraggable: $2adfa4e445ef1d89$var$setDragDropDraggableReorderingElement,
+        setDropzone: $2adfa4e445ef1d89$var$setDragDropDropzoneReorderingElement
+    },
     generic: {
         setDraggable: $2adfa4e445ef1d89$var$setDraggableGenericElement,
         setDropzone: $2adfa4e445ef1d89$var$setDropzoneGenericElement
@@ -4534,6 +5658,80 @@ const $2adfa4e445ef1d89$export$631b1a0163af1868 = {
 // -----------------------------------------------------
 //  Register events 
 // -----------------------------------------------------
+// -----------------------------------------------------
+//  Drag drop reordering
+// -----------------------------------------------------
+function $2adfa4e445ef1d89$var$setDragDropDraggableReorderingElement(element, elementHandle, callbackFn, params) {
+    // If no handle provided, considers entire element is draggable
+    console.log(elementHandle);
+    elementHandle = elementHandle || element;
+    //elementHandle.draggable = true;
+    elementHandle.addEventListener("mousedown", (event)=>{
+        //event.preventDefault();
+        //event.stopPropagation();
+        element.draggable = true;
+        console.log("mousedown");
+    });
+    elementHandle.addEventListener("mouseup", (event)=>{
+        //event.preventDefault();
+        //event.stopPropagation();
+        element.draggable = false;
+    });
+    element.addEventListener("dragstart", (event)=>{
+        //event.preventDefault();
+        event.stopPropagation();
+        event.dataTransfer.setData("text/plain", element.id);
+        element.style.opacity = "0.4";
+    });
+    element.addEventListener("dragend", (event)=>{
+        //event.preventDefault();
+        event.stopPropagation();
+        event.dataTransfer.setData("text/plain", element.id);
+        element.style.opacity = "1";
+        element.draggable = false;
+    });
+}
+function $2adfa4e445ef1d89$var$setDragDropDropzoneReorderingElement(element, callbackFn, params) {
+    element.addEventListener("dragover", (event)=>{
+        event.preventDefault();
+    //event.stopPropagation();
+    });
+    element.addEventListener("dragenter", (event)=>{
+        event.preventDefault();
+        //event.stopPropagation();
+        event.currentTarget.classList.add("dragover");
+    });
+    element.addEventListener("dragleave", (event)=>{
+        event.preventDefault();
+        //event.stopPropagation();
+        event.currentTarget.classList.remove("dragover");
+    });
+    element.addEventListener("drop", (event)=>{
+        event.preventDefault();
+        event.stopPropagation();
+        let draggedElementID = event.dataTransfer.getData("text/plain");
+        let dropzoneElementID = event.currentTarget?.id;
+        let draggedElement = document.getElementById(draggedElementID);
+        let dropzoneElement = event.currentTarget;
+        // Move dragged element before dropzone
+        dropzoneElement.before(draggedElement);
+        let action = new (0, $2fa9c1db583d4d31$export$439bf78a2cc516f5).classes.Action("Dragdrop - drop");
+        action.object = {
+            "@type": "WebPageElement",
+            "@id": draggedElementID,
+            name: "Draggable element"
+        };
+        action.instrument = {
+            "@type": "WebPageElement",
+            "@id": dropzoneElementID,
+            name: "Dropzone element"
+        };
+        action.setCompleted();
+        if (callbackFn) callbackFn(action, params);
+        // Remove all dragover
+        for (let e of document.querySelectorAll(".dragover"))e.classList.remove("dragover");
+    });
+}
 // -----------------------------------------------------
 //  Drag drop
 // -----------------------------------------------------
@@ -4603,7 +5801,7 @@ function $2adfa4e445ef1d89$var$setDraggableGenericElement(element, content, call
 function $2adfa4e445ef1d89$var$setDropzoneGenericElement(element, callbackFn, params) {
     /**
      * Assigns content to draggable element
-     */ element.draggable = true;
+     */ //element.draggable = true;
     element.addEventListener("dragover", (event)=>{
         event.preventDefault();
         event.stopPropagation();
@@ -5027,6 +6225,7 @@ function $6ab83f37dcb687d8$var$getChildrenElementsAll(element, classToGet, class
      *
      */ // Error handling
     if ((0, $2fa9c1db583d4d31$export$439bf78a2cc516f5).isNull(element)) return undefined;
+    classesToStop = [];
     //
     let results = $6ab83f37dcb687d8$var$getChildrenElements(element, classToGet, classesToStop, conditions);
     let childResults = [];
@@ -5100,6 +6299,10 @@ const $a635fab3621c72fd$export$c3cc9c4e77b9c8d7 = {
         get: $a635fab3621c72fd$var$getPropertyID,
         set: $a635fab3621c72fd$var$setPropertyID
     },
+    valueID: {
+        get: $a635fab3621c72fd$var$getValueID,
+        set: $a635fab3621c72fd$var$setValueID
+    },
     valueHash: {
         get: $a635fab3621c72fd$var$getValueHash,
         set: $a635fab3621c72fd$var$setValueHash
@@ -5154,7 +6357,7 @@ function $a635fab3621c72fd$var$setRecordId(element, record_id) {
     if ((0, $2fa9c1db583d4d31$export$439bf78a2cc516f5).isNull(element)) return null;
     //
     record_id = record_id?.["@id"] || record_id?.record_id || record_id;
-    element.setAttribute("data-record-type", record_id);
+    element.setAttribute("data-record-id", record_id);
     return element;
 }
 function $a635fab3621c72fd$var$getPropertyID(element) {
@@ -5178,6 +6381,29 @@ function $a635fab3621c72fd$var$setPropertyID(element, propertyID) {
     if ((0, $2fa9c1db583d4d31$export$439bf78a2cc516f5).isNull(element)) return null;
     //
     element.setAttribute("data-propertyID", propertyID);
+    return element;
+}
+function $a635fab3621c72fd$var$getValueID(element) {
+    /**
+     * Returns the record id of the element
+     * @param {Object} element
+     * @returns {String} The record id
+     */ // Error handling
+    if ((0, $2fa9c1db583d4d31$export$439bf78a2cc516f5).isNull(element)) return null;
+    //
+    let record_id = element.getAttribute("data-valueID");
+    return record_id;
+}
+function $a635fab3621c72fd$var$setValueID(element, valueID) {
+    /**
+     * Sets the record type of the element
+     * @param {Object} element
+     * @param {String|Object} record_type of record or ref
+     * @returns {Object} The element
+     */ // Error handling
+    if ((0, $2fa9c1db583d4d31$export$439bf78a2cc516f5).isNull(element)) return null;
+    //
+    element.setAttribute("data-valueID", valueID);
     return element;
 }
 function $a635fab3621c72fd$var$getValueHash(element) {
@@ -5254,6 +6480,7 @@ function $a635fab3621c72fd$var$getElementType(element) {
      * 
      */ // Error handling
     if ((0, $2fa9c1db583d4d31$export$439bf78a2cc516f5).isNull(element)) return null;
+    if ((0, $2fa9c1db583d4d31$export$439bf78a2cc516f5).isNull(element.classList)) return null;
     //
     if (element.classList.contains("krThing")) return "thing";
     if (element.classList.contains("krProperty")) return "property";
@@ -5389,7 +6616,11 @@ function $2ad812101d8ee679$var$getPartsOfElement(element, partName) {
     let classToGet = partName;
     if (!classToGet.startsWith("kr")) classToGet = "kr" + classToGet.charAt(0).toUpperCase() + classToGet.slice(1).toLowerCase();
     // Retrieve elements
-    let bodies = (0, $6ab83f37dcb687d8$export$ffaccbdd67f021cd).children.elements.get(element, classToGet, "kr" + nextElementType);
+    let bodies = (0, $6ab83f37dcb687d8$export$ffaccbdd67f021cd).children.elements.get(element, classToGet, [
+        "krThing",
+        "krProperty",
+        "krValue"
+    ]);
     // Return
     return bodies;
 }
@@ -5470,23 +6701,10 @@ function $2ad812101d8ee679$var$getSectionsOfElement(element) {
 
 
 
-let $72773900747a3863$var$DB = {};
-const $72773900747a3863$export$dc9f39fafadf3ccd = {
-    get: $72773900747a3863$var$get,
-    set: $72773900747a3863$var$set
-};
-function $72773900747a3863$var$get(value) {
-    return $72773900747a3863$var$DB?.[value] || null;
-}
-function $72773900747a3863$var$set(value, template) {
-    $72773900747a3863$var$DB[value] = template;
-}
-
-
 const $0c0a864fcee6a66f$export$b8f607a8a10bde0a = {
     init: $0c0a864fcee6a66f$var$initThingElementAll
 };
-function $0c0a864fcee6a66f$var$initThingElementAll(element, TEMPLATEDB) {
+function $0c0a864fcee6a66f$var$initThingElementAll(element, TEMPLATEDB, force = false) {
     /**
      * Initializes the element as a thing element
      * @param {Object} element (init document if not provided))
@@ -5497,28 +6715,28 @@ function $0c0a864fcee6a66f$var$initThingElementAll(element, TEMPLATEDB) {
     // Error handling
     element = element || document.body;
     if ((0, $2fa9c1db583d4d31$export$439bf78a2cc516f5).isArray(element)) {
-        action.instrument = element.map((x)=>$0c0a864fcee6a66f$var$initThingElementAll(x, TEMPLATEDB));
+        action.instrument = element.map((x)=>$0c0a864fcee6a66f$var$initThingElementAll(x, TEMPLATEDB, force));
         action.close();
         return action;
     }
     // Placeholders
     //replacePlaceholders(element)
-    // Replace class 
+    // Add missing classes  
     let elements = element.getElementsByTagName("*");
     for (let e of elements)$0c0a864fcee6a66f$var$addMissingClasses(e);
-    // Init element
-    if ((0, $2fa9c1db583d4d31$export$439bf78a2cc516f5).isNotNull((0, $a635fab3621c72fd$export$c3cc9c4e77b9c8d7).type.get(element))) action.instrument = $0c0a864fcee6a66f$var$initThingElement(element, TEMPLATEDB);
     // Init childrens
     let item = element.firstElementChild;
     while(item){
         let nextItem = item.nextElementSibling;
-        action.instrument = $0c0a864fcee6a66f$var$initThingElementAll(item, TEMPLATEDB);
+        action.instrument = $0c0a864fcee6a66f$var$initThingElementAll(item, TEMPLATEDB, force);
         item = nextItem;
     }
+    // Init element
+    if ((0, $2fa9c1db583d4d31$export$439bf78a2cc516f5).isNotNull((0, $a635fab3621c72fd$export$c3cc9c4e77b9c8d7).type.get(element))) action.instrument = $0c0a864fcee6a66f$var$initThingElement(element, TEMPLATEDB, force);
     action.close();
     return action;
 }
-function $0c0a864fcee6a66f$var$initThingElement(element, TEMPLATEDB) {
+function $0c0a864fcee6a66f$var$initThingElement(element, TEMPLATEDB, force) {
     /**
      * Initialize thing, property and value elements
      * @param {Object} element
@@ -5529,22 +6747,25 @@ function $0c0a864fcee6a66f$var$initThingElement(element, TEMPLATEDB) {
         action.setFailed("Element is null");
         return action;
     }
-    //
+    // Return if no type
     if ((0, $2fa9c1db583d4d31$export$439bf78a2cc516f5).isNull((0, $a635fab3621c72fd$export$c3cc9c4e77b9c8d7).type.get(element))) {
         action.close();
         return action;
     }
-    // Set id
+    // Set element id (if missing)
     (0, $c8b0dc629c726d48$export$e0169ab077dc0819).setId(element);
-    // Add part main and template if missing. Copy content as template
-    if ((0, $a635fab3621c72fd$export$c3cc9c4e77b9c8d7).type.get(element) == "property" || (0, $a635fab3621c72fd$export$c3cc9c4e77b9c8d7).type.get(element) == "thing") {
-        //action.instrument = addMainIfMissing(element, TEMPLATEDB)
-        action.instrument = $0c0a864fcee6a66f$var$retrieveAndSaveTemplate(element, TEMPLATEDB);
-        action.instrument = $0c0a864fcee6a66f$var$retrieveInnerContentAsTemplate(element, TEMPLATEDB);
-        let mainPart = (0, $2ad812101d8ee679$export$9ccd701369bc6cde).main.get(element);
-        if ((0, $2fa9c1db583d4d31$export$439bf78a2cc516f5).isNotNull(mainPart)) mainPart.innerHTML = "";
+    // Add thing and value element if missing
+    if ((0, $a635fab3621c72fd$export$c3cc9c4e77b9c8d7).type.get(element) == "property") {
+        let addThingAction = $0c0a864fcee6a66f$var$addThingToProperty(element);
+        let addValueAction = $0c0a864fcee6a66f$var$addValueToProperty(element);
     }
-    // Return     
+    // Add part element if missing       
+    let mainAction = $0c0a864fcee6a66f$var$addMainIfMissing(element, TEMPLATEDB);
+    let mainPart = (0, $2ad812101d8ee679$export$9ccd701369bc6cde).main.get(element);
+    // Set main part content as template 
+    let retrieve3Action = $0c0a864fcee6a66f$var$retrieveInnerContentAsTemplate(mainPart, TEMPLATEDB, force);
+    // Set content as template
+    let retrieve2Action = $0c0a864fcee6a66f$var$retrieveInnerContentAsTemplate(element, TEMPLATEDB, force);
     action.close();
     return action;
 }
@@ -5585,14 +6806,22 @@ function $0c0a864fcee6a66f$var$retrieveAndSaveTemplate(element, TEMPLATEDB = {})
      * @returns {Object} The element
      */ let action = new (0, $2fa9c1db583d4d31$export$439bf78a2cc516f5).classes.Action(`retrieveAndSaveTemplate ${(0, $a635fab3621c72fd$export$c3cc9c4e77b9c8d7).type.get(element)} element ${element?.id}`);
     action.object = element;
-    // Skip if template already exists
-    if (!(0, $2fa9c1db583d4d31$export$439bf78a2cc516f5).isNull(TEMPLATEDB?.[element.getAttribute("data-templateID")])) {
-        action.setCompleted();
+    // Skip if already has a templateID
+    if ((0, $2fa9c1db583d4d31$export$439bf78a2cc516f5).isNotNull(element.getAttribute("data-templateID"))) {
+        action.close();
         return action;
     }
-    // Get templates
+    // Get templates from template
     let preTemplateParts = element.querySelectorAll("TEMPLATE") //getTemplateOfElement(element)
     ;
+    // Return if no templates found
+    if ((0, $2fa9c1db583d4d31$export$439bf78a2cc516f5).isNull(preTemplateParts)) {
+        action.close();
+        return action;
+    }
+    // Set template id
+    let templateID = "template_" + (0, $2fa9c1db583d4d31$export$439bf78a2cc516f5).uuid.new();
+    element.setAttribute("data-templateID", templateID);
     let templateParts = [];
     for (let t of preTemplateParts){
         let className = "kr" + (0, $a635fab3621c72fd$export$c3cc9c4e77b9c8d7).type.get(element).slice(0, 1).toUpperCase() + (0, $a635fab3621c72fd$export$c3cc9c4e77b9c8d7).type.get(element).slice(1).toLowerCase();
@@ -5600,19 +6829,14 @@ function $0c0a864fcee6a66f$var$retrieveAndSaveTemplate(element, TEMPLATEDB = {})
     }
     action.result = templateParts;
     // Add template parts to TEMPLATEDB
-    if (templateParts.length > 0) {
-        let templateID = (0, $2fa9c1db583d4d31$export$439bf78a2cc516f5).uuid.new();
-        element.setAttribute("data-templateID", templateID);
-        for (let t of templateParts){
-            TEMPLATEDB[templateID] = (TEMPLATEDB?.[templateID] || "") + t.innerHTML;
-            TEMPLATEDB[templateID] = TEMPLATEDB[templateID].trim();
-            (0, $72773900747a3863$export$dc9f39fafadf3ccd).set(templateID, TEMPLATEDB?.[templateID]);
-        }
+    if (templateParts.length > 0) for (let t of templateParts){
+        TEMPLATEDB[templateID] = (TEMPLATEDB?.[templateID] || "") + t.innerHTML;
+        TEMPLATEDB[templateID] = TEMPLATEDB[templateID].trim();
     }
     action.close();
     return action;
 }
-function $0c0a864fcee6a66f$var$retrieveInnerContentAsTemplate(element, TEMPLATEDB) {
+function $0c0a864fcee6a66f$var$retrieveInnerContentAsTemplate(element, TEMPLATEDB, force = false) {
     /**
      * If no template, retrieves inner content to be used as template
      * @param {Object} element
@@ -5620,20 +6844,24 @@ function $0c0a864fcee6a66f$var$retrieveInnerContentAsTemplate(element, TEMPLATED
      * 
      */ let action = new (0, $2fa9c1db583d4d31$export$439bf78a2cc516f5).classes.Action(`retrieveInnerContentAsTemplate ${(0, $a635fab3621c72fd$export$c3cc9c4e77b9c8d7).type.get(element)} element ${element?.id}`);
     action.object = element;
-    // Skip if template already exists
-    if (!(0, $2fa9c1db583d4d31$export$439bf78a2cc516f5).isNull(TEMPLATEDB[element.id])) {
-        action.setCompleted();
+    // Skip if already has a templateID
+    let templateID = element.getAttribute("data-templateID");
+    if ((0, $2fa9c1db583d4d31$export$439bf78a2cc516f5).isNotNull(templateID) && (0, $2fa9c1db583d4d31$export$439bf78a2cc516f5).isNotNull(TEMPLATEDB?.[templateID]) && force != true) {
+        action.close();
         return action;
     }
-    let templateID = (0, $2fa9c1db583d4d31$export$439bf78a2cc516f5).uuid.new();
-    element.setAttribute("data-templateID", templateID);
-    if ((0, $a635fab3621c72fd$export$c3cc9c4e77b9c8d7).type.get(element) == "property" && (0, $2fa9c1db583d4d31$export$439bf78a2cc516f5).isNotNull((0, $2ad812101d8ee679$export$9ccd701369bc6cde).main.get(element))) {
-        TEMPLATEDB[templateID] = (0, $2ad812101d8ee679$export$9ccd701369bc6cde).main.get(element).innerHTML;
-        (0, $72773900747a3863$export$dc9f39fafadf3ccd).set(templateID, TEMPLATEDB?.[templateID]);
-    } else {
-        TEMPLATEDB[templateID] = element.innerHTML;
-        (0, $72773900747a3863$export$dc9f39fafadf3ccd).set(templateID, TEMPLATEDB?.[templateID]);
+    // Create templateID
+    if ((0, $2fa9c1db583d4d31$export$439bf78a2cc516f5).isNull(templateID)) {
+        templateID = "template_" + (0, $2fa9c1db583d4d31$export$439bf78a2cc516f5).uuid.new();
+        element.setAttribute("data-templateID", templateID);
     }
+    // Get inner content
+    let content = element.innerHTML || "";
+    content = content.replaceAll("\n", "");
+    content = content.replaceAll("  ", " ");
+    TEMPLATEDB[templateID] = content;
+    // Set content to null
+    element.innerHTML = "";
     action.result = element.innerHTML;
     action.close();
     return action;
@@ -5655,12 +6883,16 @@ function $0c0a864fcee6a66f$var$addThingToProperty(element) {
         action.setFailed("Element does not have a propertyID");
         return action;
     }
-    // Get parent thing element
-    let currentThingElement = (0, $6ab83f37dcb687d8$export$ffaccbdd67f021cd).current.thing.get(element);
-    // Return if already has a parent
-    if ((0, $2fa9c1db583d4d31$export$439bf78a2cc516f5).isNotNull(currentThingElement)) {
-        action.close();
-        return action;
+    // Verify if it has a parent thing element
+    let item = element.parentElement;
+    let hasNoThing = false;
+    while((0, $2fa9c1db583d4d31$export$439bf78a2cc516f5).isNotNull(item) && hasNoThing == false){
+        if ((0, $2fa9c1db583d4d31$export$439bf78a2cc516f5).isNotNull(item.classList) && item.classList.contains("krThing")) {
+            action.close();
+            return action;
+        }
+        if (item.classList.contains("krProperty")) hasNoThing = true;
+        item = item.parentElement;
     }
     // Create new parent
     let newThingElement = document.createElement("span");
@@ -5674,6 +6906,19 @@ function $0c0a864fcee6a66f$var$addThingToProperty(element) {
     (0, $c8b0dc629c726d48$export$e0169ab077dc0819).insert.above(newThingElement, element);
     action.close();
     return action;
+}
+function $0c0a864fcee6a66f$var$addValueToProperty(element) {
+    /**
+     * Addd value element if missing
+     * 
+     */ let values = (0, $6ab83f37dcb687d8$export$ffaccbdd67f021cd).children.values.get(element);
+    if ((0, $2fa9c1db583d4d31$export$439bf78a2cc516f5).isNotNull(values)) return;
+    let valueElement = document.createElement("span");
+    (0, $a635fab3621c72fd$export$c3cc9c4e77b9c8d7).type.setAsValue(valueElement);
+    $0c0a864fcee6a66f$var$addMainIfMissing(element);
+    let mainPart = (0, $2ad812101d8ee679$export$9ccd701369bc6cde).main.get(element);
+    (0, $c8b0dc629c726d48$export$e0169ab077dc0819).insert.below(valueElement, mainPart);
+    return;
 }
 function $0c0a864fcee6a66f$var$addMissingClasses(element) {
     /**
@@ -5726,14 +6971,24 @@ function $21085080d3b8a3c0$var$setObserver(element, callbackFn) {
                 "name": "Element mutation",
                 "object": mutation.target
             };
-            if (mutation.type === "childList") console.log("A child node has been added or removed.");
-            else if (mutation.type === "attributes") console.log(`The ${mutation.attributeName} attribute was modified.`);
+            if (mutation.type === "childList") ;
+            else if (mutation.type === "attributes") ;
+            else if (mutation.type === "characterData") {
+                //console.log('mutation.type', mutation)
+                let action = {
+                    "@type": "ReplaceAction",
+                    "@id": (0, $2fa9c1db583d4d31$export$439bf78a2cc516f5).uuid.new(),
+                    replacee: mutation.oldValue,
+                    replacer: mutation.target.textContent
+                };
+                callbackFn(action);
+            }
         }
     };
     // Create an observer instance linked to the callback function
     const observer = new MutationObserver(callback);
     // Start observing the target node for configured mutations
-    observer.observe(targetNode, config);
+    observer.observe(element, config);
 // Later, you can stop observing
 //observer.disconnect();
 }
@@ -5878,6 +7133,18 @@ function $ded7b0d2be5134be$var$deleteRecordFromElement(element) {
 
 
 
+
+let $72773900747a3863$var$DB = {};
+const $72773900747a3863$export$dc9f39fafadf3ccd = {
+    get: $72773900747a3863$var$get,
+    set: $72773900747a3863$var$set
+};
+function $72773900747a3863$var$get(value) {
+    return $72773900747a3863$var$DB?.[value] || null;
+}
+function $72773900747a3863$var$set(value, template) {
+    $72773900747a3863$var$DB[value] = template;
+}
 
 
 const $088016ba0ae1a642$export$c1781ce783707272 = {
@@ -6051,6 +7318,7 @@ function $088016ba0ae1a642$var$_newValueElement(record, template, propertyID, TE
 
 const $a6f8f0c2e2f67514$export$4e14e39b01a79427 = {
     test: $a6f8f0c2e2f67514$var$test,
+    testSimple: $a6f8f0c2e2f67514$var$testRecord,
     testDetailed: $a6f8f0c2e2f67514$var$testDetailed,
     tests: {
         valueRequired: $a6f8f0c2e2f67514$var$_testConditionValueRequired,
@@ -7114,10 +8382,22 @@ function $409aaf2b232e73d2$var$gt(pv1, pv2) {
     for (let propertyID of propertyIDs){
         let value1 = pv1?.metadata?.[propertyID];
         let value2 = pv2?.metadata?.[propertyID];
-        if ((0, $2fa9c1db583d4d31$export$439bf78a2cc516f5).isNull(value1) && (0, $2fa9c1db583d4d31$export$439bf78a2cc516f5).isNotNull(value2)) result = false;
-        if ((0, $2fa9c1db583d4d31$export$439bf78a2cc516f5).isNotNull(value1) && (0, $2fa9c1db583d4d31$export$439bf78a2cc516f5).isNull(value2)) result = true;
-        if ((0, $2fa9c1db583d4d31$export$439bf78a2cc516f5).isNotNull(value1) && (0, $2fa9c1db583d4d31$export$439bf78a2cc516f5).isNotNull(value2) && value1 != value2) result = value1 > value2;
-        if (result) return result;
+        if ((0, $2fa9c1db583d4d31$export$439bf78a2cc516f5).isNull(value1) && (0, $2fa9c1db583d4d31$export$439bf78a2cc516f5).isNull(value2)) continue;
+        if ((0, $2fa9c1db583d4d31$export$439bf78a2cc516f5).isNull(value1) && (0, $2fa9c1db583d4d31$export$439bf78a2cc516f5).isNotNull(value2)) return false;
+        if ((0, $2fa9c1db583d4d31$export$439bf78a2cc516f5).isNotNull(value1) && (0, $2fa9c1db583d4d31$export$439bf78a2cc516f5).isNull(value2)) return true;
+        if (propertyID.includes("Date")) {
+            if ((0, $2fa9c1db583d4d31$export$439bf78a2cc516f5).date.isValid(value1) && !(0, $2fa9c1db583d4d31$export$439bf78a2cc516f5).date.isValid(value2)) return true;
+            if (!(0, $2fa9c1db583d4d31$export$439bf78a2cc516f5).date.isValid(value1) && (0, $2fa9c1db583d4d31$export$439bf78a2cc516f5).date.isValid(value2)) return false;
+            if (!(0, $2fa9c1db583d4d31$export$439bf78a2cc516f5).date.isValid(value1) && !(0, $2fa9c1db583d4d31$export$439bf78a2cc516f5).date.isValid(value2)) continue;
+            if ((0, $2fa9c1db583d4d31$export$439bf78a2cc516f5).date.gt(value1, value2) == true) return true;
+            if ((0, $2fa9c1db583d4d31$export$439bf78a2cc516f5).date.eq(value1, value2) == true) continue;
+            if ((0, $2fa9c1db583d4d31$export$439bf78a2cc516f5).date.lt(value1, value2) == false) return false;
+        } else {
+            result = value1 > value2;
+            if (value1 > value2) return true;
+            if (value1 == value2) continue;
+            if (value1 < value2) return false;
+        }
     }
     return false;
 }
@@ -7139,14 +8419,25 @@ function $409aaf2b232e73d2$var$lt(pv1, pv2) {
         "createdDate",
         "position"
     ];
+    let result;
     for (let propertyID of propertyIDs){
         let value1 = pv1?.metadata?.[propertyID];
         let value2 = pv2?.metadata?.[propertyID];
         if ((0, $2fa9c1db583d4d31$export$439bf78a2cc516f5).isNull(value1) && (0, $2fa9c1db583d4d31$export$439bf78a2cc516f5).isNull(value2)) continue;
         if ((0, $2fa9c1db583d4d31$export$439bf78a2cc516f5).isNull(value1) && (0, $2fa9c1db583d4d31$export$439bf78a2cc516f5).isNotNull(value2)) return true;
         if ((0, $2fa9c1db583d4d31$export$439bf78a2cc516f5).isNotNull(value1) && (0, $2fa9c1db583d4d31$export$439bf78a2cc516f5).isNull(value2)) return false;
-        if (value1 < value2) return true;
-        if (value1 > value2) return false;
+        if (propertyID.includes("Date")) {
+            if ((0, $2fa9c1db583d4d31$export$439bf78a2cc516f5).date.isValid(value1) && !(0, $2fa9c1db583d4d31$export$439bf78a2cc516f5).date.isValid(value2)) return false;
+            if (!(0, $2fa9c1db583d4d31$export$439bf78a2cc516f5).date.isValid(value1) && (0, $2fa9c1db583d4d31$export$439bf78a2cc516f5).date.isValid(value2)) return true;
+            if (!(0, $2fa9c1db583d4d31$export$439bf78a2cc516f5).date.isValid(value1) && !(0, $2fa9c1db583d4d31$export$439bf78a2cc516f5).date.isValid(value2)) continue;
+            if ((0, $2fa9c1db583d4d31$export$439bf78a2cc516f5).date.lt(value1, value2) == true) return true;
+            if ((0, $2fa9c1db583d4d31$export$439bf78a2cc516f5).date.eq(value1, value2) == true) continue;
+            if ((0, $2fa9c1db583d4d31$export$439bf78a2cc516f5).date.gt(value1, value2) == false) return false;
+        } else {
+            if (value1 < value2) return true;
+            if (value1 == value2) continue;
+            if (value1 > value2) return false;
+        }
     }
     return false;
 }
@@ -7169,7 +8460,7 @@ function $409aaf2b232e73d2$var$create(actionType, propertyID, value, metadata, r
             "value": value
         },
         "metadata": {
-            "createdDate": (0, $2fa9c1db583d4d31$export$439bf78a2cc516f5).date.toDate(metadata?.createdDate) || new Date(),
+            "createdDate": (0, $2fa9c1db583d4d31$export$439bf78a2cc516f5).date.toDate(metadata?.createdDate || new Date()),
             "position": (0, $2fa9c1db583d4d31$export$439bf78a2cc516f5).number.toNumber(metadata?.position) || null,
             "credibility": (0, $2fa9c1db583d4d31$export$439bf78a2cc516f5).number.toNumber(metadata?.credibility) || null,
             "observationDate": (0, $2fa9c1db583d4d31$export$439bf78a2cc516f5).date.toDate(metadata?.observationDate) || null,
@@ -7207,6 +8498,9 @@ function $409aaf2b232e73d2$var$override(pv1, pv2) {
     /**
      * Returns true if pv1 override pv2
      */ // Error handling
+    if (pv1?.["@id"] == pv2?.["@id"]) return false;
+    if (pv1?.object.propertyID != pv2?.object.propertyID) return false;
+    // Error handling
     if ((0, $2fa9c1db583d4d31$export$439bf78a2cc516f5).isNull(pv1)) throw new Error("Value provided is not pv");
     if (!$409aaf2b232e73d2$var$isValid(pv1)) throw new Error("Value provided is not pv");
     // Error handling
@@ -7220,7 +8514,7 @@ function $409aaf2b232e73d2$var$override(pv1, pv2) {
     // Get record id
     if (recordType1 == "replaceaction") {
         let c1 = $409aaf2b232e73d2$var$gt(pv1, pv2);
-        let c2 = (0, $2fa9c1db583d4d31$export$439bf78a2cc516f5).isNull(pv1?.replacee);
+        let c2 = (0, $2fa9c1db583d4d31$export$439bf78a2cc516f5).isNull(pv1?.replacee || null);
         let c3 = pv1?.replacee == pv2?.object?.value;
         let c4 = (0, $2fa9c1db583d4d31$export$439bf78a2cc516f5).isNotNull(pv1?.object?.value?.["@type"]);
         let c5 = (0, $2fa9c1db583d4d31$export$439bf78a2cc516f5).isNotNull(pv1?.object?.value?.["@id"]);
@@ -7774,6 +9068,7 @@ const $7bb8d4569e1a97bb$export$1ef237150243f225 = {
     isEmpty: $7bb8d4569e1a97bb$var$isEmpty,
     keys: $7bb8d4569e1a97bb$var$keys,
     clone: $7bb8d4569e1a97bb$var$clone,
+    copy: $7bb8d4569e1a97bb$var$copy,
     hash: $7bb8d4569e1a97bb$var$hash,
     // Constructor
     new: $7bb8d4569e1a97bb$var$getNew,
@@ -7986,6 +9281,22 @@ function $7bb8d4569e1a97bb$var$hash(record) {
     let hash = (0, $2fa9c1db583d4d31$export$439bf78a2cc516f5).hash.get(pvs);
     return hash;
 }
+function $7bb8d4569e1a97bb$var$copy(value) {
+    /**
+     * copy a record
+     * @param {Object} record
+     * @returns {Object} The cloned record
+     */ // Error handling
+    if ((0, $2fa9c1db583d4d31$export$439bf78a2cc516f5).isNull(value)) return null;
+    if (!$7bb8d4569e1a97bb$var$isValid(value)) throw new Error("Value provided is not thing");
+    //
+    let clone = $7bb8d4569e1a97bb$var$getNew(value);
+    // Copy values
+    for (let i of (0, $2fa9c1db583d4d31$export$439bf78a2cc516f5).toArray(value?._propertyValues) || [])clone._propertyValues.push((0, $409aaf2b232e73d2$export$e0d9d093805b3f23).clone(i));
+    clone = $7bb8d4569e1a97bb$var$compileRecord(clone);
+    // Return
+    return clone;
+}
 function $7bb8d4569e1a97bb$var$clone(value) {
     /**
      * Clones a record
@@ -8170,7 +9481,7 @@ function $7bb8d4569e1a97bb$var$getValue(thing, propertyID, db) {
      * @param {object} db - The database of things
      * @returns {object|string|any} The value
      */ let values = $7bb8d4569e1a97bb$var$getValues(thing, propertyID, db);
-    if (values.length == 0) return null;
+    if ((0, $2fa9c1db583d4d31$export$439bf78a2cc516f5).isNull(values) || values.length == 0) return null;
     let value = values[0];
     return value;
 }
@@ -8182,7 +9493,7 @@ function $7bb8d4569e1a97bb$var$setValue(thing, propertyID, value, metadata) {
      * @param {object} value - The value
      * @param {object} metadata - The metadata
      * @returns {object} The thing
-     */ return $7bb8d4569e1a97bb$var$replacePropertyValue(thing, propertyID, value, metadata);
+     */ return $7bb8d4569e1a97bb$var$replacePropertyValue(thing, propertyID, value, metadata, null);
 }
 function $7bb8d4569e1a97bb$var$addValue(thing, propertyID, value, metadata) {
     /**
@@ -8221,7 +9532,9 @@ function $7bb8d4569e1a97bb$var$getValues(thing, propertyID, db) {
      * @param {string} propertyID - The property id
      * @param {object} db - The database of things
      * @returns {object|string|any} The value
-     */ let pvs = $7bb8d4569e1a97bb$var$getPropertyValues(thing, propertyID);
+     */ // If not system, return normal value 
+    if ($7bb8d4569e1a97bb$var$isThing(thing) && !$7bb8d4569e1a97bb$var$isValid(thing)) return (0, $2fa9c1db583d4d31$export$439bf78a2cc516f5).dot.get(propertyID, thing);
+    let pvs = $7bb8d4569e1a97bb$var$getPropertyValues(thing, propertyID);
     let values = pvs.map((x)=>x?.object?.value);
     values = values.map((x)=>$7bb8d4569e1a97bb$var$isThing(x) && $7bb8d4569e1a97bb$var$isValid(x) && !$7bb8d4569e1a97bb$var$isThingClass(x) ? $7bb8d4569e1a97bb$var$getRecord(x) : x);
     return values;
@@ -8299,7 +9612,7 @@ function $7bb8d4569e1a97bb$var$getPropertyValues(thing, propertyID, db) {
      * @param {String} propertyID
      * @param {Object} db - array containing thing references
      * @param {Array} db - The array of things
-     * @returns {Array} Array of values in system format
+     * @returns {Array} Array of propertyValues (in system format)
      */ // Error handling
     if ((0, $2fa9c1db583d4d31$export$439bf78a2cc516f5).isNull(thing)) return [];
     if (!$7bb8d4569e1a97bb$var$isValid(thing)) throw new Error("Value provided is not thing");
@@ -8323,15 +9636,13 @@ function $7bb8d4569e1a97bb$var$getPropertyValues(thing, propertyID, db) {
         pvs = (0, $2fa9c1db583d4d31$export$439bf78a2cc516f5).toArray(thing._propertyValues || []);
         pvs = pvs.filter((pv)=>pv.object.propertyID == propertyIDElement);
         pvs = (0, $409aaf2b232e73d2$export$e0d9d093805b3f23).compile(pvs);
-        if (propertyID == "itemListElement") pvs.sort((a, b)=>{
+        if (propertyIDElement == "itemListElement") pvs.sort((a, b)=>{
             if (($7bb8d4569e1a97bb$var$getValue(a?.object?.value, "position") || 0) < ($7bb8d4569e1a97bb$var$getValue(b?.object?.value, "position") || 0)) return -1;
             else if (($7bb8d4569e1a97bb$var$getValue(a?.object?.value, "position") || 0) < ($7bb8d4569e1a97bb$var$getValue(b?.object?.value, "position") || 0)) return 1;
             else return 0;
         });
         // Get values from pvs
         result = pvs.map((pv)=>pv?.object?.value);
-        // Retrieve content of values from things db
-        if ((0, $2fa9c1db583d4d31$export$439bf78a2cc516f5).isNotNull(db)) result = result.map((x)=>$7bb8d4569e1a97bb$var$find(db, x) || x);
         // Get position if one
         if ((0, $2fa9c1db583d4d31$export$439bf78a2cc516f5).isNotNull(position)) {
             pvs = pvs?.[position] || null;
@@ -8612,6 +9923,7 @@ function $7bb8d4569e1a97bb$var$getRecord(thing, parentThings = []) {
     if ((0, $2fa9c1db583d4d31$export$439bf78a2cc516f5).isArray(thing)) return thing.map((x)=>$7bb8d4569e1a97bb$var$getRecord(x, parentThings));
     // Error handling
     if ((0, $2fa9c1db583d4d31$export$439bf78a2cc516f5).isNull(thing)) return {};
+    if (!$7bb8d4569e1a97bb$var$isValid(thing) && $7bb8d4569e1a97bb$var$isThing(thing)) return thing;
     if (!$7bb8d4569e1a97bb$var$isValid(thing)) throw new Error("Value provided is not thing");
     if ((0, $2fa9c1db583d4d31$export$439bf78a2cc516f5).isNull(thing?._propertyValues)) return null;
     // Check if thing in parentthing, if so return ref
@@ -8677,7 +9989,7 @@ function $7bb8d4569e1a97bb$var$getSystem(thing) {
     if ((0, $2fa9c1db583d4d31$export$439bf78a2cc516f5).isNull(thing)) return null;
     if (!(0, $2fa9c1db583d4d31$export$439bf78a2cc516f5).isValid(thing)) throw new Error("Value provided is not thing");
     // Get record of thing class object
-    if ($7bb8d4569e1a97bb$var$isThingClass(thing)) return thing?.system;
+    if ($7bb8d4569e1a97bb$var$isThingClass(thing)) return thing.system;
     return thing;
 }
 function $7bb8d4569e1a97bb$var$setSystem(thing, record) {
@@ -9102,7 +10414,7 @@ function $444f5d32a598f4dd$var$setPosition(value, position) {
      * Gets the position of the thing
      * @param {Object} thing The thing
      * @returns {Number} The position
-     */ if (!$444f5d32a598f4dd$var$isValid(value)) return null;
+     */ if (!$444f5d32a598f4dd$var$isValid(value)) throw new Error("Invalid thing");
     return (0, $7bb8d4569e1a97bb$export$1ef237150243f225).value.set(value, "position", position);
 }
 function $444f5d32a598f4dd$var$getItem(value) {
@@ -9407,8 +10719,12 @@ function $5f93a651ba787782$var$getListItems(itemList) {
      * Returns the items of the list
      * @param {Object} itemList The list
      * @returns {Array} The items of the list
-     */ let listItems = (0, $7bb8d4569e1a97bb$export$1ef237150243f225).values.get(itemList, "itemListElement");
+     */ let listItems = (0, $7bb8d4569e1a97bb$export$1ef237150243f225).propertyValues.get(itemList, "itemListElement");
+    // Error handling
+    if ((0, $2fa9c1db583d4d31$export$439bf78a2cc516f5).isNull(listItems)) return [];
+    // Retrieve value part of pv
     listItems = (0, $2fa9c1db583d4d31$export$439bf78a2cc516f5).toArray(listItems);
+    listItems = listItems.map((x)=>x?.object?.value);
     listItems = listItems.filter((x)=>!(0, $2fa9c1db583d4d31$export$439bf78a2cc516f5).isNull(x));
     listItems = (0, $444f5d32a598f4dd$export$4bb05bd0559c698f).sort(listItems);
     return listItems;
@@ -9508,7 +10824,6 @@ function $5f93a651ba787782$var$insert(itemList, listItem, position, metadata) {
      * @param {Number} position The position
      * @returns {Array} The array
      */ let listItems = $5f93a651ba787782$var$getListItems(itemList);
-    console.log("listItems", listItems);
     // Default position to last item
     let lastItemFlag = false;
     if ((0, $2fa9c1db583d4d31$export$439bf78a2cc516f5).isNull(position)) {
@@ -9556,7 +10871,8 @@ function $5f93a651ba787782$var$deleteItem(itemList, listItem, metadata) {
      * @param {Array} things The array
      * @param {Object} record The record
      * @returns {Array} The array
-     */ let listItems = $5f93a651ba787782$var$getListItems(itemList);
+     */ console.log("xxx");
+    let listItems = $5f93a651ba787782$var$getListItems(itemList);
     listItem = (0, $444f5d32a598f4dd$export$4bb05bd0559c698f).search(listItems, (0, $7bb8d4569e1a97bb$export$1ef237150243f225).ref.get(listItem));
     // Retrieve previous item
     let previousItemRef = (0, $444f5d32a598f4dd$export$4bb05bd0559c698f).previousItem.get(listItem);
@@ -9591,7 +10907,7 @@ function $5f93a651ba787782$var$resetPositions(itemList, startingItem, startingPo
     let temp = firstItem;
     let p = position;
     while((0, $2fa9c1db583d4d31$export$439bf78a2cc516f5).isNotNull(temp)){
-        temp = listItems.filter((x)=>x["id"] == temp?.["@id"])?.[0] || null;
+        temp = listItems.filter((x)=>x["@id"] == temp?.["@id"])?.[0] || null;
         if ((0, $2fa9c1db583d4d31$export$439bf78a2cc516f5).isNotNull(temp)) {
             if ((0, $444f5d32a598f4dd$export$4bb05bd0559c698f).position.get(temp) != p) (0, $444f5d32a598f4dd$export$4bb05bd0559c698f).position.set(temp, p);
             temp = (0, $444f5d32a598f4dd$export$4bb05bd0559c698f).nextItem.get(temp);
@@ -9602,7 +10918,448 @@ function $5f93a651ba787782$var$resetPositions(itemList, startingItem, startingPo
 }
 
 
+
+
+
+
+const $7273ede3c5ec638c$export$310b667869cfc49d = {
+    valid: $7273ede3c5ec638c$var$checkValidity,
+    execute: $7273ede3c5ec638c$var$executePotentialAction
+};
+function $7273ede3c5ec638c$var$executePotentialAction(action) {
+    /**
+     * Executes an action
+     * 
+     */ // Check if action is system record
+    let isSystemRecordFlag = (0, $7bb8d4569e1a97bb$export$1ef237150243f225).isValid(action);
+    // Check if potential action is actionable (criteria is valid)
+    action = $7273ede3c5ec638c$var$checkValidity(action);
+    if (action.actionStatus == "FailedActionStatus") return action;
+    // Check if action is already executed
+    //if(checkIfExecuted(action) == true){
+    //return null
+    //}
+    // Execute action (-outputs)
+    action = $7273ede3c5ec638c$var$executeAction(action);
+    // Execute action type (updateAction, deleteAction, ...)
+    action = $7273ede3c5ec638c$var$executeActionType(action);
+    // Convert from system record if required
+    if (isSystemRecordFlag === false) action = (0, $7bb8d4569e1a97bb$export$1ef237150243f225).record.get(action);
+    return action;
+}
+function $7273ede3c5ec638c$var$checkValidity(action) {
+    /**
+     * Checks if action meet validity criteria
+     * Validity criteria are the -input properties
+     */ // Convert record to dot record
+    let dotRecord = (0, $2fa9c1db583d4d31$export$439bf78a2cc516f5).dot.toDot(action);
+    // Iterate through keys
+    let errors = [];
+    for(let k in dotRecord)if (k.includes("-input")) {
+        // Retrieve value
+        let value = (0, $2fa9c1db583d4d31$export$439bf78a2cc516f5).dot.get(k, action);
+        // convert uri template to pvs
+        let pvs = (0, $2fa9c1db583d4d31$export$439bf78a2cc516f5).uri.uriToPvs(value);
+        // If pvs has default value and nothing else, assume it is a regex valuePattern
+        if (Object.keys(pvs.length <= 2)) pvs.valuePattern = pvs?.defaultValue;
+        // Check if meet pvs
+        let result = $7273ede3c5ec638c$var$testPVS(action, k, pvs);
+        if (result == false) {
+            errors.push(`${k} does not meet validity criteria ${value}`);
+            action.actionStatus = "FailedActionStatus";
+        }
+    }
+    if (action.actionStatus != "FailedActionStatus") action.actionStatus = "PotentialActionStatus";
+    if (errors.length > 0) action.error = errors.join(", ");
+    return action;
+}
+function $7273ede3c5ec638c$var$executeAction(action) {
+    /**
+     * Converts keys ending in '-output' by executing their value is if uri template 
+     */ // Copy record
+    let newAction = JSON.parse(JSON.stringify(action));
+    // Convert to dot record
+    let dotRecord = (0, $2fa9c1db583d4d31$export$439bf78a2cc516f5).dot.toDot(action);
+    // Iterate through all keys
+    for (let k of Object.keys(dotRecord)){
+        // Remove input
+        if (k.includes("-input")) (0, $2fa9c1db583d4d31$export$439bf78a2cc516f5).dot.setValue(newAction, k, undefined);
+        //
+        if (k.includes("-output")) {
+            // Retrieve value
+            let value = (0, $2fa9c1db583d4d31$export$439bf78a2cc516f5).dot.get(k, newAction);
+            // Convert value to pvs
+            let pvs = (0, $2fa9c1db583d4d31$export$439bf78a2cc516f5).uri.uriToPvs(value);
+            // Execute pvs template
+            value = (0, $2fa9c1db583d4d31$export$439bf78a2cc516f5).template.get(pvs?.defaultValue, action);
+            // Convert if json
+            try {
+                value = JSON.parse(value);
+            } catch (error) {}
+            // Set value 
+            let newK = k.replace("-output", "");
+            (0, $2fa9c1db583d4d31$export$439bf78a2cc516f5).dot.setValue(newAction, newK, value);
+            // Remove old output key
+            (0, $2fa9c1db583d4d31$export$439bf78a2cc516f5).dot.setValue(newAction, k, undefined);
+        }
+    }
+    // Set action to completed
+    newAction.actionStatus = "CompletedActionStatus";
+    return newAction;
+}
+function $7273ede3c5ec638c$var$testPVS(record, key, pvs) {
+    /**
+     *  {
+    "@type": "PropertyValueSpecification",
+    "@id": "8ca1b4ac-9a70-4761-ab77-8ec77512cef5",
+    "defaultValue": null,
+    "readonlyValue": null,
+    "valueRequired": true,
+    "multipleValues": false,
+    "minValue": null,
+    "maxValue": null,
+    "valueMinLength": null,
+    "valueMaxLength": null,
+    "valuePattern": null,
+    "stepValue": null,
+    "valueName": null,
+}
+
+     */ let newKey = key.replace("-input", "");
+    let value = (0, $2fa9c1db583d4d31$export$439bf78a2cc516f5).dot.get(newKey, record);
+    let errors = [];
+    let result = true;
+    // valueRequired
+    if ((0, $2fa9c1db583d4d31$export$439bf78a2cc516f5).isNotNull(pvs.valueRequired)) try {
+        if ((0, $2fa9c1db583d4d31$export$439bf78a2cc516f5).isNull(value)) {
+            errors.push("valueRequired");
+            result = false;
+        }
+    } catch (error) {
+        errors.push(error);
+        result = false;
+    }
+    // multipleValues
+    if ((0, $2fa9c1db583d4d31$export$439bf78a2cc516f5).isNotNull(pvs.multipleValues)) try {
+        if (value.length > 1) {
+            errors.push("multipleValues");
+            result = false;
+        }
+    } catch (error) {
+        errors.push(error);
+        result = false;
+    }
+    // minValue
+    if ((0, $2fa9c1db583d4d31$export$439bf78a2cc516f5).isNotNull(pvs.minValue)) try {
+        if (value < Number(pvs.minValue)) {
+            errors.push("minValue");
+            result = false;
+        }
+    } catch (error) {
+        errors.push(error);
+        result = false;
+    }
+    // valueMaxLength
+    if ((0, $2fa9c1db583d4d31$export$439bf78a2cc516f5).isNotNull(pvs.maxValue)) try {
+        if (Number(pvs.maxValue)) {
+            errors.push("maxValue");
+            result = false;
+        }
+    } catch (error) {
+        errors.push(error);
+        result = false;
+    }
+    // valueMinLength
+    if ((0, $2fa9c1db583d4d31$export$439bf78a2cc516f5).isNotNull(pvs.valueMinLength)) try {
+        if ((value?.length || "") < pvs.valueMinLength) {
+            errors.push("valueMinLength");
+            result = false;
+        }
+    } catch (error) {
+        errors.push(error);
+        result = false;
+    }
+    // valueMaxLength
+    if ((0, $2fa9c1db583d4d31$export$439bf78a2cc516f5).isNotNull(pvs.valueMaxLength)) try {
+        if ((value?.length || "") > pvs.valueMaxLength) {
+            errors.push("valueMaxLength");
+            result = false;
+        }
+    } catch (error) {
+        errors.push(error);
+        result = false;
+    }
+    // valueStep
+    if ((0, $2fa9c1db583d4d31$export$439bf78a2cc516f5).isNotNull(pvs.stepValue)) try {
+        if (value % pvs.stepValue != 0) {
+            errors.push("stepValue");
+            result = false;
+        }
+    } catch (error) {
+        errors.push(error);
+        result = false;
+    }
+    // valuePattern
+    if ((0, $2fa9c1db583d4d31$export$439bf78a2cc516f5).isNotNull(pvs.valuePattern)) try {
+        value = String(value);
+        if ((0, $2fa9c1db583d4d31$export$439bf78a2cc516f5).regex.test(value, pvs.valuePattern) == false) {
+            errors.push("valuePattern");
+            result = false;
+        }
+    } catch (error) {
+        errors.push(error);
+        result = false;
+    }
+    return result;
+}
+function $7273ede3c5ec638c$var$executePotentialAction_OLD(action) {
+    /**
+     * Executes an action
+     * 
+     */ // Check if potential action is actionable (criteria is valid)
+    //if(checkValidity(action) == false){
+    //return null
+    // }
+    // Check if action is already executed
+    //if(checkIfExecuted(action) == true){
+    //return null
+    //}
+    // Execute action
+    action = $7273ede3c5ec638c$var$executeAction(action);
+    return action;
+}
+function $7273ede3c5ec638c$var$checkValidity_OLD(record, action) {
+    /**
+     * Checks if the action is valid
+     */ return (0, $a6f8f0c2e2f67514$export$4e14e39b01a79427).test(record, action);
+}
+function $7273ede3c5ec638c$var$checkIfExecuted(record, action) {
+/**
+     * Checks if the action is already executed
+     */ }
+function $7273ede3c5ec638c$var$executeActionType(action) {
+    /**
+     * Executes an action
+     */ let action_type = action?.record_type || action?.["@type"];
+    let recordIsThingFlag = false;
+    if ((0, $7bb8d4569e1a97bb$export$1ef237150243f225).isValid(action)) recordIsThingFlag = true;
+    else action = (0, $7bb8d4569e1a97bb$export$1ef237150243f225).toThing(action);
+    // Init action
+    action = (0, $7bb8d4569e1a97bb$export$1ef237150243f225).value.set(action, "startTime", new Date());
+    // Switch
+    switch(action_type){
+        //
+        case "UpdateAction":
+            action = $7273ede3c5ec638c$var$executeUpdateAction(action);
+            break;
+        // List actions
+        case "InsertAction":
+            action = $7273ede3c5ec638c$var$executeInsertAction(action);
+            break;
+        case "AddAction":
+            action = $7273ede3c5ec638c$var$executeInsertAction(action);
+            break;
+        case "DeleteAction":
+            action = $7273ede3c5ec638c$var$executeDeleteAction(action);
+            break;
+        case "ReplaceAction":
+            action = $7273ede3c5ec638c$var$executeReplaceAction(action);
+            break;
+        case "InsertAction":
+            action = $7273ede3c5ec638c$var$executeInsertAction(action);
+            break;
+        case "AppendAction":
+            action = $7273ede3c5ec638c$var$executeAppendAction(action);
+            break;
+        case "PrependAction":
+            action = $7273ede3c5ec638c$var$executePrependAction(action);
+            break;
+        case "DeleteAction":
+            action = $7273ede3c5ec638c$var$executeDeleteAction(action);
+            break;
+        default:
+            break;
+    }
+    // 
+    action = (0, $7bb8d4569e1a97bb$export$1ef237150243f225).value.set(action, "endTime", new Date());
+    // Convert back to record 
+    if (recordIsThingFlag == true) action = (0, $7bb8d4569e1a97bb$export$1ef237150243f225).record.get(action);
+    return action;
+}
+// -----------------------------------------------------
+//  Record 
+// -----------------------------------------------------
+function $7273ede3c5ec638c$var$executeUpdateAction(action) {
+    /**
+     * Executes an update action
+     * 
+     */ // Error handling
+    if ((0, $2fa9c1db583d4d31$export$439bf78a2cc516f5).isNull(action.object)) {
+        action = (0, $7bb8d4569e1a97bb$export$1ef237150243f225).value.set(action, "actionStatus", "FailedActionStatus");
+        action = (0, $7bb8d4569e1a97bb$export$1ef237150243f225).value.set(action, "actionStatus", "Missing object");
+        action = (0, $7bb8d4569e1a97bb$export$1ef237150243f225).value.set(action, "endTime", new Date());
+        return action;
+    }
+    if ((0, $2fa9c1db583d4d31$export$439bf78a2cc516f5).isNull(action.targetCollection)) {
+        action = (0, $7bb8d4569e1a97bb$export$1ef237150243f225).value.set(action, "actionStatus", "FailedActionStatus");
+        action = (0, $7bb8d4569e1a97bb$export$1ef237150243f225).value.set(action, "actionStatus", "Missing targetCollection");
+        action = (0, $7bb8d4569e1a97bb$export$1ef237150243f225).value.set(action, "endTime", new Date());
+        return action;
+    }
+    // Execute action
+    let targetCollections = (0, $7bb8d4569e1a97bb$export$1ef237150243f225).propertyValues.get(action, "targetCollection");
+    targetCollections = targetCollections.map((x)=>x.object.value);
+    let objects = (0, $7bb8d4569e1a97bb$export$1ef237150243f225).propertyValues.get(action, "object");
+    objects = objects.map((x)=>x.object.value);
+    let results = [];
+    for (let targetCollection of targetCollections){
+        let result = targetCollection;
+        for (let object of objects){
+            let propertyID = (0, $7bb8d4569e1a97bb$export$1ef237150243f225).value.get(object, "propertyID");
+            let value = (0, $7bb8d4569e1a97bb$export$1ef237150243f225).value.get(object, "value");
+            result = (0, $7bb8d4569e1a97bb$export$1ef237150243f225).value.set(result, propertyID, value);
+        }
+        results.push(result);
+    }
+    // Execute action
+    action = (0, $7bb8d4569e1a97bb$export$1ef237150243f225).value.set(action, "result", results);
+    // Set action status
+    action = (0, $7bb8d4569e1a97bb$export$1ef237150243f225).value.set(action, "actionStatus", "CompletedActionStatus");
+    // Return
+    return action;
+}
+// -----------------------------------------------------
+//  Lists 
+// -----------------------------------------------------
+function $7273ede3c5ec638c$var$executeAddAction(action) {
+    /**
+     * Execute an append action adding item to the end of the list
+     */ return $7273ede3c5ec638c$var$executeInsertAction(action);
+}
+function $7273ede3c5ec638c$var$executeAppendAction(action) {
+    /**
+     * Execute an append action adding item to the end of the list
+     */ return $7273ede3c5ec638c$var$executeInsertAction(action, null);
+}
+function $7273ede3c5ec638c$var$executePrependAction(action) {
+    /**
+     * Execute an append action adding item to the end of the list
+     */ return $7273ede3c5ec638c$var$executeInsertAction(action, 0);
+}
+function $7273ede3c5ec638c$var$executeInsertAction(action, toLocation) {
+    /**
+     * Executes an append action adding item to the end of the list
+     */ // Get variables
+    toLocation = toLocation || (0, $7bb8d4569e1a97bb$export$1ef237150243f225).value.get(action, "toLocation");
+    let objects = (0, $7bb8d4569e1a97bb$export$1ef237150243f225).propertyValues.get(action, "object");
+    objects = objects.map((x)=>x.object.value);
+    let targetCollections = (0, $7bb8d4569e1a97bb$export$1ef237150243f225).propertyValues.get(action, "targetCollection");
+    targetCollections = targetCollections.map((x)=>x.object.value);
+    // Error handling
+    if ((0, $2fa9c1db583d4d31$export$439bf78a2cc516f5).isNull(objects)) {
+        action.actionStatus = "FailedActionStatus";
+        action.error = "Missing object";
+        return action;
+    }
+    if ((0, $2fa9c1db583d4d31$export$439bf78a2cc516f5).isNull(targetCollections)) {
+        action.actionStatus = "FailedActionStatus";
+        action.error = "Missing targetCollection";
+        return action;
+    }
+    // Execute action
+    let results = [];
+    for (let targetCollection of targetCollections){
+        let result = targetCollection;
+        let tempToLocation = toLocation;
+        for (let object of objects){
+            result = (0, $5f93a651ba787782$export$9fe8be205aeaa496).insert(result, object, tempToLocation);
+            tempToLocation = (0, $7bb8d4569e1a97bb$export$1ef237150243f225).value.get(object, "position") + 1;
+        }
+        results.push(result);
+    }
+    // Execute action
+    action = (0, $7bb8d4569e1a97bb$export$1ef237150243f225).value.set(action, "result", results);
+    // Set action status
+    action = (0, $7bb8d4569e1a97bb$export$1ef237150243f225).value.set(action, "actionStatus", "CompletedActionStatus");
+    // Return
+    return action;
+}
+function $7273ede3c5ec638c$var$executeDeleteAction(action) {
+    /**
+     * Delete an item from the list
+     */ // Error handling
+    if ((0, $2fa9c1db583d4d31$export$439bf78a2cc516f5).isNull(action.object)) {
+        action.actionStatus = "FailedActionStatus";
+        action.error = "Missing object";
+        return action;
+    }
+    if ((0, $2fa9c1db583d4d31$export$439bf78a2cc516f5).isNull(action.targetCollection)) {
+        action.actionStatus = "FailedActionStatus";
+        action.error = "Missing targetCollection";
+        return action;
+    }
+    // Get variables
+    let objects = (0, $7bb8d4569e1a97bb$export$1ef237150243f225).propertyValues.get(action, "object");
+    objects = objects.map((x)=>x.object.value);
+    let targetCollections = (0, $7bb8d4569e1a97bb$export$1ef237150243f225).propertyValues.get(action, "targetCollection");
+    targetCollections = targetCollections.map((x)=>x.object.value);
+    // Execute action
+    let results = [];
+    for (let targetCollection of targetCollections){
+        let result = targetCollection;
+        for (let object of objects)result = (0, $5f93a651ba787782$export$9fe8be205aeaa496).delete(result, object);
+        results.push(result);
+    }
+    action = (0, $7bb8d4569e1a97bb$export$1ef237150243f225).value.set(action, "result", results);
+    // Set action status
+    action = (0, $7bb8d4569e1a97bb$export$1ef237150243f225).value.set(action, "actionStatus", "CompletedActionStatus");
+    // Return
+    return action;
+}
+function $7273ede3c5ec638c$var$executeReplaceAction(action) {
+    /**
+     * Delete an item from the list
+     */ // Error handling
+    if ((0, $2fa9c1db583d4d31$export$439bf78a2cc516f5).isNull(action?.object)) {
+        action.actionStatus = "FailedActionStatus";
+        action.error = "Missing object";
+        return action;
+    }
+    if ((0, $2fa9c1db583d4d31$export$439bf78a2cc516f5).isNull(action?.targetCollection)) {
+        action.actionStatus = "FailedActionStatus";
+        action.error = "Missing targetCollection";
+        return action;
+    }
+    // Get 
+    let replacers = (0, $7bb8d4569e1a97bb$export$1ef237150243f225).propertyValues.get(action, "replacer");
+    replacers = replacers.map((x)=>x.object.value);
+    let replacees = (0, $7bb8d4569e1a97bb$export$1ef237150243f225).propertyValues.get(action, "replacee");
+    replacees = replacees.map((x)=>x.object.value);
+    let targetCollections = (0, $7bb8d4569e1a97bb$export$1ef237150243f225).propertyValues.get(action, "targetCollection");
+    targetCollections = targetCollections.map((x)=>x.object.value);
+    let toPosition = (0, $7bb8d4569e1a97bb$export$1ef237150243f225).value.get(replacers?.[0], "toPosition");
+    // Execute action
+    let results = [];
+    for (let targetCollection of targetCollections){
+        let result = targetCollection;
+        let tempToPosition = toPosition || 0;
+        for (let replacee of replacees)result = (0, $5f93a651ba787782$export$9fe8be205aeaa496).delete(result, replacee);
+        for (let replacer of replacers){
+            result = (0, $5f93a651ba787782$export$9fe8be205aeaa496).insert(result, replacer, tempToPosition);
+            tempToPosition += 1;
+        }
+        results.push(result);
+    }
+    action = (0, $7bb8d4569e1a97bb$export$1ef237150243f225).value.set(action, "result", results);
+    // Set action status
+    action = (0, $7bb8d4569e1a97bb$export$1ef237150243f225).value.set(action, "actionStatus", "CompletedActionStatus");
+    // Return
+    return action;
+}
+
+
 const $fbdfe69f48d32df8$export$c24b4489b93ad8cb = {
+    pvh: (0, $409aaf2b232e73d2$export$e0d9d093805b3f23),
     list: (0, $5f93a651ba787782$export$9fe8be205aeaa496),
     pv: (0, $409aaf2b232e73d2$export$e0d9d093805b3f23),
     // Base
@@ -9615,6 +11372,7 @@ const $fbdfe69f48d32df8$export$c24b4489b93ad8cb = {
     isEmpty: (0, $7bb8d4569e1a97bb$export$1ef237150243f225).isEmpty,
     keys: (0, $7bb8d4569e1a97bb$export$1ef237150243f225).keys,
     clone: (0, $7bb8d4569e1a97bb$export$1ef237150243f225).clone,
+    copy: (0, $7bb8d4569e1a97bb$export$1ef237150243f225).copy,
     hash: (0, $7bb8d4569e1a97bb$export$1ef237150243f225).hash,
     // Constructor
     new: (0, $7bb8d4569e1a97bb$export$1ef237150243f225).new,
@@ -9700,7 +11458,9 @@ const $fbdfe69f48d32df8$export$c24b4489b93ad8cb = {
     dedupe: (0, $7bb8d4569e1a97bb$export$1ef237150243f225).dedupe,
     sort: (0, $7bb8d4569e1a97bb$export$1ef237150243f225).sort,
     filter: (0, $7bb8d4569e1a97bb$export$1ef237150243f225).filter,
-    mergeLists: (0, $7bb8d4569e1a97bb$export$1ef237150243f225).mergeLists
+    mergeLists: (0, $7bb8d4569e1a97bb$export$1ef237150243f225).mergeLists,
+    // Execution
+    execute: (0, $7273ede3c5ec638c$export$310b667869cfc49d).execute
 };
 
 
@@ -9763,61 +11523,65 @@ function $989c7a224980c1bb$var$renderElements(element, record, conditions, TEMPL
     // Return
     return action;
 }
-function $989c7a224980c1bb$var$_renderThingElement(element, value, TEMPLATEDB) {
+function $989c7a224980c1bb$var$_renderThingElement(element, record, TEMPLATEDB) {
     /**
      * Updates the element with the value
      * @param {Object} element
      * @param {Object} value
      * @returns {Object} The element updated
-     */ let action = new $989c7a224980c1bb$var$h.base.classes.Action(`Render elements ${value?.["@type"]} ${value?.["@id"]}`);
+     */ let action = new $989c7a224980c1bb$var$h.base.classes.Action(`Render elements ${record?.["@type"]} ${record?.["@id"]}`);
     // Get current thing element
     let thingElement = $989c7a224980c1bb$var$h.dom.thing.traverse.current.thing.get(element);
     if ($989c7a224980c1bb$var$h.isNull(thingElement)) {
         action.setFailed("No thing element found");
         return action;
     }
-    // Create main element if missing
-    let propertyMainElement = $989c7a224980c1bb$var$h.dom.thing.part.main.get(thingElement);
-    if ($989c7a224980c1bb$var$h.isNull(propertyMainElement)) propertyMainElement = $989c7a224980c1bb$var$h.dom.thing.part.add(thingElement, "main", "");
+    // Use custom element render mechanism if classList contains 'krElement'
+    if (element.classList.contains("krElement")) {
+        element.render();
+        action.setCompleted();
+        return action;
+    }
     // Set type and id
-    thingElement.setAttribute("data-record-type", value?.["@type"] || value?.record_type);
-    thingElement.setAttribute("data-record-id", value?.["@id"] || value?.record_id);
+    thingElement.setAttribute("data-record-type", record?.["@type"] || record?.record_type);
+    thingElement.setAttribute("data-record-id", record?.["@id"] || record?.record_id);
     // Retrieve property elements
     let propertyElements = $989c7a224980c1bb$var$h.dom.thing.traverse.children.properties.get(thingElement);
-    // Render thing from template if not already on the document
+    // Render thing from stcratch if no propertyelements identified
     let templateID = element.getAttribute("data-templateID");
-    // Test to see if need to render template 
-    let template = thingElement?._template || $989c7a224980c1bb$var$h.dom.thing.templateDB.get(templateID);
-    let mainPart = $989c7a224980c1bb$var$h.dom.thing.part.main.get(thingElement);
-    let c1 = $989c7a224980c1bb$var$h.isNotNull(template) && template.includes("{{");
-    let c2 = propertyElements.length == 0;
-    if (c1 || c2) {
-        console.log("*******");
-        let mainPart = $989c7a224980c1bb$var$h.dom.thing.part.main.get(thingElement);
-        // Get headings from record
-        let headingRecord = $989c7a224980c1bb$var$h.thing.record.get(value);
-        headingRecord = $989c7a224980c1bb$var$h.base.heading.addHeadings(headingRecord);
-        headingRecord = $989c7a224980c1bb$var$h.base.json.simplify(headingRecord);
-        // Render template and set as content
-        let htmlContent = $989c7a224980c1bb$var$h.base.template.get(template, headingRecord);
-        mainPart.innerHTML = htmlContent;
-        $989c7a224980c1bb$var$h.dom.thing.init.init(mainPart, TEMPLATEDB);
-        propertyElements = $989c7a224980c1bb$var$h.dom.thing.traverse.children.properties.get(mainPart);
+    let template = TEMPLATEDB?.[templateID] || "";
+    if (propertyElements.length == 0 || template && template.includes("{{")) {
+        $989c7a224980c1bb$var$_renderNonExistantThingElement(element, record, TEMPLATEDB);
+        propertyElements = $989c7a224980c1bb$var$h.dom.thing.traverse.children.properties.get(element);
     }
-    // Render if contains {{
-    mainPart = $989c7a224980c1bb$var$h.dom.thing.part.main.get(thingElement);
-    if (mainPart.innerHTML.includes("{{")) {
-        let headingRecord = $989c7a224980c1bb$var$h.thing.record.get(value);
-        headingRecord = $989c7a224980c1bb$var$h.base.heading.addHeadings(headingRecord);
-        headingRecord = $989c7a224980c1bb$var$h.base.json.simplify(headingRecord);
-        mainPart.innerHTML = $989c7a224980c1bb$var$h.base.template.get(mainPart.innerHTML, headingRecord);
-        $989c7a224980c1bb$var$h.dom.thing.init.init(mainPart, TEMPLATEDB);
-        propertyElements = $989c7a224980c1bb$var$h.dom.thing.traverse.children.properties.get(mainPart);
+    // Render individual property elements
+    for (let p of propertyElements){
+        $989c7a224980c1bb$var$h.dom.thing.property.record_type.set(p, record?.["@type"] || record.record_type);
+        $989c7a224980c1bb$var$h.dom.thing.property.record_id.set(p, record?.["@id"] || record.record_id);
+        action.instrument = $989c7a224980c1bb$var$_renderPropertyElement(p, record, null, TEMPLATEDB);
     }
-    // Render individual properties
-    for (let p of propertyElements)action.instrument = $989c7a224980c1bb$var$_renderPropertyElement(p, value, null, TEMPLATEDB);
     action.close();
     return action;
+}
+function $989c7a224980c1bb$var$_renderNonExistantThingElement(element, record, TEMPLATEDB) {
+    /**
+     * Render a thing element if not already on the document
+     */ let templateID = element.getAttribute("data-templateID");
+    let template = TEMPLATEDB?.[templateID] || "";
+    // Get headings from record
+    let headingRecord = $989c7a224980c1bb$var$h.thing.record.get(record);
+    headingRecord = $989c7a224980c1bb$var$h.base.heading.addHeadings(headingRecord);
+    headingRecord = $989c7a224980c1bb$var$h.base.json.simplify(headingRecord);
+    // Render template and set as content
+    let htmlContent = $989c7a224980c1bb$var$h.base.template.get(template, headingRecord);
+    element.innerHTML = htmlContent;
+    let mainPart = $989c7a224980c1bb$var$h.dom.thing.part.main.get(element);
+    if ($989c7a224980c1bb$var$h.isNull(mainPart)) return;
+    let mainPartTemplateID = mainPart.getAttribute("data-templateID");
+    let mainPartTemplate = TEMPLATEDB?.[mainPartTemplateID] || "";
+    // Render template and set as content
+    mainPart.innerHTML = $989c7a224980c1bb$var$h.base.template.get(mainPartTemplate, headingRecord);
+    return;
 }
 function $989c7a224980c1bb$var$_renderPropertyElement(element, record, template, TEMPLATEDB) {
     /**
@@ -9837,14 +11601,27 @@ function $989c7a224980c1bb$var$_renderPropertyElement(element, record, template,
         action.setFailed("No record provided");
         return action;
     }
+    // Use custom element render mechanism if classList contains 'krElement'
+    if (element.classList.contains("krElement")) {
+        element.render();
+        action.setCompleted();
+        return action;
+    }
     // Get propertyValues (pvs)
     let propertyID = element.getAttribute("data-propertyID");
     let pvs = $989c7a224980c1bb$var$h.thing.propertyValues.get(record, propertyID);
     pvs = $989c7a224980c1bb$var$h.toArray(pvs);
     // Get template 
     let templateID = element.getAttribute("data-templateID");
-    template = $989c7a224980c1bb$var$h.dom.thing.templateDB.get(templateID) //TEMPLATEDB?.[templateID] || template;
-    ;
+    template = TEMPLATEDB?.[templateID];
+    // Set template if not set
+    let values = $989c7a224980c1bb$var$h.dom.thing.traverse.children.values.get(element);
+    if ($989c7a224980c1bb$var$h.isNull(values)) element.innerHTML = template;
+    // Get value template
+    let mainPart = $989c7a224980c1bb$var$h.dom.thing.part.main.get(element);
+    let mainPartTemplateID = mainPart.getAttribute("data-templateID");
+    let valueTemplate = TEMPLATEDB?.[mainPartTemplateID];
+    // Render value template
     // Create main element if missing
     let propertyMainElement = $989c7a224980c1bb$var$h.dom.thing.part.main.get(element);
     if ($989c7a224980c1bb$var$h.isNull(propertyMainElement)) propertyMainElement = $989c7a224980c1bb$var$h.dom.thing.part.add(element, "main", "");
@@ -9868,15 +11645,10 @@ function $989c7a224980c1bb$var$_renderPropertyElement(element, record, template,
         if (pvElements.length > 0) ve = pvElements[0];
         // Create new element if missing
         if ($989c7a224980c1bb$var$h.isNull(ve)) {
-            // Prepopulate template with values (in case there are {{ }} )
-            let content = template //h.template.get(template, newRecord);
-            ;
             // Generate new value element
-            ve = $989c7a224980c1bb$var$_newValueElement(pv, record, content, propertyID, TEMPLATEDB);
+            ve = $989c7a224980c1bb$var$_newValueElement(pv, record, valueTemplate, propertyID, TEMPLATEDB);
             // Render sub things if any
-            $989c7a224980c1bb$var$h.dom.thing.traverse.children.things.get(ve).map((x)=>$989c7a224980c1bb$var$_renderThingElement(x, pv?.object?.value, null, TEMPLATEDB));
-            // Render sub properties if any
-            $989c7a224980c1bb$var$h.dom.thing.traverse.children.properties.get(ve).map((x)=>$989c7a224980c1bb$var$_renderPropertyElement(x, pv?.object?.value, null, TEMPLATEDB));
+            $989c7a224980c1bb$var$h.dom.thing.traverse.children.things.get(ve).map((x)=>$989c7a224980c1bb$var$_renderThingElement(x, pv?.object?.value, TEMPLATEDB));
         }
         // Add to element
         if ($989c7a224980c1bb$var$h.isNotNull(item)) item.after(ve);
@@ -9894,33 +11666,33 @@ function $989c7a224980c1bb$var$_newValueElement(pv, record, template, propertyID
      * @param {Object} template
      * @param {String} propertyID
      * @returns {Object} The new value element
-     */ let value = pv?.object?.value || value;
-    let newValueElement = document.createElement("span");
+     */ let value = pv;
+    if ($989c7a224980c1bb$var$h.isNotNull(pv?.object?.value)) value = pv?.object?.value;
+    if ($989c7a224980c1bb$var$h.isNotNull(value?._system)) value = value?._system;
+    let temp = document.createElement("span");
+    temp.innerHTML = $989c7a224980c1bb$var$h.base.template.render(template, record);
+    // Get valueElement from template
+    let newValueElement = $989c7a224980c1bb$var$h.dom.thing.traverse.children.values.get(temp)?.[0] || temp;
     $989c7a224980c1bb$var$h.dom.thing.property.type.setAsValue(newValueElement);
+    $989c7a224980c1bb$var$h.dom.thing.property.record_type.set(newValueElement, record?.["@type"] || record.record_type);
+    $989c7a224980c1bb$var$h.dom.thing.property.record_id.set(newValueElement, record?.["@id"] || record.record_id);
     $989c7a224980c1bb$var$h.dom.thing.property.propertyID.set(newValueElement, propertyID);
-    $989c7a224980c1bb$var$h.dom.thing.property.propertyID.set(newValueElement, pv?.["@id"]);
-    $989c7a224980c1bb$var$h.dom.thing.property.valueHash.set(newValueElement, value);
-    template = template.trim();
-    if ($989c7a224980c1bb$var$h.isNull(template)) newValueElement.textContent = value;
-    else {
-        newValueElement.innerHTML = template;
-        let main = $989c7a224980c1bb$var$h.dom.thing.part.main.get(newValueElement);
-        if (main) {
-            main.innerHTML = value;
-            for (let t of $989c7a224980c1bb$var$h.dom.thing.children.things.get(main))$989c7a224980c1bb$var$h.dom.thing.property.ref.set(t, value);
-        }
+    $989c7a224980c1bb$var$h.dom.thing.property.valueID.set(newValueElement, pv?.["@id"]);
+    $989c7a224980c1bb$var$h.dom.thing.property.valueHash.set(newValueElement, $989c7a224980c1bb$var$h.base.hash.get(value));
+    // If value not an object, assign to main
+    if (!$989c7a224980c1bb$var$h.thing.isThing(value)) {
+        let mainPart = $989c7a224980c1bb$var$h.dom.thing.part.main.get(newValueElement) || newValueElement;
+        mainPart.textContent = value;
+        return newValueElement;
     }
-    if (newValueElement.innerHTML.includes("{{")) {
-        let headingRecord = $989c7a224980c1bb$var$h.thing.record.get(value);
-        headingRecord = $989c7a224980c1bb$var$h.base.heading.addHeadings(headingRecord);
-        headingRecord = $989c7a224980c1bb$var$h.base.json.simplify(headingRecord);
-        newValueElement.innerHTML = $989c7a224980c1bb$var$h.base.template.get(newValueElement.innerHTML, headingRecord);
-    }
-    $989c7a224980c1bb$var$h.dom.thing.init.init(newValueElement, TEMPLATEDB);
-    for (let t of $989c7a224980c1bb$var$h.dom.thing.traverse.children.things.get(newValueElement)){
-        t.setAttribute("data-record-type", value?.["@type"]);
-        t.setAttribute("data-record-id", value?.["@id"]);
-    }
+    // Render template and set as content
+    //newValueElement.innerHTML = h.base.template.get(template, record)
+    // Get value
+    let main = $989c7a224980c1bb$var$h.dom.thing.part.main.get(newValueElement) || newValueElement;
+    // if children, assign value
+    let c = $989c7a224980c1bb$var$h.dom.thing.traverse.children.things.get(main);
+    if ($989c7a224980c1bb$var$h.isNotNull(c)) for (let t of c)$989c7a224980c1bb$var$h.dom.thing.property.ref.set(t, value);
+    else main.innerHTML = value;
     return newValueElement;
 }
 
@@ -9941,75 +11713,16 @@ function $2b7cd5effc340282$var$registerEvents(element, db1, TEMPLATEDB) {
     /**
      * Registers events on an element
      * @param {Object} element
+     * @param {Object} db: the db containing things records
+     * @param {Object} TEMPLATEDB: the db containing the templates
      * @returns {Object} The element
      *
      * classes:
      *     - krDropzone:
      *     - krDraggable:
-     *     - krClickable:
-     */ let classList = {
-        //Drag and drop
-        krDrag: {
-            eventFn: (0, $2adfa4e445ef1d89$export$631b1a0163af1868).dragDrop.setDraggable,
-            callbackFn: $2b7cd5effc340282$var$addToList,
-            params: {
-                db: db1,
-                TEMPLATEDB: TEMPLATEDB
-            }
-        },
-        krDrop: {
-            eventFn: (0, $2adfa4e445ef1d89$export$631b1a0163af1868).dragDrop.setDropzone,
-            callbackFn: $2b7cd5effc340282$var$addToList,
-            params: {
-                db: db1,
-                TEMPLATEDB: TEMPLATEDB
-            }
-        },
-        // Generic dropzone
-        krDropzone: {
-            eventFn: (0, $2adfa4e445ef1d89$export$631b1a0163af1868).generic.setDropzone,
-            callbackFn: $2b7cd5effc340282$var$addToList,
-            params: {
-                db: db1,
-                TEMPLATEDB: TEMPLATEDB
-            }
-        },
-        // Generic draggable
-        krDraggable: {
-            eventFn: (0, $2adfa4e445ef1d89$export$631b1a0163af1868).generic.setDraggable,
-            callbackFn: $2b7cd5effc340282$var$addToList,
-            params: {
-                db: db1,
-                TEMPLATEDB: TEMPLATEDB
-            }
-        },
-        // Generic clickable
-        krClickable: {
-            eventFn: (0, $2adfa4e445ef1d89$export$631b1a0163af1868).click.set,
-            callbackFn: $2b7cd5effc340282$var$addToList,
-            params: {
-                db: db1,
-                TEMPLATEDB: TEMPLATEDB
-            }
-        }
-    };
-    // Set id to element if doesn't already have one
-    (0, $c8b0dc629c726d48$export$e0169ab077dc0819).setId(element);
-    // Register
-    for(let k in classList){
-        if ((0, $2fa9c1db583d4d31$export$439bf78a2cc516f5).isNull($2b7cd5effc340282$var$DB?.[k])) {
-            console.log(k);
-            $2b7cd5effc340282$var$DB[k] = {};
-        }
-        let fn = classList?.[k]?.["eventFn"];
-        let callbackFn = classList?.[k]?.["callbackFn"];
-        let params = classList?.[k]?.["params"];
-        let elements = element.querySelectorAll(`.${k}`);
-        for (let e of elements)if ((0, $2fa9c1db583d4d31$export$439bf78a2cc516f5).isNull($2b7cd5effc340282$var$DB?.[k]?.[e?.id])) {
-            fn(e, callbackFn, params);
-            $2b7cd5effc340282$var$DB[k][e.id] = true;
-        }
-    }
+     *     - krClickable:    
+     *     - krSelectable: allows an item to be selected
+     */ return;
 }
 // -----------------------------------------------------
 //  addToList
@@ -10154,12 +11867,12 @@ function $8ce030c78f8b39da$var$isValid(element) {
     if ((0, $2fa9c1db583d4d31$export$439bf78a2cc516f5).isNotNull(getElementType(element))) return true;
     return false;
 }
-function $8ce030c78f8b39da$var$init(element) {
+function $8ce030c78f8b39da$var$init(element, TEMPLATEDB, force = false) {
     /**
      * Initializes an element
      * @param {Object} element
      * @returns {Object} The element
-     */ return (0, $0c0a864fcee6a66f$export$b8f607a8a10bde0a).init(element, $8ce030c78f8b39da$var$TEMPLATEDB);
+     */ return (0, $0c0a864fcee6a66f$export$b8f607a8a10bde0a).init(element, TEMPLATEDB, force);
 }
 function $8ce030c78f8b39da$var$set(element, record, conditions) {
     /**
@@ -10177,13 +11890,13 @@ function $8ce030c78f8b39da$var$render(element, record, conditions) {
      * @returns {Object} The element
      */ return (0, $088016ba0ae1a642$export$c1781ce783707272).render(element, record, conditions, $8ce030c78f8b39da$var$TEMPLATEDB);
 }
-function $8ce030c78f8b39da$var$renderSystem(element, record, conditions) {
+function $8ce030c78f8b39da$var$renderSystem(element, record, conditions, TEMPLATEDB) {
     /**
      * Sets the record of an element
      * @param {Object} element
      * @param {Object} record
      * @returns {Object} The element
-     */ return (0, $989c7a224980c1bb$export$6ee4764c2ac4fe01).render(element, record, conditions, $8ce030c78f8b39da$var$TEMPLATEDB);
+     */ return (0, $989c7a224980c1bb$export$6ee4764c2ac4fe01).render(element, record, conditions, TEMPLATEDB);
 }
 
 
@@ -10275,7 +11988,63 @@ function $d8921a44da82fdcb$var$updateThing(element, record) {
 }
 
 
+const $c4455f90708ddfe2$export$1cfcdeb349d89715 = {
+    get: $c4455f90708ddfe2$var$getCursorPosition,
+    set: $c4455f90708ddfe2$var$setCursorPosition
+};
+function $c4455f90708ddfe2$var$getCursorPosition(div) {
+    let cursorPosition = 0;
+    // Check if the div has focus
+    if (window.getSelection && document.activeElement === div) {
+        const selection = window.getSelection();
+        if (selection.rangeCount > 0) {
+            const range = selection.getRangeAt(0);
+            const preCursorRange = range.cloneRange();
+            // Move the start of the range to the beginning of the div
+            preCursorRange.selectNodeContents(div);
+            preCursorRange.setEnd(range.startContainer, range.startOffset);
+            // The length of preCursorRange is the cursor position within the div
+            cursorPosition = preCursorRange.toString().length;
+        }
+    }
+    return cursorPosition;
+}
+function $c4455f90708ddfe2$var$setCursorPosition(div, position) {
+    // Ensure the div is focused
+    div.focus();
+    // Get the text nodes in the div
+    function getTextNodes(node) {
+        let textNodes = [];
+        if (node.nodeType === Node.TEXT_NODE) textNodes.push(node);
+        else for (let child of node.childNodes)textNodes = textNodes.concat(getTextNodes(child));
+        return textNodes;
+    }
+    const textNodes = getTextNodes(div);
+    let currentPos = 0;
+    let range = document.createRange();
+    let found = false;
+    // Loop through the text nodes to find the right position
+    for (let textNode of textNodes){
+        const nodeLength = textNode.textContent.length;
+        if (currentPos + nodeLength >= position) {
+            range.setStart(textNode, position - currentPos);
+            range.collapse(true);
+            found = true;
+            break;
+        }
+        currentPos += nodeLength;
+    }
+    // Set the cursor position
+    if (found) {
+        const selection = window.getSelection();
+        selection.removeAllRanges();
+        selection.addRange(range);
+    } else console.warn("Position out of range");
+}
+
+
 const $3a31490163c9c724$export$3633c9dc515d5cf9 = {
+    cursor: (0, $c4455f90708ddfe2$export$1cfcdeb349d89715),
     element: (0, $c8b0dc629c726d48$export$e0169ab077dc0819),
     event: (0, $2adfa4e445ef1d89$export$631b1a0163af1868),
     thing: (0, $8ce030c78f8b39da$export$b64d8dba83c7ded7),
@@ -10290,6 +12059,935 @@ const $4f0e7017aa5846ec$export$a8f5b9913def03f3 = {
     headings: (0, $3766123d98edc643$export$36b1aac33f5f1b68)
 };
 
+
+function $1d1d7e6925c636ce$export$bba2aacf8566461b() {
+    /**
+     *
+     *
+     */ return `
+
+<div class="container px-4 py-5">
+
+
+    <div class="row  g-5 py-5">
+
+
+        <!-- toc -->
+        <div class="col col-md-4 order-2 sticky-top" >
+
+            <div class="sticky-top">
+                <ul class="list-unstyled">
+                    {{#hasPart}}
+                        <li >
+                            
+                           <a href="#{{hasPart.@id}}">{{hasPart._heading1}}</a>
+                             
+                              <ul class="list-unstyled">
+                              
+                                    {{#hasPart.hasPart}}
+                                    
+                                        <li>
+                                            <a href="#{{hasPart.hasPart.@id}}">{{hasPart.hasPart._heading1}}</a>
+                                        </li>
+        
+        
+                                    {{/hasPart.hasPart}}
+                              </ul>
+                          
+                        </li>
+                        
+                    {{/hasPart}}
+                </ul>
+            </div>
+        </div>
+
+        <!-- article -->
+
+        <div class="col-md-8 order-1">
+
+            <div class="container mt-4 mb-2">
+
+
+                <!-- image --> 
+                    {{#_headingImage}}
+            
+                        <img src="{{_headingImage}}" class="d-block my-5 img-fluid" alt="{{_headingImage}}" width="700" height="500" loading="lazy">
+            
+                    {{/_headingImage}}
+
+
+                <!-- heading -->
+                    {{#_heading1}}
+                        <h2 class="fw-bold mt-5 text-body-emphasis mt-5">{{_heading1}}</h2>
+                    {{/_heading1}}
+            
+                
+
+                <!-- date -->
+                    {{#_headingDate}}
+                        <small>{{_headingDate}}</small>
+                    {{/_headingDate}}
+                    
+
+
+                <!-- author -->
+                    {{#author}}
+                        <small>{{author._heading1}}</small>
+                    {{/author}}
+
+
+                <!-- Abstract -->
+
+                    {{#abstract}}    
+                        <p class="lead">
+                          {{abstract}}
+                        </p>
+                    {{/abstract}}    
+
+                <!-- content -->
+                    {{#_headingDescription}}
+                        <p class="lead mt-5">{{_headingDescription}}</p>
+                    {{/_headingDescription}}
+
+
+        
+                <!-- article parts -->
+                {{#hasPart}}
+        
+                    <div class="container ps-0 pe-0 mt-5 mb-1 ms-0 me-0" id="{{hasPart.@id}}">
+                        {{#hasPart._headingImage}}
+            
+                            <img src="{{hasPart._headingImage}}" class="d-block my-5 img-fluid" alt="{{hasPart._headingImage}}" width="300" height="200" loading="lazy">
+            
+                        {{/hasPart._headingImage}}
+            
+                        {{#hasPart._heading1}}
+                            <h3 class="fw-bold text-body-emphasis">{{hasPart._heading1}}</h3>
+                        {{/hasPart._heading1}}
+            
+                        {{#hasPart._headingDescription}}
+                            <p class="lead">{{hasPart._headingDescription}}</p>
+                        {{/hasPart._headingDescription}}
+            
+            
+                        <!-- article parts -->
+                        {{#hasPart.hasPart}}
+        
+                            <div class="container mt-5 mb-1 ms-0 me-0" id="{{hasPart.hasPart.@id}}">
+                                {{#_headingImage}}
+                
+                                    <img src="{{hasPart.hasPart._headingImage}}" class="d-block img-fluid" alt="{{hasPart.hasPart._headingImage}}" width="150" height="100" loading="lazy">
+                
+                                {{/hasPart.hasPart._headingImage}}
+                                
+                                {{#hasPart.hasPart._heading1}}
+                                    <h4 class="fw-bold text-body-emphasis mt-5">{{hasPart.hasPart._heading1}}</h4>
+                                {{/hasPart.hasPart._heading1}}
+                
+                                {{#hasPart.hasPart._headingDescription}}
+                                    <p class="lead">{{hasPart.hasPart._headingDescription}}</p>
+                                {{/hasPart.hasPart._headingDescription}}
+            
+                            </div>
+                           
+            
+                        {{/hasPart.hasPart}}
+                        
+                    </div>
+            
+                {{/hasPart}}
+            </div>
+        </div>
+
+    </div>
+</div>
+
+
+`;
+}
+
+
+
+function $76c1cc9e1ba74570$export$aa3e815946b80764(classes, prefixes) {
+    //
+    prefixes = (0, $2fa9c1db583d4d31$export$439bf78a2cc516f5).toArray(prefixes) || [];
+    prefixes = prefixes.filter((x)=>x !== undefined && x !== null);
+    let prefix = prefixes.join(".");
+    if (prefix != "") prefix = prefix + ".";
+    return ` <div class="card ${(0, $2fa9c1db583d4d31$export$439bf78a2cc516f5).toArray(classes).join(" ")}" style="width: 18rem;">
+         
+            <img src="{{${prefix}image.contentUrl}}" class="card-img-top" alt="..." onerror="this.style.display='none'">
+           
+            <div class="card-body">
+            {{#${prefix}_headingPosition}}
+              <h5 class="card-title">{{${prefix}_headingPosition}}</h5>
+            {{/${prefix}_headingPosition}}
+              <h5 class="card-title">{{${prefix}_headingStars}}</h5>
+                <h5 class="card-title">{{ ${prefix}_heading1 }}</h5>
+                <p class="card-text">{{ ${prefix}_heading2 }}</p>
+                {{#${prefix}potentialAction}}
+                    <a href="{{ potentialAction.url}}" class="btn btn-primary">{{ ${prefix}potentialAction.name}}</a>
+                {{/${prefix}potentialAction}}
+            </div>
+        </div>
+    `;
+}
+
+
+
+function $709a68bd1ec08152$export$1b08a1f3c4097168(classes, prefixes) {
+    //
+    prefixes = (0, $2fa9c1db583d4d31$export$439bf78a2cc516f5).toArray(prefixes) || [];
+    prefixes = prefixes.filter((x)=>x !== undefined && x !== null);
+    let prefix = prefixes.join(".");
+    if (prefix != "") prefix = prefix + ".";
+    return ` 
+    
+        <div class="card mb-3" style="max-width: 300px;">
+            <div class="row g-0">
+
+    
+               <!-- image -->
+               {{#${prefix}image.contentUrl}}
+                    <div class="col col-sm-4 align-self-center">
+                        <a href="#" class="btn h-100" data-bs-toggle="modal" data-bs-target="#modalID">
+                              <img src="{{${prefix}image.contentUrl}}" class="card-img-top" alt="..." onerror="this.style.display='none'">
+                        </a>
+                    </div>
+
+                {{/${prefix}image.contentUrl}}
+
+                <!-- content -->
+                <div class="col pt-0 align-self-top">
+                
+                    <div class="row mt-0 me-1">
+                        <span
+                            class="mt-0 mb-1 align-self-end text-end justify-content-end kr-action">{{kr-action}}</span>
+                    </div>
+                    
+                    <div class="card-body">
+
+                        <div class="row align-self-center">
+                            <h5 class="card-title mb-0">
+                                <font size="-1">{{_heading1}}</font>
+                            </h5>
+                            <p class="card-text mt-0">
+                                <font size="-1">{{_heading2}}</font>
+                            </p>
+
+                        </div>
+                    </div>
+                    <div class="row me-1 mt-0 text-end justify-content-end">
+                        <p class="card-text"><small class="text-body-secondary">
+                                <font size="-1">{{_headingStatus}}</font>
+                            </small></p>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    `;
+}
+
+
+
+function $85edee0a0611fc02$export$6210fa4921d2a466(record) {
+    return `
+
+
+     
+
+
+            <form>
+                
+                <div class="mb-3">
+
+                
+                {{#transpose: }}
+                    
+                    {{#filter:value.@type=PropertyValueSpecification}}
+
+                        <!-- for checkbox -->
+                        {{#value | filter:_headingHtmlInputType=checkbox}}
+
+                            <div class="form-check mt-3">
+                                <input 
+                                class="form-check-input " 
+                                type="checkbox" value="" 
+                                id="{{value.valueName}}"
+                                {{#value | filter:required=true }}
+                                    required 
+                                {{/value}}
+                                >
+                                <label 
+                                class="form-check-label" 
+                                for="{{value.@id}}"
+                                >
+                                {{value._headingDescription}}
+                                </label>
+                            </div>
+                            
+                        {{/value}}
+
+
+                        {{#value | filter:_headingHtmlInputType=ne checkbox}}
+
+                            
+                                <label for="exampleInputEmail1" class="form-label text-capitalize mt-3">
+                                    {{value.valueName}}
+                                </label>
+                          
+                                <input 
+                                type="{{value._headingHtmlInputType}}"
+                                class="form-control" 
+                                
+                                
+                                value="{{value.defaultValue}}"
+                                id="{{value.valueName}}" 
+                                aria-describedby="emailHelp"
+            
+                                
+                                {{#value | filter:multipleValues=false }}
+                                    multiple
+                                {{/value}}
+            
+                                {{#value | filter:readonlyValue=true }}
+                                    readonly 
+                                {{/value}}
+                    
+                                {{#value | filter:required=true }}
+                                    required 
+                                {{/value}}
+
+
+                                {{#value.valuePattern}}
+                                    pattern="{{value.valuePattern}}"
+                                {{/value.valuePattern}}
+            
+                                {{#value.valueMaxLength}}
+                                    maxLength="{{value.valueMaxLength}}"
+                                {{/value.valueMaxLength}}
+            
+                                {{#value.minValue}}
+                                    min="{{value.minValue}}"
+                                {{/value.minValue}}
+                        
+                                {{#value.maxValue}}
+                                    max="{{value.maxValue}}"
+                                {{/value.maxValue}}
+            
+                                {{#value.stepValue}}
+                                    max="{{value.stepValue}}"
+                                {{/value.stepValue}}
+                        
+                                
+                                >
+                         {{/value}}
+                    
+                    {{/filter}}
+
+                     
+                {{/transpose}}
+
+            </div>
+                
+            <button type="submit" class="btn btn-primary">{{name}}</button>
+        
+        </form>
+                
+                
+    
+    `;
+}
+function $85edee0a0611fc02$var$getPropertyValuesSpecifications(record) {
+    let pvs;
+    for(let k in record)if (k.includes("_input")) pvs = pvs.merge(history.toArray(record[k]));
+    return pvs;
+}
+
+
+function $cc70f1201526a438$export$2416a15e4d3cccfa() {
+    let formContent = (0, $85edee0a0611fc02$export$6210fa4921d2a466)();
+    return `
+    
+    
+
+    <div class="container col-xl-10 col-xxl-8 px-4 py-5">
+
+        <div class="row align-items-center g-lg-5 py-5">
+
+            <div class="col-lg-7 text-center text-lg-start">
+            
+                <h1 class="display-4 fw-bold lh-1 text-body-emphasis mb-3">{{_heading1}}</h1>
+                <p class="col-lg-10 fs-4">{{_headingDescription}}</p>
+                
+            </div>
+
+
+            <div class="col-md-10 mx-auto col-lg-5">
+            
+                ${formContent}
+                
+            </div>
+
+        </div>
+
+    </div>
+    
+    
+    
+    
+    
+    `;
+}
+
+
+const $a03ed131cc6a7a3f$var$hex = "#228BE6";
+const $a03ed131cc6a7a3f$var$rgb = parseInt($a03ed131cc6a7a3f$var$hex.slice(1), 16);
+const $a03ed131cc6a7a3f$var$r = $a03ed131cc6a7a3f$var$rgb >> 16 & 255;
+const $a03ed131cc6a7a3f$var$g = $a03ed131cc6a7a3f$var$rgb >> 8 & 255;
+const $a03ed131cc6a7a3f$var$b = $a03ed131cc6a7a3f$var$rgb & 255;
+function $a03ed131cc6a7a3f$export$dbf350e5966cf602(palette) {
+    // Add rgb colors
+    for(let k in palette){
+        let hex = palette[k];
+        const rgb = parseInt(hex.slice(1), 16);
+        const r = rgb >> 16 & 255;
+        const g = rgb >> 8 & 255;
+        const b = rgb & 255;
+        palette[k + "_rgb"] = `${r}, ${g}, ${b}`;
+    }
+    return `
+
+    <style>
+
+
+    :root{
+
+        --xx-white:      ${palette.white};
+
+        --xx-light:      ${palette.light};
+        --xx-dark:       ${palette.dark};
+        --xx-primary:    ${palette.primary};
+        --xx-secondary:  ${palette.secondary};
+        --xx-info:       ${palette.info};
+        --xx-success:    ${palette.success};
+        --xx-warning:    ${palette.warning};
+        --xx-danger:     ${palette.danger};
+
+
+        --bs-white: var(--xx-white);
+        --bs-light: var(--xx-light);
+        --bs-dark: var(--xx-dark);
+        --bs-primary: var(--xx-primary);
+        --bs-secondary: var(--xx-secondary);
+        --bs-info: var(--xx-info);
+        --bs-success: var(--xx-success);
+        --bs-warning: var(--xx-warning);
+        --bs-danger: var(--xx-danger);
+
+        --bs-white-rgb: ${palette.white_rgb};
+        --bs-light-rgb: ${palette.light_rgb};
+        --bs-dark-rgb: ${palette.dark_rgb};
+        --bs-primary-rgb: ${palette.primary_rgb};
+        --bs-secondary-rgb: ${palette.secondary_rgb};
+        --bs-info-rgb: ${palette.info_rgb};
+        --bs-success-rgb: ${palette.success_rgb};
+        --bs-warning-rgb: ${palette.warning_rgb};
+        --bs-danger-rgb: ${palette.danger_rgb};
+
+
+        --bs-primary-color: var(--bs-dark);
+        --bs-body-color: var(--bs-dark);
+        --bs-link-color: var(--bs-primary);
+        --bs-emphasis-color:  hsl(
+            from var(--bs-dark)
+                calc(h - 0.15)
+                calc(s - 0.15)
+                calc(l - 0.15)
+                / 
+                alpha
+          );
+
+        
+        --bs-secondary-color: var(--bs-secondary);
+
+        --bs-primary-hover-bg: hsl(
+            from var(--bs-primary)
+                calc(h - (l*0.15))
+                calc(s - (s*0.15))
+                calc(l - (l*0.15))
+                / 
+                alpha
+          );
+
+        --bs-primary-active-bg: hsl(
+            from var(--bs-primary)
+                calc(h - (l*0.20))
+                calc(s - (s*0.20))
+                calc(l - (l*0.20))
+                / 
+                alpha
+          );
+
+        --bs-primary-subtle-bg: hsl(
+            from var(--bs-primary)
+                calc(h + (l*0.20))
+                calc(s + (s*0.20))
+                calc(l + (l*0.20))
+                / 
+                alpha
+          );
+
+
+
+        --bs-secondary-hover-bg: hsl(
+            from var(--bs-secondary)
+                calc(h - (l*0.15))
+                calc(s - (s*0.15))
+                calc(l - (l*0.15))
+                / 
+                alpha
+          );
+
+        --bs-secondary-active-bg: hsl(
+            from var(--bs-secondary)
+                calc(h - (l*0.20))
+                calc(s - (s*0.20))
+                calc(l - (l*0.20))
+                / 
+                alpha
+          );
+
+        --bs-secondary-subtle-bg: hsl(
+            from var(--bs-secondary)
+                calc(h + (l*0.20))
+                calc(s + (s*0.20))
+                calc(l + (l*0.20))
+                / 
+                alpha
+          );
+
+
+
+
+        
+
+    }
+
+
+
+
+   .filter-src {
+    filter: invert(48%) sepia(79%) saturate(2476%) hue-rotate(86deg) brightness(118%) contrast(119%);
+
+   }
+
+
+    button.btn-primary {
+        --bs-btn-color: #fff;
+        --bs-btn-bg: var(--bs-primary);
+        --bs-btn-border-color: var(--bs-primary);
+        --bs-btn-hover-color: #fff;
+        --bs-btn-hover-bg: var(--bs-primary-hover-bg);
+        --bs-btn-hover-border-color: var(--bs-primary-hover-bg);
+        --bs-btn-focus-shadow-rgb: 49, 132, 253;
+        --bs-btn-active-color: #fff;
+        --bs-btn-active-bg: var(--bs-primary-active);
+        --bs-btn-active-border-color: var(--bs-primary-active);
+        --bs-btn-active-shadow: inset 0 3px 5px rgba(0, 0, 0, 0.125);
+        --bs-btn-disabled-color: #fff;
+        --bs-btn-disabled-bg: var(--bs-primary);
+        --bs-btn-disabled-border-color: var(--bs-primary);
+    }
+
+
+    button.btn-secondary {
+        --bs-btn-color: #fff;
+        --bs-btn-bg: var(--bs-secondary);
+        --bs-btn-border-color:var(--bs-secondary);
+        --bs-btn-hover-color: #fff;
+        --bs-btn-hover-bg: var(--bs-secondary-hover-bg);
+        --bs-btn-hover-border-color:var(--bs-secondary-hover-bg);
+        --bs-btn-focus-shadow-rgb: 130, 138, 145;
+        --bs-btn-active-color: #fff;
+        --bs-btn-active-bg: var(--bs-secondary-active-bg);
+        --bs-btn-active-border-color:var(--bs-secondary-active-bg);
+        --bs-btn-active-shadow: inset 0 3px 5px rgba(0, 0, 0, 0.125);
+        --bs-btn-disabled-color: #fff;
+        --bs-btn-disabled-bg:var(--bs-secondary);
+        --bs-btn-disabled-border-color:var(--bs-secondary);
+    }
+
+    </style>
+    `;
+}
+
+
+function $2e6f30c3f5256cba$export$606190e461fe9031() {
+    /**
+     *
+     *
+     */ return `
+    
+<div class="container px-4 py-5">
+    
+    <div class="row align-items-md-center g-5 py-5">
+    
+        <div class="col col-12 col-md-6 d-flex flex-column align-items-start gap-2">
+
+
+            {{#_headingImage}}
+                <div class="d-none d-md-block">
+                    <img src="{{_headingImage}}" class="d-block mx-lg-auto img-fluid" alt="{{_headingImage}}" width="700" height="500" loading="lazy">
+                </div>
+            
+            {{/_headingImage}}
+            
+            {{#_heading1}}
+                <h2 class="fw-bold text-body-emphasis">{{_heading1}}</h2>
+            {{/_heading1}}
+
+            {{#_headingDescription}}
+                <p class="lead">{{_headingDescription}}</p>
+            {{/_headingDescription}}
+            
+            {{#potentialAction}}
+                <a href="{{potentialAction.url}}" class="btn btn-primary btn-lg">{{potentialAction.name}}</a>
+            {{/potentialAction}}
+            
+        </div>
+            
+        <div class="col">
+            
+            <div class="row row-cols-1 row-cols-sm-2 g-4">
+            
+                {{ #positiveNotes }}
+                    {{#positiveNotes.item}}
+                        
+                        <div class="col  d-flex flex-column gap-2">
+    
+                            
+                            {{#positiveNotes.item._headingImage}}
+
+        
+                                    <div class="row d-none d-md-block">
+                                        <div class="col-md-4">
+                                        
+                                            <img 
+                                            src="{{positiveNotes.item._headingImage}}" 
+                                            class="d-block mx-lg-auto img-fluid" 
+                                            alt="{{positiveNotes.item.._headingImage}}" 
+                                            loading="lazy"
+                                            >
+                                            </div>
+                                        <div class="col-md-4">
+                                            </div>
+                                        <div class="col-md-4">
+                                            </div>
+                                    </div>
+                            {{/positiveNotes.item._headingImage}}
+                    
+                               
+                            <h4 class="fw-semibold mb-0 mt-3 text-body-emphasis">{{positiveNotes.item._heading1}}</h4>
+                            <p class="">{{positiveNotes.item._headingDescription}}</p>
+                            
+                            {{#positiveNotes.item.potentialAction}}
+                                <a href="{{positiveNotes.item.potentialAction.url}}" class="btn btn-primary btn-lg">
+                                    {{hasPart.potentialAction.name}}
+                                </a>
+                            {{/positiveNotes.item.potentialAction}}
+                            
+                        </div>
+                    {{ /positiveNotes.item }}
+                {{ /positiveNotes }}
+                
+            
+            </div>
+        </div>
+    </div>
+</div>
+
+
+`;
+}
+
+
+function $c1a4b784a1c88929$export$adb608be33961c98() {
+    return `
+            
+                <div class="container">
+                    <footer 
+                    class="row row-cols-1 row-cols-sm-2 row-cols-md-5 py-5 my-5 border-top bg-body-tertiary bg-dark border-bottom border-body" data-bs-theme="dark"
+                    >
+                    
+                        <div class="col mb-3">
+                        
+                            <a href="/" class="d-flex align-items-center mb-3 link-body-emphasis text-decoration-none">
+                                <svg class="bi me-2" width="40" height="32"><use xlink:href="#bootstrap"></use></svg>
+                            </a>
+                            
+                            <p class="text-body-secondary">\xa9 2024</p>
+                        </div>
+
+                        <div class="col mb-3">
+
+                        </div>
+
+                        <div class="col mb-3">
+                         
+                        </div>
+
+                        <div class="col mb-3">
+                            
+                        </div>
+
+                        <div class="col mb-3">
+                            
+
+                               {{ #hasPart | filter:@type=WPFooter }}
+
+                                   <h5>{{ hasPart.name }}</h5>
+                                   <ul class="nav flex-column">
+
+                                    {{ #hasPart.hasPart }}
+                                        
+                                        <li class="nav-item mb-2">
+                                            <a href="{{ hasPart.hasPart.url }}" class="nav-link p-0 text-body-secondary">{{ hasPart.hasPart.name }}</a>
+                                        </li>
+
+                                    {{ /hasPart.hasPart }}
+                                    
+                                {{ /hasPart }}
+
+                                
+                            </ul>
+                        </div>
+                    </footer>
+                </div>
+                
+                `;
+}
+
+
+
+function $caaf9e564e828a9b$export$38e42c68cf43b5d4() {
+    /**
+         * @type {string}
+         */ let content = `
+        
+            <header class="p-3 text-bg-dark">
+                <div class="container">
+                    <nav class="navbar navbar-expand-lg">
+                        <div class="container-fluid">
+                            <a class="navbar-brand" href="/">{{name}}</a>
+                            <button
+                                class="navbar-toggler"
+                                type="button"
+                                data-bs-toggle="collapse"
+                                data-bs-target="#navbarSupportedContent"
+                                aria-controls="navbarSupportedContent"
+                                aria-expanded="false"
+                                aria-label="Toggle navigation"
+                            >
+                                <span class="navbar-toggler-icon"></span>
+                            </button>
+            
+                            <div
+                                class="collapse navbar-collapse"
+                                id="navbarSupportedContent"
+                            >
+                                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                                    {{#hasPart | filter:@type=WPHeader }}
+                                    {{#hasPart.hasPart}}
+            
+                                    <li class="nav-item">
+                                        <a
+                                            href="{{hasPart.hasPart.url}}"
+                                            class="nav-link px-2 text-secondary"
+                                            >{{hasPart.hasPart.name}}</a
+                                        >
+                                    </li>
+            
+                                    {{/hasPart.hasPart}} {{/hasPart }}
+                                </ul>
+                            </div>
+                        </div>
+                    </nav>
+                </div>
+            </header>
+
+            `;
+    return content;
+}
+
+
+function $fba729fe2c3be31b$export$124049a9e3d0d4c3() {
+    return `
+            
+                <div class="container col-xxl-8 px-4 py-5">
+                    <div class="row flex-lg-row-reverse align-items-center g-5 py-5">
+                         
+                        <div class="d-none d-md-block col-10 col-sm-8 col-lg-6">
+                         
+                            {{#_headingImage}}
+                               
+                                <img src="{{_headingImage}}" class="d-block mx-lg-auto img-fluid filter-src" alt="{{_headingImage}}" width="700" height="500" loading="lazy" />
+                               
+                            {{/_headingImage}}
+                            
+                        </div>
+
+
+                        
+                        <div class="col-lg-6">
+
+                            {{#_heading1 }}
+                                <h1 class="display-5 fw-bold  lh-1 mb-3">{{_heading1}}</h1>
+                            {{/_heading1 }}
+                            
+                            {{#_headingDescription }}
+                                <p class="lead">{{_headingDescription}}</p>
+                            {{/_headingDescription }}
+
+                            {{#potentialAction}}
+                                <div class="d-grid gap-2 d-md-flex justify-content-md-start">
+                                    <button type="button" href="{{potentialAction.url}}" class="btn btn-primary btn-lg px-4 me-md-2">
+                                        {{potentialAction.name}}
+                                    </button>
+                                </div>
+                            {{/potentialAction}}
+                            
+                        </div>
+
+                        
+                    </div>
+                </div>
+           
+                    
+                    `;
+}
+
+
+function $69c32621a8b1cbcb$export$91392eeb01bb62de() {
+    return `
+
+
+
+      
+            <div class="container col-xxl-8 px-4 py-5">
+                <div class="row  align-items-center g-5 py-5">
+
+
+
+
+                    <div class="col-10 col-sm-8 col-lg-6">
+
+                        {{#_headingImage}}
+                            <div class="d-none d-md-block">
+                                <img src="{{_headingImage}}" class="d-block mx-lg-auto img-fluid filter-src" alt="{{_headingImage}}" width="700" height="500" loading="lazy" />
+                            </div>
+
+                        {{/_headingImage}}
+                        
+                        {{#_heading1 }}
+                            <h1 class="display-5 fw-bold  lh-1 mb-3">{{_heading1}}</h1>
+                        {{/_heading1 }}
+                        
+                        {{#_headingDescription }}
+                            <p class="lead">{{_headingDescription}}</p>
+                        {{/_headingDescription }}
+
+                        
+
+                    </div>
+
+
+
+                    <div class="col-lg-6">
+
+                        <!-- howTo step -->
+                        {{#step }}
+                             
+                                <!-- item start -->
+                                    <div class="row">
+    
+                                        {{#step._headingImage}}
+                                            <div class="d-none d-md-block col col-3">
+                                                <img 
+                                                src="{{step._headingImage}}" 
+                                                class="d-block mx-lg-auto img-fluid filter-src" 
+                                                alt="{{step._headingImage}}" 
+                                                width="700" height="500" loading="lazy" 
+                                                />
+                                            </div>    
+                                        {{/step._headingImage}}
+
+                                        <div class="col-2 p-0 me-5">
+                                            <div class="bg-primary m-0 text-white text-center">
+                                                <p class="fs-1"> {{step.position}} </p>
+                                            </div>
+                                        </div>
+                                        <div class="col-10 d-md-none">
+                                        </div>
+                                        
+                                        <div class="col">
+                                            <h4>{{step._heading1}}</h4>
+                                            <p>{{step._headingDescription}}</p>
+                                        </div>
+                                        
+                                    </div>
+                                <!-- item stop -->
+                            
+                        {{/step}}
+
+
+                        
+                        
+
+
+
+
+                        
+
+                    </div>
+
+
+                </div>
+            </div>
+       
+
+    
+    
+    
+    `;
+}
+
+
+const $7336d3e0ff0b04a2$export$df03f54e09e486fa = {
+    drag: $7336d3e0ff0b04a2$var$dragArrow,
+    expandOn: $7336d3e0ff0b04a2$var$expandOn,
+    expandOff: $7336d3e0ff0b04a2$var$expandOff
+};
+function $7336d3e0ff0b04a2$var$dragArrow() {
+    /**
+     * Creates a drag arrow
+     */ return `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrows-move" viewBox="0 0 16 16">
+  <path fill-rule="evenodd" d="M7.646.146a.5.5 0 0 1 .708 0l2 2a.5.5 0 0 1-.708.708L8.5 1.707V5.5a.5.5 0 0 1-1 0V1.707L6.354 2.854a.5.5 0 1 1-.708-.708zM8 10a.5.5 0 0 1 .5.5v3.793l1.146-1.147a.5.5 0 0 1 .708.708l-2 2a.5.5 0 0 1-.708 0l-2-2a.5.5 0 0 1 .708-.708L7.5 14.293V10.5A.5.5 0 0 1 8 10M.146 8.354a.5.5 0 0 1 0-.708l2-2a.5.5 0 1 1 .708.708L1.707 7.5H5.5a.5.5 0 0 1 0 1H1.707l1.147 1.146a.5.5 0 0 1-.708.708zM10 8a.5.5 0 0 1 .5-.5h3.793l-1.147-1.146a.5.5 0 0 1 .708-.708l2 2a.5.5 0 0 1 0 .708l-2 2a.5.5 0 0 1-.708-.708L14.293 8.5H10.5A.5.5 0 0 1 10 8"/>
+</svg>`;
+}
+function $7336d3e0ff0b04a2$var$expandOn() {
+    return `
+    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-caret-down-fill" viewBox="0 0 16 16">
+  <path d="M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z"/>
+</svg>`;
+}
+function $7336d3e0ff0b04a2$var$expandOff() {
+    return `
+    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-caret-right-fill" viewBox="0 0 16 16">
+  <path d="m12.14 8.753-5.482 4.796c-.646.566-1.658.106-1.658-.753V3.204a1 1 0 0 1 1.659-.753l5.48 4.796a1 1 0 0 1 0 1.506z"/>
+</svg>`;
+}
 
 
 function $2daab24e0d2386f8$export$73754b0a4e25f0a4(prefixes) {
@@ -10384,11 +13082,13 @@ function $2daab24e0d2386f8$export$73754b0a4e25f0a4(prefixes) {
 }
 
 
+
+
 function $f4b33ebb584657d4$export$53f1d5ea8de3d7c(prefixes = []) {
     prefixes = prefixes || [];
     let prefix = prefixes.join(".");
     if (prefix != "") prefix = prefix + ".";
-    return ` <div class="row align-items-center " >
+    return ` <div class="row align-items-center mt-2 mb-2" >
 
                 <div class="col col-12 col-sm-6 col-md-2">
                    
@@ -10427,59 +13127,11 @@ function $f4b33ebb584657d4$export$53f1d5ea8de3d7c(prefixes = []) {
 }
 
 
-function $76c1cc9e1ba74570$export$aa3e815946b80764() {
-    return ` <div class="card" style="width: 18rem;">
-         
-            <img src="{{image.contentUrl}}" class="card-img-top" alt="..." onerror="this.style.display='none'">
-           
-            <div class="card-body">
-            {{#_headingPosition}}
-              <h5 class="card-title">{{_headingPosition}}</h5>
-            {{/_headingPosition}}
-              <h5 class="card-title">{{_headingStars}}</h5>
-                <h5 class="card-title">{{ _heading1 }}</h5>
-                <p class="card-text">{{ _heading2 }}</p>
-                {{#potentialAction}}
-                    <a href="{{ potentialAction.url}}" class="btn btn-primary">{{ potentialAction.name}}</a>
-                {{/potentialAction}}
-            </div>
-        </div>
-    `;
-}
 
-
-function $4e52112d33bc49e7$export$523fb3936f49e028() {
-    return `<!doctype html>
-<html lang="en">
-
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>{{title}}</title>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
-    integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
-
-  {{head_content}}
-  
-</head>
-
-<body>
-
-  {{content}}
-  
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
-    integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
-    crossorigin="anonymous"></script>
-  <script type="module" src="script.js"></script>
-</body>
-
-</html>`;
-}
-
-
-
-
-function $155333d55623e825$export$f90eb7c4d1fc985e(itemContent, prefixes) {
+function $155333d55623e825$export$f90eb7c4d1fc985e(classlist, itemContent, prefixes) {
+    // Handle classes
+    let classes = (0, $2fa9c1db583d4d31$export$439bf78a2cc516f5).toArray(classlist).join(" ");
+    // Handle prefixes
     prefixes = prefixes || [];
     let prefix = prefixes.join(".");
     if (prefix != "") prefix = prefix + ".";
@@ -10488,7 +13140,7 @@ function $155333d55623e825$export$f90eb7c4d1fc985e(itemContent, prefixes) {
     ]));
     return `
 
-        <div class=" mt-1 mb-1">
+        <div class=" mt-1 mb-1 ${classes || ""}">
             <nav>
                 <div class="row d-flex align-items-center">
     
@@ -10506,18 +13158,24 @@ function $155333d55623e825$export$f90eb7c4d1fc985e(itemContent, prefixes) {
     
                         
                     <div class="col col-auto order-2 order-sm-3 text-center">
+                        <span class="krProperty" data-propertyID="position">
                         {{ ${prefix}position }}
+                        </span>
                     </div>
                     
     
                      <div class="col col-12 col-sm-1 flex-sm-grow-1 order-5 order-sm-3" >
+                        
+                        <span class="krProperty" data-propertyID="item">
                         <main>
                             ${itemContent}
                         </main>
+                        </span>
                     </div>
                 
                     
                     <div class="col col-auto order-3 order-sm-4 ms-auto text-end">
+                        
                         ${(0, $2daab24e0d2386f8$export$73754b0a4e25f0a4)(prefixes)}
                     </div>
         
@@ -10544,8 +13202,10 @@ function $155333d55623e825$export$f90eb7c4d1fc985e(itemContent, prefixes) {
 
 
 
-
-function $03cb398f5a2433c4$export$b97dc3b2d35f8775(content, prefixes = []) {
+function $03cb398f5a2433c4$export$b97dc3b2d35f8775(classlist, classlistListItem, content, prefixes = []) {
+    // Handle classes
+    let classes = (0, $2fa9c1db583d4d31$export$439bf78a2cc516f5).toArray(classlist).join(" ");
+    //
     prefixes = prefixes || [];
     prefixes = prefixes.filter((x)=>x !== undefined && x !== null);
     let prefix = prefixes.join(".");
@@ -10553,7 +13213,7 @@ function $03cb398f5a2433c4$export$b97dc3b2d35f8775(content, prefixes = []) {
     let id = "checkbox_" + String(crypto.randomUUID());
     let result = `
 
-        <div class="container checkboxParent">
+        <div class="container checkboxParent ${classes || ""}">
 
             <div class="row border-top border-bottom align-items-center" >
 
@@ -10583,12 +13243,16 @@ function $03cb398f5a2433c4$export$b97dc3b2d35f8775(content, prefixes = []) {
 
         
             {{ #itemListElement }}
+
                 
-                   ${(0, $155333d55623e825$export$f90eb7c4d1fc985e)(content, prefixes.concat("itemListElement"))}
+                   ${(0, $155333d55623e825$export$f90eb7c4d1fc985e)(classlistListItem, content, prefixes.concat([
+        "itemListElement"
+    ]))}
+              
                
             {{ /itemListElement }}
 
-
+                
             <div class="row mt-2 mb-2 border-bottom align-items-center">
 
             </div>
@@ -10599,6 +13263,26 @@ function $03cb398f5a2433c4$export$b97dc3b2d35f8775(content, prefixes = []) {
     `;
     return result;
 }
+
+
+function $b22cd3de1d812d2d$export$f8fce98513fdd41a(record) {
+    /**
+     * Returns the record in JSON ld format
+     * 
+     */ if (!record || record == null) return "";
+    record["@context"] = record["@context"] || "https://schema.org/";
+    return `
+    
+    <script type="application/ld+json">
+
+        ${JSON.stringify(record, null, 4)}
+        
+    </script>
+
+    `;
+}
+
+
 
 
 function $7815f8c2c6e056e7$export$58733aaf927c3bbe() {
@@ -10649,155 +13333,267 @@ function $7815f8c2c6e056e7$export$58733aaf927c3bbe() {
 }
 
 
-function $c1a4b784a1c88929$export$adb608be33961c98() {
-    return `
-            
-                <div class="container">
-                    <footer 
-                    class="row row-cols-1 row-cols-sm-2 row-cols-md-5 py-5 my-5 border-top bg-body-tertiary bg-dark border-bottom border-body" data-bs-theme="dark"
+function $4e52112d33bc49e7$export$523fb3936f49e028() {
+    return `<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{{title}}</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
+    integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+
+  {{head_content}}
+  
+</head>
+
+<body>
+
+  {{content}}
+  
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+    integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
+    crossorigin="anonymous"></script>
+  <script type="module" src="script.js"></script>
+</body>
+
+</html>`;
+}
+
+
+
+function $ea78f44e9c4fdb13$export$dc6dff4b377d0f20(prefixes = []) {
+    prefixes = prefixes || [];
+    let prefix = prefixes.join(".");
+    if (prefix != "") prefix = prefix + ".";
+    return ` <div class="row align-items-center mt-2 mb-2" >
+
+                <div class="col col-12 col-sm-6 col-md-2">
+
+                    <img 
+                    src="{{${prefix}_headingImage}}" 
+                    class="img-fluid" 
+                    alt{{${prefix}_headingDescription}} 
+
+                    onerror="this.style.display='none'"
                     >
-                    
-                        <div class="col mb-3">
-                        
-                            <a href="/" class="d-flex align-items-center mb-3 link-body-emphasis text-decoration-none">
-                                <svg class="bi me-2" width="40" height="32"><use xlink:href="#bootstrap"></use></svg>
-                            </a>
-                            
-                            <p class="text-body-secondary">\xa9 2024</p>
-                        </div>
 
-                        <div class="col mb-3">
-
-                        </div>
-
-                        <div class="col mb-3">
-                         
-                        </div>
-
-                        <div class="col mb-3">
-                            
-                        </div>
-
-                        <div class="col mb-3">
-                            
-
-                               {{ #hasPart | filter:@type=WPFooter }}
-
-                                   <h5>{{ hasPart.name }}</h5>
-                                   <ul class="nav flex-column">
-
-                                    {{ #hasPart.hasPart }}
-                                        
-                                        <li class="nav-item mb-2">
-                                            <a href="{{ hasPart.hasPart.url }}" class="nav-link p-0 text-body-secondary">{{ hasPart.hasPart.name }}</a>
-                                        </li>
-
-                                    {{ /hasPart.hasPart }}
-                                    
-                                {{ /hasPart }}
-
-                                
-                            </ul>
-                        </div>
-                    </footer>
                 </div>
-                
-                `;
+
+                <div class="col col-12 col-sm-6 col-md-10">
+                    <div class="row d-flex">
+                        <div class="col col-md-auto">
+                            {{ ${prefix}_heading1 }}
+                        </div>
+
+                        <div class="col col-12 col-md-auto text-truncate ">
+                            {{ ${prefix}_heading2 }}
+                        </div>
+
+                        <div class="col col-12 col-md-auto ">
+                            {{ ${prefix}_headingStatus }}
+                        </div>
+
+                        <div class="col col-12 col-md-auto text-truncate">
+                            <a href="{{ ${prefix}url }}">Link</a>
+                        </div>
+                    </div>
+                </div>
+
+             </div>
+    `;
 }
 
 
-const $0c6143b014d5fc75$export$99f0d4ee82e9706 = {
-    card: (0, $76c1cc9e1ba74570$export$aa3e815946b80764),
-    line: (0, $f4b33ebb584657d4$export$53f1d5ea8de3d7c),
-    page: (0, $4e52112d33bc49e7$export$523fb3936f49e028),
-    listitem: (0, $155333d55623e825$export$f90eb7c4d1fc985e),
-    itemlist: (0, $03cb398f5a2433c4$export$b97dc3b2d35f8775),
-    navbar: (0, $7815f8c2c6e056e7$export$58733aaf927c3bbe),
-    footer: (0, $c1a4b784a1c88929$export$adb608be33961c98)
-};
+function $69f4a06c5a5f7855$export$ee3212a4833dc722() {
+    return `
+
+        <div class="container">
+
+            <div class="p-3 mt-4 pb-md-4 mx-auto text-center">
+                {{#_heading1}}
+                    <h2 class="display-4 fw-normal text-body-emphasis">{{_heading1}}</h2>
+                {{/_heading1}}
+    
+                {{#_headingDescription}}
+                    <p class="fs-5 text-body-secondary">{{_headingDescription}}</p>
+                {{/_headingDescription}}
+            </div>
 
 
+            <div class="row row-cols-1 row-cols-md-3 mt-3 mb-3 text-center">
+                {{#itemListElement}} {{#itemListElement.item}}
+                <div class="col">
+                    <div class="card mb-4 rounded-3 shadow-sm">
+                        <div class="card-header py-3">
+                            <h4 class="my-0 fw-normal">
+                                {{itemListElement.item.itemOffered.name}}
+                            </h4>
+                        </div>
+                        <div class="card-body">
+                            <h1 class="card-title pricing-card-title">
+                                {{itemListElement.item.priceSpecification.price}}<small
+                                    class="text-body-secondary fw-light"
+                                    >/{{itemListElement.item.priceSpecification.referenceQuantity.unitCode}}</small
+                                >
+                            </h1>
 
-const $53bcb33ef2023ce8$export$f936470337fdc8d0 = {
-    base: (0, $2fa9c1db583d4d31$export$439bf78a2cc516f5),
-    dom: (0, $3a31490163c9c724$export$3633c9dc515d5cf9),
-    html: (0, $0c6143b014d5fc75$export$99f0d4ee82e9706),
-    localization: (0, $4f0e7017aa5846ec$export$a8f5b9913def03f3),
-    thing: (0, $fbdfe69f48d32df8$export$c24b4489b93ad8cb),
-    // shortcuts
-    isNull: (0, $2fa9c1db583d4d31$export$439bf78a2cc516f5).null.isNull,
-    isNotNull: (0, $2fa9c1db583d4d31$export$439bf78a2cc516f5).null.isNotNull,
-    isEqual: (0, $2fa9c1db583d4d31$export$439bf78a2cc516f5).null.isEqual,
-    isNotEqual: (0, $2fa9c1db583d4d31$export$439bf78a2cc516f5).null.isNotEqual,
-    toArray: (0, $2fa9c1db583d4d31$export$439bf78a2cc516f5).array.toArray,
-    isArray: (0, $2fa9c1db583d4d31$export$439bf78a2cc516f5).array.isArray,
-    isObject: (0, $2fa9c1db583d4d31$export$439bf78a2cc516f5).object.isObject,
-    isDate: (0, $2fa9c1db583d4d31$export$439bf78a2cc516f5).date.isDate,
-    isNumber: (0, $2fa9c1db583d4d31$export$439bf78a2cc516f5).number.isNumber,
-    uuid: (0, $2fa9c1db583d4d31$export$439bf78a2cc516f5).uuid
-};
+                            <ul class="list-unstyled mt-3 mb-4">
+                                {{#itemListElement.item.additionalProperty}}
+                                <li>{{itemListElement.item.additionalProperty.value}}</li>
+                                {{/itemListElement.item.additionalProperty}}
+                            </ul>
+                            {{#itemListElement.item.potentialAction}}
+                            <button
+                                href="{{itemListElement.item.potentialAction.url}}"
+                                type="button"
+                                class="w-100 btn btn-lg btn-outline-primary"
+                            >
+                                {{itemListElement.item.potentialAction.name}}
+                            </button>
+                            {{/itemListElement.item.potentialAction}}
+                        </div>
+                    </div>
+                </div>
+                {{/itemListElement.item}} {{/itemListElement}}
+            </div>
+        </div>
 
 
-class $72185a15243df046$export$1481e10980f8a723 {
-    constructor(){
-        this.startTimes = new Map(); // Store start times for labels
-        this.endTimes = new Map(); // Store end times for labels
-    }
-    // Starts the timer for a specific label (default: 'default')
-    start(label = "default") {
-        if (this.startTimes.has(label)) {
-            console.warn(`Timer for '${label}' has already been started.`);
-            return;
-        }
-        this.startTimes.set(label, performance.now());
-    }
-    // Stops the timer for a specific label and calculates duration
-    stop(label = "default") {
-        if (!this.startTimes.has(label)) {
-            console.warn(`Timer for '${label}' was not started.`);
-            return;
-        }
-        const endTime = performance.now();
-        const duration = endTime - this.startTimes.get(label);
-        this.endTimes.set(label, duration);
-        this.startTimes.delete(label); // Clean up after stop
-        return duration; // Returns duration for convenience
-    }
-    // Resets all timers
-    reset(label = null) {
-        if (label) {
-            this.startTimes.delete(label);
-            this.endTimes.delete(label);
-        } else {
-            this.startTimes.clear();
-            this.endTimes.clear();
-        }
-    }
-    // Retrieves the duration for a specific label
-    getDuration(label = "default") {
-        if (!this.endTimes.has(label)) {
-            console.warn(`Timer for '${label}' has not been stopped.`);
-            return null;
-        }
-        return this.endTimes.get(label);
-    }
-    // Logs all durations
-    logAllDurations() {
-        this.endTimes.forEach((duration, label)=>{
-            console.log(`Duration for '${label}': ${duration.toFixed(2)} ms`);
-        });
-    }
+`;
 }
 
 
-const $27aca64046765c2d$export$8ffd1228772c8ae6 = {
-    KrTimer: (0, $72185a15243df046$export$1481e10980f8a723)
-};
+
+function $31a5d99e72741423$export$e5185e241753e543(record) {
+    let listRecord = {
+        "@type": record["@type"],
+        "@id": record["@id"],
+        itemListElement: []
+    };
+    let innerContent = "";
+    for (let k of Object.keys(record)){
+        let c = ` <dt class="col-sm-3">${k}</dt>`;
+        for (let v of (0, $2fa9c1db583d4d31$export$439bf78a2cc516f5).toArray(record[k])){
+            if ((0, $2fa9c1db583d4d31$export$439bf78a2cc516f5).isNotNull(v?.["@type"])) v = record(v);
+            c += ` <dd class="col-sm-9">${record[k]}</dd>`;
+        }
+        innerContent += c;
+    }
+    let content = `
+
+        <dl class="row">
+            ${innerContent}
+        </dl>    
+    
+    `;
+    return content;
+}
+
+
+function $1e883218857c7794$export$cfaa45ebb704a3b2() {
+    return `
+
+    <script src="/consent/consent.js">
+
+        
+
+
+    </script>
+    
+    `;
+}
+
+
+function $f8940d488cd7a66f$export$fa24ed99e5e77fab() {
+    return `
+    
+    
+   <!-- AOS 3.0.0-beta.6 plugin CSS (Animations) -->
+    <link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
+
+
+
+  
+
+    
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"
+    integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+     
+    
+    
+    `;
+}
+
+
+function $f1ab845195ae8ea8$export$95dc927f26875787() {
+    return `
+    
+
+
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL"
+        crossorigin="anonymous"></script>
+
+    <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+     <script>
+        AOS.init();
+      </script>
+
+    
+    
+    `;
+}
+
+
+
+function $80fcb1b48f652599$export$9a59ac6eee85ea02(record) {
+    let innerContent = "";
+    for (let pv of record._propertyValues){
+        let c = `
+       <tr>
+          <td>${pv.object.propertyID}</td>
+          <td>${pv?.["@type"]}</td>
+          <td>${pv.object.value}</td>
+          <td>${pv.metadata.credibility}</td>
+          <td>${(0, $2fa9c1db583d4d31$export$439bf78a2cc516f5).date.human.date(pv.metadata.createdDate)}</td>
+        </tr>
+
+       `;
+        innerContent += c;
+    }
+    let content = `
+
+       <table class="table">
+          <thead>
+            <tr>
+              <th scope="col">PropertyID</th>
+              <th scope="col">Action</th>
+              <th scope="col">Value</th>
+              <th scope="col">credibility</th>
+              <th scope="col">createdDate</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${innerContent}
+            
+         </tbody>
+</table>
+
+    `;
+    return content;
+}
+
 
 
 
 class $706f18fe777015bf$export$3138a16edeb45799 {
-    constructor(record_or_record_type, record_id, metadata1){
+    constructor(record_or_record_type, record_id, metadata){
         // Property that can be used to differentiate from normal objects
         this.id = (0, $53bcb33ef2023ce8$export$f936470337fdc8d0).base.uuid.new();
         this.instanceof = "KrThing";
@@ -10811,7 +13607,7 @@ class $706f18fe777015bf$export$3138a16edeb45799 {
         ];
         this._callbacks = [];
         this._eventMonitoringCache = null;
-        if ((0, $53bcb33ef2023ce8$export$f936470337fdc8d0).thing.isThing(record_or_record_type)) this.system = (0, $53bcb33ef2023ce8$export$f936470337fdc8d0).thing.toThing(record_or_record_type, record_id, metadata1);
+        if ((0, $53bcb33ef2023ce8$export$f936470337fdc8d0).thing.isThing(record_or_record_type)) this.system = (0, $53bcb33ef2023ce8$export$f936470337fdc8d0).thing.toThing(record_or_record_type, record_id, metadata);
     //this._convertChildrenThingsRecordsToThingObjects()
     }
     // -----------------------------------------------------
@@ -10841,8 +13637,8 @@ class $706f18fe777015bf$export$3138a16edeb45799 {
     get _propertyValues() {
         return this.system?._propertyValues;
     }
-    set _propertyValues(value1) {
-        this.system._propertyValues = value1;
+    set _propertyValues(value) {
+        this.system._propertyValues = value;
     }
     get _version() {
         return this._system._version;
@@ -10853,12 +13649,12 @@ class $706f18fe777015bf$export$3138a16edeb45799 {
          */ //this._eventMonitoringCache = h.thing.hash(this._system)
         return this._system;
     }
-    set system(value1) {
+    set system(value) {
         /**
          * Event monitoring
-         */ this._system = value1;
-        this._record_type = (0, $53bcb33ef2023ce8$export$f936470337fdc8d0).thing.record_type.get(value1);
-        this._record_id = (0, $53bcb33ef2023ce8$export$f936470337fdc8d0).thing.record_id.get(value1);
+         */ this._system = value;
+        this._record_type = (0, $53bcb33ef2023ce8$export$f936470337fdc8d0).thing.record_type.get(value);
+        this._record_id = (0, $53bcb33ef2023ce8$export$f936470337fdc8d0).thing.record_id.get(value);
         this._convertChildrenThingsRecordsToThingObjects();
         if (this._eventMonitoringCache != (0, $53bcb33ef2023ce8$export$f936470337fdc8d0).thing.hash(this._system)) this.broadcastEvent("property", this.ref);
     }
@@ -10887,13 +13683,13 @@ class $706f18fe777015bf$export$3138a16edeb45799 {
          * 
          */ return (0, $53bcb33ef2023ce8$export$f936470337fdc8d0).thing.record_type.get(this.system);
     }
-    set record_type(value1) {
+    set record_type(value) {
         /**
          * Sets the record type
          * @param {String} value The record type
          * @returns {Object} The record
-         */ this.system = (0, $53bcb33ef2023ce8$export$f936470337fdc8d0).thing.record_type.set(this.system, value1);
-        this._record_type = value1;
+         */ this.system = (0, $53bcb33ef2023ce8$export$f936470337fdc8d0).thing.record_type.set(this.system, value);
+        this._record_type = value;
     }
     get record_id() {
         /**
@@ -10901,13 +13697,13 @@ class $706f18fe777015bf$export$3138a16edeb45799 {
          * @returns {String} The record id
          */ return (0, $53bcb33ef2023ce8$export$f936470337fdc8d0).thing.record_id.get(this.system);
     }
-    set record_id(value1) {
+    set record_id(value) {
         /**
          * Sets the record id
          * @param {String} value The record id
          * @returns {Object} The record
-         */ this.system = (0, $53bcb33ef2023ce8$export$f936470337fdc8d0).thing.record_id.set(this.system, value1);
-        this._record_id = value1;
+         */ this.system = (0, $53bcb33ef2023ce8$export$f936470337fdc8d0).thing.record_id.set(this.system, value);
+        this._record_id = value;
     }
     get ref() {
         /**
@@ -10929,18 +13725,18 @@ class $706f18fe777015bf$export$3138a16edeb45799 {
          * @returns {Object} The record without propertyValues
          */ return (0, $53bcb33ef2023ce8$export$f936470337fdc8d0).thing.record.get(this.system);
     }
-    set record(value1) {
+    set record(value) {
         /**
          * Sets the record
          * @param {Object} value The record
          * @returns {Object} The record
-         */ this.system = (0, $53bcb33ef2023ce8$export$f936470337fdc8d0).thing.toThing(value1);
+         */ this.system = (0, $53bcb33ef2023ce8$export$f936470337fdc8d0).thing.toThing(value);
     }
     get children() {
         /**
          * Get sub things
          * 
-         */ return (0, $53bcb33ef2023ce8$export$f936470337fdc8d0).thing.children(this.system);
+         */ return (0, $53bcb33ef2023ce8$export$f936470337fdc8d0).thing.children.get(this.system);
     }
     // -----------------------------------------------------
     //  Values 
@@ -10948,14 +13744,14 @@ class $706f18fe777015bf$export$3138a16edeb45799 {
     get(propertyID) {
         return this.getValues(propertyID);
     }
-    set(propertyID, value1, metadata1) {
-        return this.setValue(propertyID, value1, metadata1);
+    set(propertyID, value, metadata) {
+        return this.setValue(propertyID, value, metadata);
     }
-    add(propertyID, value1, metadata1) {
-        return this.addValue(propertyID, value1, metadata1);
+    add(propertyID, value, metadata) {
+        return this.addValue(propertyID, value, metadata);
     }
-    delete(propertyID, value1, metadata1) {
-        return this.deleteValue(propertyID, value1, metadata1);
+    delete(propertyID, value, metadata) {
+        return this.deleteValue(propertyID, value, metadata);
     }
     getValues(propertyID) {
         /**
@@ -10971,51 +13767,51 @@ class $706f18fe777015bf$export$3138a16edeb45799 {
          * @returns {Object} The record value for a given property
          */ return (0, $53bcb33ef2023ce8$export$f936470337fdc8d0).thing.value.get(this.system, propertyID);
     }
-    setValue(propertyID, value1, metadata1) {
+    setValue(propertyID, value, metadata) {
         /**
          * Sets the value for a given property
          * @param {String} propertyID The propertyID
          * @param {Object} value The record value for a given property
          * @returns {Object} The record
-         */ this.system = (0, $53bcb33ef2023ce8$export$f936470337fdc8d0).thing.value.set(this.system, propertyID, value1, metadata1);
+         */ this.system = (0, $53bcb33ef2023ce8$export$f936470337fdc8d0).thing.value.set(this.system, propertyID, value, metadata);
     }
-    replaceValue(propertyID, value1, metadata1) {
+    replaceValue(propertyID, value, metadata) {
         /**
          * Sets the value for a given property
          * @param {String} propertyID The propertyID
          * @param {Object} value The record value for a given property
          * @returns {Object} The record
-         */ this.system = (0, $53bcb33ef2023ce8$export$f936470337fdc8d0).thing.value.replace(this.system, propertyID, value1, metadata1);
+         */ this.system = (0, $53bcb33ef2023ce8$export$f936470337fdc8d0).thing.value.replace(this.system, propertyID, value, metadata);
     }
-    addValue(propertyID, value1, metadata1) {
+    addValue(propertyID, value, metadata) {
         /**
          * Add the value for a given property
          * @param {String} propertyID The propertyID
          * @param {Object} value The record value for a given property
          * @returns {Object} The record
-         */ this.system = (0, $53bcb33ef2023ce8$export$f936470337fdc8d0).thing.value.add(this.system, propertyID, value1, metadata1);
+         */ this.system = (0, $53bcb33ef2023ce8$export$f936470337fdc8d0).thing.value.add(this.system, propertyID, value, metadata);
     }
-    deleteValue(propertyID, value1, metadata1) {
+    deleteValue(propertyID, value, metadata) {
         /**
          * Add the value for a given property
          * @param {String} propertyID The propertyID
          * @param {Object} value The record value for a given property
          * @returns {Object} The record
-         */ this.system = (0, $53bcb33ef2023ce8$export$f936470337fdc8d0).thing.value.delete(this.system, propertyID, value1, metadata1);
+         */ this.system = (0, $53bcb33ef2023ce8$export$f936470337fdc8d0).thing.value.delete(this.system, propertyID, value, metadata);
     }
     getPropertyValue(propertyID) {
         /**
          * Returns the property value for a given property
          * @param {String} propertyID The propertyID
          * @returns {Object} The record value for a given property
-         */ return (0, $53bcb33ef2023ce8$export$f936470337fdc8d0).thing.value.get(this.system, propertyID);
+         */ return (0, $53bcb33ef2023ce8$export$f936470337fdc8d0).thing.propertyValue.get(this.system, propertyID);
     }
     getPropertyValues(propertyID) {
         /**
          * Returns the property value for a given property
          * @param {String} propertyID The propertyID
          * @returns {Object} The record value for a given property
-         */ this.system = (0, $53bcb33ef2023ce8$export$f936470337fdc8d0).thing.value.set(this.system, propertyID, value, metadata);
+         */ return (0, $53bcb33ef2023ce8$export$f936470337fdc8d0).thing.propertyValues.get(this.system, propertyID);
     }
     // -----------------------------------------------------
     //  Comparisons 
@@ -11082,18 +13878,19 @@ class $706f18fe777015bf$export$3138a16edeb45799 {
     // -----------------------------------------------------
     //  List operations 
     // -----------------------------------------------------
-    insert(value1) {
+    insert(value, position) {
         /**
          * Inserts a value into the list
          * @param {Object} value The value
          *    
-         */ this.system = (0, $53bcb33ef2023ce8$export$f936470337fdc8d0).thing.list.insert(this.system, value1);
+         */ console.log("Insert", value, position);
+        this.system = (0, $53bcb33ef2023ce8$export$f936470337fdc8d0).thing.list.insert(this.system, value, position);
     }
     get position() {
         return (0, $53bcb33ef2023ce8$export$f936470337fdc8d0).thing.value.get(this.system, "position");
     }
-    set position(value1) {
-        return (0, $53bcb33ef2023ce8$export$f936470337fdc8d0).thing.value.set(this.system, "position", value1);
+    set position(value) {
+        return (0, $53bcb33ef2023ce8$export$f936470337fdc8d0).thing.value.set(this.system, "position", value);
     }
     // -----------------------------------------------------
     //  Static operations 
@@ -11196,32 +13993,32 @@ class $706f18fe777015bf$export$3138a16edeb45799 {
     get name() {
         return (0, $53bcb33ef2023ce8$export$f936470337fdc8d0).thing.value.get(this.system, "name");
     }
-    set name(value1) {
-        this.system = (0, $53bcb33ef2023ce8$export$f936470337fdc8d0).thing.value.set(this.system, "name", value1);
+    set name(value) {
+        this.system = (0, $53bcb33ef2023ce8$export$f936470337fdc8d0).thing.value.set(this.system, "name", value);
     }
     get url() {
         return (0, $53bcb33ef2023ce8$export$f936470337fdc8d0).thing.value.get(this.system, "url");
     }
-    set url(value1) {
-        this.system = (0, $53bcb33ef2023ce8$export$f936470337fdc8d0).thing.value.set(this.system, "url", value1);
+    set url(value) {
+        this.system = (0, $53bcb33ef2023ce8$export$f936470337fdc8d0).thing.value.set(this.system, "url", value);
     }
     get itemListElement() {
         return (0, $53bcb33ef2023ce8$export$f936470337fdc8d0).thing.values.get(this.system, "itemListElement");
     }
-    set itemListElement(value1) {
-        this.system = (0, $53bcb33ef2023ce8$export$f936470337fdc8d0).thing.values.set(this.system, "itemListElement", value1);
+    set itemListElement(value) {
+        this.system = (0, $53bcb33ef2023ce8$export$f936470337fdc8d0).thing.values.set(this.system, "itemListElement", value);
     }
     get item() {
         return (0, $53bcb33ef2023ce8$export$f936470337fdc8d0).thing.value.get(this.system, "item");
     }
-    set item(value1) {
-        this.system = (0, $53bcb33ef2023ce8$export$f936470337fdc8d0).thing.value.set(this.system, "item", value1);
+    set item(value) {
+        this.system = (0, $53bcb33ef2023ce8$export$f936470337fdc8d0).thing.value.set(this.system, "item", value);
     }
     get other() {
         return (0, $53bcb33ef2023ce8$export$f936470337fdc8d0).thing.value.get(this.system, "other");
     }
-    set other(value1) {
-        this.system = (0, $53bcb33ef2023ce8$export$f936470337fdc8d0).thing.value.set(this.system, "other", value1);
+    set other(value) {
+        this.system = (0, $53bcb33ef2023ce8$export$f936470337fdc8d0).thing.value.set(this.system, "other", value);
     }
     // -----------------------------------------------------
     //  Static 
@@ -11347,7 +14144,15 @@ class $2cb32bf7096e125e$export$625c98c0044d29a6 {
          * @returns {Array} The things
          */ return (0, $53bcb33ef2023ce8$export$f936470337fdc8d0).thing.sort(this._db, conditions);
     }
+    // -----------------------------------------------------
+    //  Comment 
+    // -----------------------------------------------------
+    executeAction(action) {
+    /**
+         * Executes an action
+         */ }
 }
+
 
 
 
@@ -11356,25 +14161,45 @@ class $2cb32bf7096e125e$export$625c98c0044d29a6 {
 class $ccac8dd150ebbe19$export$ca3c739adc83f458 {
     constructor(element){
         this._db = new (0, $2cb32bf7096e125e$export$625c98c0044d29a6)(true);
-        this._templateDB = {};
+        this._templateDB = {
+            "a": "aaa"
+        };
+        this.isInitialized = false;
         this._registeredThings = new (0, $53bcb33ef2023ce8$export$f936470337fdc8d0).base.classes.Cache();
         this._element = element || document.body;
     }
     init() {
+        // Initialize things
         (0, $53bcb33ef2023ce8$export$f936470337fdc8d0).dom.thing.init(this._element, this._templateDB);
+        // Initialize inputs
+        this.isInitialized = true;
     }
+    // -----------------------------------------------------
+    //  Comment 
+    // -----------------------------------------------------
+    // -----------------------------------------------------
+    //  Comment 
+    // -----------------------------------------------------
     get(record_or_record_type, record_id) {
         /**
          * Gets a thing
          * @param {Object} record_or_record_type The record or record type
          * @param {String} record_id The record id
          * @returns {Object} The thing
-         */ return this._db.get(record_or_record_type, record_id);
+         */ let thing = this._db.get(record_or_record_type, record_id);
+        // Retrieve from api if missing
+        if ((0, $53bcb33ef2023ce8$export$f936470337fdc8d0).isNull(thing)) {
+            let record = (0, $53bcb33ef2023ce8$export$f936470337fdc8d0).base.storage.get(record);
+            thing = new (0, $706f18fe777015bf$export$3138a16edeb45799)(record);
+        }
+        return thing;
     }
     set(record) {
         // Add to thing db (will convert to thing object if required)
         // Add thing to thing db
         let thing = this._db.set(record);
+        // Add thing to storage
+        (0, $53bcb33ef2023ce8$export$f936470337fdc8d0).base.storage.set(thing.system);
         // Suscribe to thing event listener
         this.registerThing(this._db.getAll());
         // Render thing
@@ -11406,19 +14231,43 @@ class $ccac8dd150ebbe19$export$ca3c739adc83f458 {
          * @returns {Object} The thing
          * 
          */ let things = this._db.getAll();
-        for (let t of things)this.renderThing(t);
+        for (let t of things)if (t) this.renderThing(t);
     }
-    renderThing(thing) {
+    renderThing(record_or_record_type, record_id) {
         /**
          * Renders the thing
          * @param {Object} thing The thing
          * @returns {Object} The thing
          * 
-         */ thing = this._db.get(thing);
-        (0, $53bcb33ef2023ce8$export$f936470337fdc8d0).dom.thing.renderSystem(this._element, thing.system);
+         */ // Render thing
+        let newThing = this._db.get(record_or_record_type, record_id);
+        let systemRecord = newThing?.system;
+        if ((0, $53bcb33ef2023ce8$export$f936470337fdc8d0).isNotNull(systemRecord)) {
+            (0, $53bcb33ef2023ce8$export$f936470337fdc8d0).dom.thing.renderSystem(this._element, systemRecord, null, this._templateDB);
+            (0, $53bcb33ef2023ce8$export$f936470337fdc8d0).dom.thing.event.register(this._element);
+        }
+    // Render thing childrens
+    //for(let t of newThing?.children || []){
+    // this.renderThing(t)
+    // }
+    }
+    addTemplate(templateID, template, elementKrType = "krThing") {
+        /**
+         * Adds a template
+         * @param {String} templateID The template id
+         * @param {String} template The template
+         */ let force = true;
+        let temp = document.createElement("div");
+        temp.setAttribute("data-templateID", templateID);
+        temp.classList.add(elementKrType);
+        temp.innerHTML = template;
+        (0, $53bcb33ef2023ce8$export$f936470337fdc8d0).dom.thing.init(temp, this._templateDB, force);
+        return;
     }
     thingEventCallback(action) {
-        console.log("New callback", action.object);
+        // Store in storage
+        if ((0, $53bcb33ef2023ce8$export$f936470337fdc8d0).isNotNull(action.object?.system)) (0, $53bcb33ef2023ce8$export$f936470337fdc8d0).base.storage.set(action.object?.system);
+        // Render
         this.renderThing(action.object);
     }
 }
@@ -11431,377 +14280,1095 @@ const $3044c528e2aca24b$export$4d4e92f9aafe7618 = {
 };
 
 
+0, $80fcb1b48f652599$export$9a59ac6eee85ea02;
+const $0c6143b014d5fc75$export$99f0d4ee82e9706 = {
+    article: (0, $1d1d7e6925c636ce$export$bba2aacf8566461b),
+    callToAction: (0, $cc70f1201526a438$export$2416a15e4d3cccfa),
+    card: (0, $76c1cc9e1ba74570$export$aa3e815946b80764),
+    cardHorizontal: (0, $709a68bd1ec08152$export$1b08a1f3c4097168),
+    css: (0, $a03ed131cc6a7a3f$export$dbf350e5966cf602),
+    features: (0, $2e6f30c3f5256cba$export$606190e461fe9031),
+    footer: (0, $c1a4b784a1c88929$export$adb608be33961c98),
+    form: (0, $85edee0a0611fc02$export$6210fa4921d2a466),
+    hero: (0, $fba729fe2c3be31b$export$124049a9e3d0d4c3),
+    howTo: (0, $69c32621a8b1cbcb$export$91392eeb01bb62de),
+    icons: (0, $7336d3e0ff0b04a2$export$df03f54e09e486fa),
+    itemlist: (0, $03cb398f5a2433c4$export$b97dc3b2d35f8775),
+    jsonld: (0, $b22cd3de1d812d2d$export$f8fce98513fdd41a),
+    line: (0, $f4b33ebb584657d4$export$53f1d5ea8de3d7c),
+    listitem: (0, $155333d55623e825$export$f90eb7c4d1fc985e),
+    navbar: (0, $7815f8c2c6e056e7$export$58733aaf927c3bbe),
+    page: (0, $4e52112d33bc49e7$export$523fb3936f49e028),
+    pill: (0, $ea78f44e9c4fdb13$export$dc6dff4b377d0f20),
+    pricing: (0, $69f4a06c5a5f7855$export$ee3212a4833dc722),
+    propertyValues: (0, $80fcb1b48f652599$export$9a59ac6eee85ea02),
+    record: (0, $31a5d99e72741423$export$e5185e241753e543),
+    userConsent: (0, $1e883218857c7794$export$cfaa45ebb704a3b2),
+    landingPage: $0c6143b014d5fc75$var$getLandingPage,
+    contentHead: (0, $f8940d488cd7a66f$export$fa24ed99e5e77fab),
+    contentBody: (0, $f1ab845195ae8ea8$export$95dc927f26875787)
+};
+function $0c6143b014d5fc75$var$getLandingPage(records) {
+    /**
+     * Get elements of landing page
+     */ let content = "";
+    let count = 0;
+    for (let r of records){
+        r = (0, $2fa9c1db583d4d31$export$439bf78a2cc516f5).heading.addHeadings(r);
+        let krakenClasses = [];
+        let partContent = "";
+        switch(r?.["@type"]){
+            case "Article":
+                partContent += (0, $2fa9c1db583d4d31$export$439bf78a2cc516f5).template.render((0, $1d1d7e6925c636ce$export$bba2aacf8566461b)(), r);
+                break;
+            case "CreativeWork":
+                partContent += (0, $2fa9c1db583d4d31$export$439bf78a2cc516f5).template.render((0, $fba729fe2c3be31b$export$124049a9e3d0d4c3)(), r);
+                break;
+            case "HowTo":
+                partContent += (0, $2fa9c1db583d4d31$export$439bf78a2cc516f5).template.render((0, $69c32621a8b1cbcb$export$91392eeb01bb62de)(), r);
+                break;
+            case "Product":
+                partContent += (0, $2fa9c1db583d4d31$export$439bf78a2cc516f5).template.render((0, $2e6f30c3f5256cba$export$606190e461fe9031)(), r);
+                break;
+            case "OfferCatalog":
+                partContent += (0, $2fa9c1db583d4d31$export$439bf78a2cc516f5).template.render((0, $69f4a06c5a5f7855$export$ee3212a4833dc722)(), r);
+                break;
+            case "Action":
+                partContent += (0, $2fa9c1db583d4d31$export$439bf78a2cc516f5).template.render((0, $cc70f1201526a438$export$2416a15e4d3cccfa)(), r);
+                break;
+        }
+        // Get classes
+        if (count == 0) {
+            krakenClasses.push("text-bg-dark");
+            krakenClasses.push("bg-gradient ");
+        }
+        if (count != 0 && (0, $2fa9c1db583d4d31$export$439bf78a2cc516f5).number.isEven(count)) krakenClasses.push("text-bg-secondary");
+        // Increment counter
+        count += 1;
+        // Compile content
+        content += `
+        <section 
+        class="aos-init aos-animate ${krakenClasses.join(" ")} pt-5 pb-5"
+        data-aos="fade-down"
+        data-aos-offset="300"
+        > 
+            ${partContent} 
+        </section>`;
+    }
+    return content;
+}
 
-class $0ef250b87a5eb9d9$export$a24f065ae97d3b9d extends HTMLElement {
-    constructor(){
-        super();
-        this._thing = null;
-        this._record = null;
-    }
-    // -----------------------------------------------------
-    //  Draw 
-    // -----------------------------------------------------
-    init() {
-        this.record = $0ef250b87a5eb9d9$var$getRecord();
-        this.classList.add("krThing");
-        this.innerHTML = (0, $53bcb33ef2023ce8$export$f936470337fdc8d0).html.itemlist();
-        (0, $53bcb33ef2023ce8$export$f936470337fdc8d0).dom.thing.init(this);
-        let headingrecord = (0, $53bcb33ef2023ce8$export$f936470337fdc8d0).localization.headings.record.get(this.record);
-        (0, $53bcb33ef2023ce8$export$f936470337fdc8d0).dom.thing.render(this, headingrecord);
-    }
-    // -----------------------------------------------------
-    //  Properties 
-    // -----------------------------------------------------
-    get record_type() {
-        return this.getAttribute("data-record-type");
-    }
-    set record_type(value) {
-        return this.setAttribute("data-record-type", value);
-    }
-    get record_id() {
-        return this.getAttribute("data-record-id");
-    }
-    set record_id(value) {
-        return this.setAttribute("data-record-id", value);
-    }
-    get ref() {
-        return {
-            "@type": this.record_type,
-            "@id": this.record_id
-        };
-    }
-    set ref(value) {
-        this.record_type = value?.["@type"] || value?.record_type || null;
-        this.record_id = value?.["@id"] || value?.record_id || null;
-    }
-    get record() {
-        return $0ef250b87a5eb9d9$var$getRecord();
-    }
-    set record(value) {
-        this.ref = value;
-        return this._record = value;
-    }
-    get thing() {
-        return this._thing;
-    }
-    set thing(value) {
-        return this._thing = value;
-    }
-    connectedCallback() {
-        this.init();
-    }
-    disconnectedCallback() {}
-    adoptedCallback() {}
-    attributeChangedCallback(name, oldValue, newValue) {}
-}
-customElements.define("kr-list", $0ef250b87a5eb9d9$export$a24f065ae97d3b9d);
-function $0ef250b87a5eb9d9$var$getAction(name, no) {
-    return {
-        "@type": "action",
-        "@id": "action_" + name + "_" + String(no),
-        name: "action_" + name + "_" + String(no),
-        actionStatus: "PotentialActionStatus"
+
+
+
+const $2847cdd26445865b$export$57abcc0c7c9e66d0 = {
+    get: $2847cdd26445865b$var$getApi,
+    post: $2847cdd26445865b$var$postApi,
+    delete: $2847cdd26445865b$var$deleteApi,
+    postFile: $2847cdd26445865b$var$postApiFile,
+    getFile: $2847cdd26445865b$var$getApiFile
+};
+async function $2847cdd26445865b$var$getApi(baseUrl, urlPath, params) {
+    const requestOptionsGet = {
+        method: "GET",
+        headers: {
+            "Content-Type": "application/json"
+        }
     };
+    let url;
+    if ((0, $2fa9c1db583d4d31$export$439bf78a2cc516f5).isNotNull(urlPath)) url = new URL(String(urlPath), String(baseUrl));
+    else url = new URL(String(baseUrl));
+    url.search = new URLSearchParams(params);
+    url = String(url);
+    const response1 = await fetch(url, requestOptionsGet);
+    if (response1.status != 200 && response1.status != 201 && response1.status && 202) throw new Error(String(response1.status) + " " + response1.statusText);
+    let results = await response1.json();
+    return results;
 }
-function $0ef250b87a5eb9d9$var$getRecord() {
-    let record = {
-        "@type": "ListItem",
-        "@id": "listitem1",
-        position: 4,
-        item: {
-            "@context": "https://schema.org/",
-            "@type": "Thing",
-            "@id": "thing1",
-            name: "thing1",
-            image: {
-                "@context": "https://schema.org/",
-                "@type": "ImageObject",
-                "@id": "image1",
-                name: "image_1",
-                contentUrl: "https://placehold.co/600x400"
-            },
-            reviewRating: {
-                "@type": "Rating",
-                bestRating: "5",
-                ratingValue: "4",
-                worstRating: "1"
-            },
-            potentialAction: [
-                $0ef250b87a5eb9d9$var$getAction("Thing", 0),
-                $0ef250b87a5eb9d9$var$getAction("Thing", 1),
-                $0ef250b87a5eb9d9$var$getAction("Thing", 2)
-            ]
+async function $2847cdd26445865b$var$postApi(baseUrl, urlPath, records) {
+    //Post 
+    let requestOptions = {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
         },
-        potentialAction: [
-            $0ef250b87a5eb9d9$var$getAction("ListItem", 0),
-            $0ef250b87a5eb9d9$var$getAction("ListItem", 1),
-            $0ef250b87a5eb9d9$var$getAction("ListItem", 2)
-        ]
+        body: JSON.stringify(records)
     };
-    let itemlist = {
-        "@type": "ItemList",
-        "@id": "itemlist1",
-        name: "itemlist1",
-        itemListElement: [
-            record,
-            record,
-            record,
-            record
-        ],
-        potentialAction: [
-            $0ef250b87a5eb9d9$var$getAction("ItemList", 0),
-            $0ef250b87a5eb9d9$var$getAction("ItemList", 1),
-            $0ef250b87a5eb9d9$var$getAction("ItemList", 2)
-        ]
+    let url;
+    if ((0, $2fa9c1db583d4d31$export$439bf78a2cc516f5).isNotNull(urlPath)) url = new URL(String(urlPath), String(baseUrl));
+    else url = new URL(String(baseUrl));
+    url = String(url);
+    const response1 = await fetch(url, requestOptions);
+    if (response1.status != 200 && response1.status != 201 && response1.status != 202) throw new Error(String(response1.status) + " " + response1.statusText);
+    return response1.json();
+}
+async function $2847cdd26445865b$var$getApiFile(filename, baseUrl, urlPath) {
+    if ((0, $2fa9c1db583d4d31$export$439bf78a2cc516f5).isNull(filename)) {
+        let parts = filename = baseUrl.split("/");
+        filename = parts[parts.length - 1];
+    }
+    try {
+        let url;
+        if ((0, $2fa9c1db583d4d31$export$439bf78a2cc516f5).isNotNull(urlPath)) url = new URL(String(urlPath), String(baseUrl));
+        else url = new URL(String(baseUrl));
+        // Fetch the file from the provided URL
+        const response1 = await fetch(url);
+        // Check if the response is ok (status is in the range 200-299)
+        if (!response1.ok) throw new Error(`Failed to fetch file: ${response1.statusText}`);
+        // Convert the response data to a Blob object
+        const blob = await response1.blob();
+        // Create a File object from the Blob
+        const file = new File([
+            blob
+        ], filename, {
+            type: blob.type
+        });
+        return file;
+    } catch (error) {
+        console.error("Error fetching the file:", error);
+        return null;
+    }
+}
+async function $2847cdd26445865b$var$postApiFile(baseUrl, urlPath, file) {
+    //Post 
+    let url;
+    if ((0, $2fa9c1db583d4d31$export$439bf78a2cc516f5).isNotNull(urlPath)) url = new URL(String(urlPath), String(baseUrl));
+    else url = new URL(String(baseUrl));
+    const formData = new FormData();
+    formData.append("file", file); // 'file' is the key expected by the API
+    try {
+        const response1 = await fetch(url, {
+            method: "POST",
+            body: formData,
+            headers: {
+            }
+        });
+        if (response1.ok) {
+            const result = await response1.json();
+            return result;
+        }
+    } catch (error) {}
+    return response;
+}
+async function $2847cdd26445865b$var$deleteApi(baseUrl, urlPath, params) {
+    const requestOptionsGet = {
+        method: "DELETE",
+        headers: {
+            "Content-Type": "application/json"
+        }
     };
-    return itemlist;
+    let url;
+    if ((0, $2fa9c1db583d4d31$export$439bf78a2cc516f5).isNotNull(urlPath)) url = new URL(String(urlPath), String(baseUrl));
+    else url = new URL(String(baseUrl));
+    url.search = new URLSearchParams(params);
+    const response1 = await fetch(url, requestOptionsGet);
+    if (response1.status != 200 && response1.status != 201 && response1.status != 202) throw new Error(String(response1.status) + " " + response1.statusText);
+    return true;
 }
 
 
 
-class $fcaceaa039140c3c$export$4d003f86c0d70530 extends HTMLElement {
-    constructor(){
-        super();
-        this._thing = null;
-        this._record = null;
-        this.record = {
-            "@type": "CreativeWork",
-            "@id": String(crypto.randomUUID()),
-            "headline": "",
-            "text": "aaa",
-            "hasPart": [
-                {
-                    "@type": "CreativeWork",
-                    "@id": String(crypto.randomUUID()),
-                    "headline": "",
-                    "text": "bbb",
-                    "hasPart": []
-                },
-                {
-                    "@type": "CreativeWork",
-                    "@id": String(crypto.randomUUID()),
-                    "headline": "",
-                    "text": "ccc",
-                    "hasPart": []
-                }
-            ]
-        };
+const $82d074b4d9acded9$export$b030493e7466de36 = {
+    req: {
+        record_type: $82d074b4d9acded9$var$getRecordTypeFromReq,
+        record_id: $82d074b4d9acded9$var$getRecordIdFromReq,
+        collection: $82d074b4d9acded9$var$getCollectionFromReq,
+        records: $82d074b4d9acded9$var$getRecordsFromReq,
+        record: $82d074b4d9acded9$var$getRecordsFromReq,
+        params: $82d074b4d9acded9$var$getParamsFromReq,
+        file: $82d074b4d9acded9$var$getFileFromReq,
+        method: $82d074b4d9acded9$var$getMethodFromReq,
+        query: $82d074b4d9acded9$var$getQueryFromReq,
+        limit: $82d074b4d9acded9$var$getLimitFromReq,
+        offset: $82d074b4d9acded9$var$getOffsetFromReq,
+        orderBy: $82d074b4d9acded9$var$getOrderByFromReq,
+        orderDirection: $82d074b4d9acded9$var$getOrderDirectionFromReq
+    },
+    record: {
+        webpage: $82d074b4d9acded9$var$getWebpageRecordFromReq,
+        device: $82d074b4d9acded9$var$getDeviceRecordFromReq,
+        action: $82d074b4d9acded9$var$getActionRecordFromReq
     }
-    // -----------------------------------------------------
-    //  Draw 
-    // -----------------------------------------------------
-    init() {
-        this.classList.add("krThing");
-        this.innerHTML = `
+};
+function $82d074b4d9acded9$var$getRecordsFromReq(req) {
+    let records = req.body || null;
+    return records;
+}
+function $82d074b4d9acded9$var$getRecordTypeFromReq(req) {
+    let record_type;
+    record_type = req.params?.record_type || record_type;
+    record_type = req.params?.["@type"] || record_type;
+    record_type = req.query?.record_type || record_type;
+    record_type = req.query?.["@type"] || record_type;
+    return record_type;
+}
+function $82d074b4d9acded9$var$getRecordIdFromReq(req) {
+    let record_id;
+    record_id = req.params?.record_id || record_id;
+    record_id = req.params?.["@id"] || record_id;
+    record_id = req.query?.record_id || record_id;
+    record_id = req.query?.["@id"] || record_id;
+    return record_id;
+}
+function $82d074b4d9acded9$var$getCollectionFromReq(req) {
+    let collection;
+    collection = req.params?.collection || collection;
+    collection = req.query?.collection || collection;
+    while(collection.startsWith("/"))collection = collection.slice(1, collection.length - 1);
+    while(collection.endsWith("/"))collection = collection.slice(0, collection.length - 2);
+    return collection;
+}
+function $82d074b4d9acded9$var$getParamsFromReq(req) {
+    // Returns the params as an array
+    let params = {};
+    for(let k in req.params){
+        let value = req.params?.[k];
+        if ((0, $2fa9c1db583d4d31$export$439bf78a2cc516f5).isNotNull(value)) params[k] = value;
+    }
+    return params;
+}
+function $82d074b4d9acded9$var$getFileFromReq(req) {
+    let files = [];
+    for (let k of Object.keys(req.files)){
+        let subFiles = req.files[k];
+        if (!Array.isArray(subFiles)) subFiles = [
+            subFiles
+        ];
+        for (let s of subFiles)files.push(s);
+    }
+    return files;
+}
+function $82d074b4d9acded9$var$getMethodFromReq(req) {
+    return req.method;
+}
+function $82d074b4d9acded9$var$getDomainFromReq(req) {
+    return req.hostname;
+}
+function $82d074b4d9acded9$var$getUrlFromReq(req) {
+    let url = req.protocol + "://" + req.hostname + req.originalurl;
+    return url;
+}
+function $82d074b4d9acded9$var$getQueryFromReq(req) {
+    let name = "query";
+    let value = req.params?.[name] || req.query?.[name] || null;
+    try {
+        value = JSON.parse(value);
+    } catch  {}
+    return value;
+}
+function $82d074b4d9acded9$var$getLimitFromReq(req) {
+    let name = "limit";
+    let value = req.params?.[name] || req.query?.[name] || null;
+    return value;
+}
+function $82d074b4d9acded9$var$getOffsetFromReq(req) {
+    let name = "offset";
+    let value = req.params?.[name] || req.query?.[name] || null;
+    return value;
+}
+function $82d074b4d9acded9$var$getOrderByFromReq(req) {
+    let name = "orderBy";
+    let value = req.params?.[name] || req.query?.[name] || null;
+    return value;
+}
+function $82d074b4d9acded9$var$getOrderDirectionFromReq(req) {
+    let name = "orderDirection";
+    let value = req.params?.[name] || req.query?.[name] || null;
+    return value;
+}
+function $82d074b4d9acded9$var$getActionRecordFromReq(req) {
+    let action = {
+        "@type": "ViewAction",
+        "@id": String(crypto.randomUUID()),
+        object: $82d074b4d9acded9$var$getWebpageRecordFromReq(req),
+        instrument: $82d074b4d9acded9$var$getDeviceRecordFromReq(req),
+        agent: $82d074b4d9acded9$var$getAgentRecordFromReq(),
+        timeStart: new Date(),
+        actionStatus: "CompletedActionStatus"
+    };
+    return action;
+}
+function $82d074b4d9acded9$var$getWebpageRecordFromReq(req) {
+    let record = {
+        "@type": "WebPage",
+        "url": $82d074b4d9acded9$var$getUrlFromReq(req)
+    };
+    return record;
+}
+function $82d074b4d9acded9$var$getDeviceRecordFromReq(req) {
+    let record = {
+        "@context": "https://schema.org",
+        "@type": "Product",
+        "name": "Computer Device",
+        "identifier": {
+            "@type": "PropertyValue",
+            "name": "IP Address",
+            "value": "192.168.0.1"
+        }
+    };
+    return record;
+}
+function $82d074b4d9acded9$var$getAgentRecordFromReq(req) {
+    /**
+     * Returns the agent record
+     */ let record = {
+        "@type": "Person",
+        "@id": (0, $2fa9c1db583d4d31$export$439bf78a2cc516f5).uuid.new(),
+        "knowsLanguage": req.headers["accept-language"]
+    };
+    return record;
+}
+
+
+const $5e5f0feca47925ff$export$41307516eb485fda = {
+    sendData: $5e5f0feca47925ff$var$sendData
+};
+function $5e5f0feca47925ff$var$sendData(record) {
+    /**
+     * @type {string}
+     *
+     */ console.log("sendData start");
+    console.log(record);
+    const data = JSON.stringify(record);
+    navigator.sendBeacon(apiUrl, data);
+    console.log("sendData end");
+}
+
+
+const $89c05b0785d9b053$export$30704911fa9a0a07 = {
+    api: (0, $2847cdd26445865b$export$57abcc0c7c9e66d0),
+    express: (0, $82d074b4d9acded9$export$b030493e7466de36),
+    browser: (0, $5e5f0feca47925ff$export$41307516eb485fda)
+};
+
+
+/**
+ * @fileoverview Kraken Selectable
+ * @author Simon Chapleau
+ * @version 1.0.0
+ *
+ * Functions to add selectable functionality to elements
+ *
+ * Elements with class name 'krSelectable' becomes selectable when clicked on
+ * When selected, class 'krSelected' is added
+ * 
+ * 
+ */ 
+const $32408525531fd7dd$export$55c553c6132a50f2 = {
+    set: $32408525531fd7dd$var$makeSelectable,
+    get: $32408525531fd7dd$var$getSelected,
+    addCss: $32408525531fd7dd$var$addSelectedCss
+};
+const $32408525531fd7dd$var$selectableClass = "krSelectable";
+const $32408525531fd7dd$var$selectedClass = "krSelected";
+// Initialize database of already initialized elements
+let $32408525531fd7dd$var$elementDB = {};
+function $32408525531fd7dd$var$makeSelectable(element, allowMultiSelect = true) {
+    /**
+     * Make all elements with class name 'krSelectable' selectable
+     * When selected, class 'krSelected' is added
+     * @param element: parent element of all elements to make selectable
+     * @param allowMultiSelect: allow multiple selections
+     * @return void
+     * 
+     */ element = element || document.body;
+    // Initialize parent element to deselect all other elements on click
+    if ((0, $2fa9c1db583d4d31$export$439bf78a2cc516f5).isNull(element.id)) element.id = (0, $2fa9c1db583d4d31$export$439bf78a2cc516f5).uuid.new();
+    element.addEventListener("click", (event)=>{
+        let selectedElements = element.querySelectorAll("." + $32408525531fd7dd$var$selectedClass) || [];
+        for (let selectedElement of selectedElements)selectedElement.classList.remove($32408525531fd7dd$var$selectedClass);
+    });
+    // Initialize selectable elements under parent element
+    let selectableElements = element.querySelectorAll("." + $32408525531fd7dd$var$selectableClass);
+    for (let e of selectableElements){
+        // Add id is missing
+        if ((0, $2fa9c1db583d4d31$export$439bf78a2cc516f5).isNull(e.id)) e.id = (0, $2fa9c1db583d4d31$export$439bf78a2cc516f5).uuid.new();
+        // Skip if already initialized
+        if ((0, $2fa9c1db583d4d31$export$439bf78a2cc516f5).isNotNull($32408525531fd7dd$var$elementDB?.[element.id])) continue;
+        // Add event listener on element
+        e.addEventListener("click", (event)=>{
+            event.preventDefault();
+            event.stopPropagation();
+            //If  Shift key not pressed, remove current selection
+            if (!event.shiftKey || allowMultiSelect == false) {
+                let selectedElements = element.querySelectorAll("." + $32408525531fd7dd$var$selectedClass) || [];
+                for (let selectedElement of selectedElements)if (selectedElement != e) selectedElement.classList.remove($32408525531fd7dd$var$selectedClass);
+            }
+            // Toggle current element
+            event.currentTarget.classList.toggle($32408525531fd7dd$var$selectedClass);
+        });
+    }
+}
+function $32408525531fd7dd$var$getSelected(element) {
+    /**
+     * Returns the elements selected below the input element
+     * @param {HTMLElement} element
+     * @returns {Array}
+     * 
+     */ element = element || document.body;
+    let results = element.querySelectorAll("." + $32408525531fd7dd$var$selectedClass);
+    results = results || [];
+    return results;
+}
+function $32408525531fd7dd$var$addSelectedCss() {
+    /**
+     * Add Css necessary to make element appear selected
+     * @param {HTMLElement} element
+     * @returns {void}
+     */ var styles = `
+       
+    
+        .${$32408525531fd7dd$var$selectableClass}.${$32408525531fd7dd$var$selectedClass} { 
+            
+              outline-style: solid;
+              outline-color: transparent;
+              box-shadow: 0 0 0 2px #0e44af,
+                          0 0 0 5px #fff;
+        }
         
+    `;
+    var styleSheet = document.createElement("style");
+    styleSheet.textContent = styles;
+    document.head.appendChild(styleSheet);
+    return;
+}
 
-         
-            <div>
-                <div>
-                {{ text }}
-               </div>
 
-                <div>
-                    {{# hasPart}}
-                        <div contenteditable="true">
-                           <kr-line></kr-line>
-                        </div>
-                        
-                    {{/hasPart}}
-                </div>
+/**
+ * @fileoverview Kraken drag drop generic
+ * @author Simon Chapleau
+ * @version 1.0.0
+ *
+ * Functions to add generic dran and drop capabilities
+ *
+ * Elements with class name 'krDropzone' becomes dropzones
+ * Elements with class name 'krDraggable' becomes draggable
+ * 
+ * 
+ */ 
 
-            </div>
+const $49d105fa6f31cf65$export$fa58845da60d0a9b = {
+    draggable: {
+        set: $49d105fa6f31cf65$var$setDraggable
+    },
+    dropzone: {
+        set: $49d105fa6f31cf65$var$setDropzone
+    },
+    addCss: $49d105fa6f31cf65$var$addCss
+};
+const $49d105fa6f31cf65$var$dropzoneClass = "krDropzone";
+const $49d105fa6f31cf65$var$dropzoneOverClass = "krDropzoneOver";
+const $49d105fa6f31cf65$var$draggableClass = "krDraggable";
+const $49d105fa6f31cf65$var$draggableHandleClass = "krDraggableHandle";
+const $49d105fa6f31cf65$var$draggingClass = "krDragging";
+const $49d105fa6f31cf65$var$krSelectedClass = "krSelected";
+// Initialize database of already initialized elements
+let $49d105fa6f31cf65$var$elementDB = {};
+function $49d105fa6f31cf65$var$setDraggable(engine, element, allowMultiSelect = true) {
+    /**
+     * Make all elements with class name 'krDraggable' draggable
+     * @param element: parent element of all elements to make draggable
+     * @param allowMultiSelect: allow multiple selections
+     * @return void
+     * 
+     */ element = element || document.body;
+    let draggableElements = element.querySelectorAll("." + $49d105fa6f31cf65$var$draggableClass);
+    for (let e of draggableElements){
+        // Get grabhandle 
+        let dragHandle = e.querySelector("." + $49d105fa6f31cf65$var$draggableHandleClass);
+        // Default hanbdle to element if missing
+        dragHandle = dragHandle || e;
+        // -----------------------------------------------------
+        //  Handle click make the elemtn draggable or not 
+        // -----------------------------------------------------
+        // On click of handle, make element draggable
+        dragHandle.addEventListener("mousedown", (event)=>{
+            e.draggable = true;
+        });
+        dragHandle.addEventListener("mouseup", (event)=>{
+            e.draggable = false;
+        });
+        // -----------------------------------------------------
+        //  Draggable fn 
+        // -----------------------------------------------------
+        dragHandle.addEventListener("dragstart", (event)=>{
+            //event.preventDefault()
+            //event.stopPropagation()
+            // Get dragged element
+            let draggedElement = event.currentTarget;
+            // Set class of dragged element
+            draggedElement.classList.add($49d105fa6f31cf65$var$draggingClass);
+            // Get record from element
+            let thing = engine.get((0, $3a31490163c9c724$export$3633c9dc515d5cf9).thing.property.ref.get(draggedElement));
+            let record = thing?.record || null;
+            // Set record as datatransfer value
+            event.dataTransfer.setData("text/plain", JSON.stringify(record));
+        });
+        dragHandle.addEventListener("dragend", (event)=>{
+            //event.preventDefault()
+            //event.stopPropagation()
+            // Get dragged element
+            let draggedElement = event.currentTarget;
+            // Remove class of dragged elements
+            for (let e1 of element.querySelectorAll("." + $49d105fa6f31cf65$var$draggingClass))e1.classList.remove($49d105fa6f31cf65$var$draggingClass);
+        });
+    }
+}
+function $49d105fa6f31cf65$var$setDropzone(engine, element, allowMultiSelect = true) {
+    /**
+     * Make all elements with class name 'krDropzone' dropzone
+     */ element = element || document.body;
+    let dropzoneElements = element.querySelectorAll("." + $49d105fa6f31cf65$var$dropzoneClass);
+    for (let e of dropzoneElements){
+        e.addEventListener("dragover", (event)=>{
+            event.preventDefault();
+            event.stopPropagation();
+            e.classList.add($49d105fa6f31cf65$var$dropzoneOverClass);
+        });
+        e.addEventListener("dragenter", (event)=>{
+            event.preventDefault();
+            event.stopPropagation();
+            e.classList.add($49d105fa6f31cf65$var$dropzoneOverClass);
+        });
+        e.addEventListener("dragleave", (event)=>{
+            event.preventDefault();
+            event.stopPropagation();
+            e.classList.remove($49d105fa6f31cf65$var$dropzoneOverClass);
+        });
+        e.addEventListener("drop", (event)=>{
+            event.preventDefault();
+            event.stopPropagation();
+            // Remove all dragover class
+            for (let e1 of element.querySelectorAll("." + $49d105fa6f31cf65$var$dropzoneOverClass))e1.classList.remove($49d105fa6f31cf65$var$dropzoneOverClass);
+            // Retrieve record or value
+            let record = JSON.parse(event.dataTransfer.getData("text/plain"));
+            // Retrieve thing ref related to dropzone
+            let currentElement = event.currentTarget;
+            let thingElement = (0, $3a31490163c9c724$export$3633c9dc515d5cf9).thing.traverse.current.thing.get(currentElement);
+            let thing = engine.get((0, $3a31490163c9c724$export$3633c9dc515d5cf9).thing.property.ref.get(thingElement));
+            // Handle lists
+            if (thing?.record_type == "ListItem") {
+                record = record?.item;
+                let parentThingElement = thingElement.parentElement.closest(".krThing");
+                let parentThing = engine.get((0, $3a31490163c9c724$export$3633c9dc515d5cf9).thing.property.ref.get(parentThingElement));
+                parentThing.insert(record, thing.position);
+                engine.set(parentThing);
+                thing = parentThing;
+            }
+            // Render
+            engine.render(thing);
+            $49d105fa6f31cf65$var$setDropzone(engine, element);
+            $49d105fa6f31cf65$var$setDraggable(engine, element);
+        });
+    }
+}
+function $49d105fa6f31cf65$var$addCss() {
+    /**
+     * Add Css necessary to make element appear dragging
+     * @param {HTMLElement} element
+     * @returns {void}
+     */ var styles = `
+
+
+        .${$49d105fa6f31cf65$var$draggableClass}.${$49d105fa6f31cf65$var$draggingClass} { 
+
+            opacity = '0.4';
+        }
+
+        .${$49d105fa6f31cf65$var$dropzoneClass}.${$49d105fa6f31cf65$var$dropzoneOverClass} {
+
+           margin-top: 20px;
         
-        `;
-        (0, $53bcb33ef2023ce8$export$f936470337fdc8d0).dom.thing.init(this);
-        //let headingrecord = krakenLocalizationHelpers.headings.record.get(this.record);
-        console.log(this.record);
-        (0, $53bcb33ef2023ce8$export$f936470337fdc8d0).dom.thing.render(this, this.record);
-    }
-    // -----------------------------------------------------
-    //  Properties 
-    // -----------------------------------------------------
-    get record_type() {
-        return this.getAttribute("data-record-type");
-    }
-    set record_type(value) {
-        return this.setAttribute("data-record-type", value);
-    }
-    get record_id() {
-        return this.getAttribute("data-record-id");
-    }
-    set record_id(value) {
-        return this.setAttribute("data-record-id", value);
-    }
-    get ref() {
-        return {
-            "@type": this.record_type,
-            "@id": this.record_id
-        };
-    }
-    set ref(value) {
-        this.record_type = value?.["@type"] || value?.record_type || null;
-        this.record_id = value?.["@id"] || value?.record_id || null;
-    }
-    get record() {
-        return this._record;
-    }
-    set record(value) {
-        this.ref = value;
-        this._record = value;
-    }
-    get thing() {
-        return this._thing;
-    }
-    set thing(value) {
-        return this._thing = value;
-    }
-    connectedCallback() {
-        this.init();
-    }
-    disconnectedCallback() {}
-    adoptedCallback() {}
-    attributeChangedCallback(name, oldValue, newValue) {}
+        }
+
+    `;
+    var styleSheet = document.createElement("style");
+    styleSheet.textContent = styles;
+    document.head.appendChild(styleSheet);
+    return;
 }
-customElements.define("kr-input", $fcaceaa039140c3c$export$4d003f86c0d70530);
 
 
+const $299ad19cbb68af01$export$ddce14f862b473c6 = {
+    selectable: (0, $32408525531fd7dd$export$55c553c6132a50f2),
+    dragdrop: (0, $49d105fa6f31cf65$export$fa58845da60d0a9b)
+};
 
-class $c9145326ace92d33$export$acb9410cd2a7d54e extends HTMLElement {
+
+const $4a1ec78adc00c303$export$e0169ab077dc0819 = {
+    event: (0, $299ad19cbb68af01$export$ddce14f862b473c6)
+};
+
+
+const $53bcb33ef2023ce8$export$f936470337fdc8d0 = {
+    base: (0, $2fa9c1db583d4d31$export$439bf78a2cc516f5),
+    dom: (0, $3a31490163c9c724$export$3633c9dc515d5cf9),
+    html: (0, $0c6143b014d5fc75$export$99f0d4ee82e9706),
+    localization: (0, $4f0e7017aa5846ec$export$a8f5b9913def03f3),
+    thing: (0, $fbdfe69f48d32df8$export$c24b4489b93ad8cb),
+    http: (0, $89c05b0785d9b053$export$30704911fa9a0a07),
+    element: (0, $4a1ec78adc00c303$export$e0169ab077dc0819),
+    // shortcuts
+    isNull: (0, $2fa9c1db583d4d31$export$439bf78a2cc516f5).null.isNull,
+    isNotNull: (0, $2fa9c1db583d4d31$export$439bf78a2cc516f5).null.isNotNull,
+    isEqual: (0, $2fa9c1db583d4d31$export$439bf78a2cc516f5).null.isEqual,
+    isNotEqual: (0, $2fa9c1db583d4d31$export$439bf78a2cc516f5).null.isNotEqual,
+    toArray: (0, $2fa9c1db583d4d31$export$439bf78a2cc516f5).array.toArray,
+    isArray: (0, $2fa9c1db583d4d31$export$439bf78a2cc516f5).array.isArray,
+    isObject: (0, $2fa9c1db583d4d31$export$439bf78a2cc516f5).object.isObject,
+    isDate: (0, $2fa9c1db583d4d31$export$439bf78a2cc516f5).date.isDate,
+    isNumber: (0, $2fa9c1db583d4d31$export$439bf78a2cc516f5).number.isNumber,
+    uuid: (0, $2fa9c1db583d4d31$export$439bf78a2cc516f5).uuid,
+    wait: (0, $2fa9c1db583d4d31$export$439bf78a2cc516f5).wait
+};
+
+
+class $72185a15243df046$export$1481e10980f8a723 {
     constructor(){
-        super();
-        this._thing = null;
-        this._record = null;
-        this._template = (0, $53bcb33ef2023ce8$export$f936470337fdc8d0).html.itemlist();
+        this.startTimes = new Map(); // Store start times for labels
+        this.endTimes = new Map(); // Store end times for labels
     }
-    // -----------------------------------------------------
-    //  Draw 
-    // -----------------------------------------------------
-    init() {
-        this.classList.add("krThing");
-        this.innerHTML = this._template;
-    //h.dom.thing.init(this)
-    //let headingrecord = h.localization.headings.record.get(this.record);
-    //h.dom.thing.render(this, headingrecord)
+    // Starts the timer for a specific label (default: 'default')
+    start(label = "default") {
+        if (this.startTimes.has(label)) {
+            console.warn(`Timer for '${label}' has already been started.`);
+            return;
+        }
+        this.startTimes.set(label, performance.now());
     }
-    // -----------------------------------------------------
-    //  Properties 
-    // -----------------------------------------------------
-    get thingElement() {
-        console.log("thingElement");
-        return (0, $53bcb33ef2023ce8$export$f936470337fdc8d0).dom.thing.traverse.current.thing.get(this);
+    // Stops the timer for a specific label and calculates duration
+    stop(label = "default") {
+        if (!this.startTimes.has(label)) {
+            console.warn(`Timer for '${label}' was not started.`);
+            return;
+        }
+        const endTime = performance.now();
+        const duration = endTime - this.startTimes.get(label);
+        this.endTimes.set(label, duration);
+        this.startTimes.delete(label); // Clean up after stop
+        return duration; // Returns duration for convenience
     }
-    get record_type() {
-        return (0, $53bcb33ef2023ce8$export$f936470337fdc8d0).dom.thing.property.record_type.get(this.thingElement);
+    // Resets all timers
+    reset(label = null) {
+        if (label) {
+            this.startTimes.delete(label);
+            this.endTimes.delete(label);
+        } else {
+            this.startTimes.clear();
+            this.endTimes.clear();
+        }
     }
-    set record_type(value) {
-        return (0, $53bcb33ef2023ce8$export$f936470337fdc8d0).dom.thing.property.record_type.set(this, value);
+    // Retrieves the duration for a specific label
+    getDuration(label = "default") {
+        if (!this.endTimes.has(label)) {
+            console.warn(`Timer for '${label}' has not been stopped.`);
+            return null;
+        }
+        return this.endTimes.get(label);
     }
-    get record_id() {
-        return (0, $53bcb33ef2023ce8$export$f936470337fdc8d0).dom.thing.property.record_id.get(this);
-    }
-    set record_id(value) {
-        return (0, $53bcb33ef2023ce8$export$f936470337fdc8d0).dom.thing.property.record_id.set(this, value);
-    }
-    get ref() {
-        return {
-            "@type": this.record_type,
-            "@id": this.record_id
-        };
-    }
-    set ref(value) {
-        this.record_type = value?.["@type"] || value?.record_type || null;
-        this.record_id = value?.["@id"] || value?.record_id || null;
-    }
-    get record() {
-        return getRecord();
-    }
-    set record(value) {
-        this.ref = value;
-        return this._record = value;
-    }
-    get thing() {
-        return this._thing;
-    }
-    set thing(value) {
-        return this._thing = value;
-    }
-    render() {
-        if ((0, $53bcb33ef2023ce8$export$f936470337fdc8d0).isNull(this.record_type) || (0, $53bcb33ef2023ce8$export$f936470337fdc8d0).isNull(this.record_id)) return;
-        console.log("element render");
-        let db = this.closest("kr-engine");
-        let systemRecord = db.get(this.record_type, this.record_id);
-        let simpleRecord = (0, $53bcb33ef2023ce8$export$f936470337fdc8d0).thing.record.get(systemRecord);
-        console.log("ss", simpleRecord);
-        let headingRecord = (0, $53bcb33ef2023ce8$export$f936470337fdc8d0).base.heading.addHeadings(simpleRecord);
-        let content = (0, $53bcb33ef2023ce8$export$f936470337fdc8d0).base.template.get(this._template, headingRecord);
-        console.log(content);
-        this.innerHTML = content;
-    }
-    connectedCallback() {
-        this.init();
-        this.render();
-    }
-    disconnectedCallback() {}
-    adoptedCallback() {}
-    attributeChangedCallback(name, oldValue, newValue) {
-        if (name == "data-record-type") this.render();
-        if (name == "data-record-id") this.render();
+    // Logs all durations
+    logAllDurations() {
+        this.endTimes.forEach((duration, label)=>{
+            console.log(`Duration for '${label}': ${duration.toFixed(2)} ms`);
+        });
     }
 }
-customElements.define("kr-base", $c9145326ace92d33$export$acb9410cd2a7d54e);
 
 
 
-class $a47487796306864f$export$77c048791dedfa54 extends (0, $c9145326ace92d33$export$acb9410cd2a7d54e) {
-    constructor(){
-        super();
-        this._template = (0, $53bcb33ef2023ce8$export$f936470337fdc8d0).html.card();
+class $56ba4b57196189e3$export$f5bc5036afac6116 {
+    constructor(maxItems = 1000, longestDuration = 600){
+        /**
+         * @param {Number} maxItems
+         * @param {Number} longestDuration (in seconds)
+         */ this._db = {};
+        this._maxItems = maxItems;
+        this._longestDuration = longestDuration;
+        this._noOfCacherecords = 0;
     }
-}
-customElements.define("kr-card", $a47487796306864f$export$77c048791dedfa54);
-
-
-
-
-class $675103532c00e15f$export$ca3c739adc83f458 extends HTMLElement {
-    constructor(){
-        super();
-        this._engine = null;
-    }
-    init() {
-        this._engine = new (0, $3044c528e2aca24b$export$4d4e92f9aafe7618).KrElementEngine();
-        this._engine.init(this);
+    length() {
+        /**
+         * Returns the number of items in the cache
+         * @returns {Number}
+         */ return this._noOfCacherecords;
     }
     get(record_or_record_type, record_id) {
-        return this._engine.get(record_or_record_type, record_id);
+        /**
+         * Returns the record
+         * @param {String} record_type
+         * @param {String} record_id
+         * @returns {Object} The record
+         * 
+         */ // Retrieve type and id
+        let record_type = record_or_record_type?.["@type"] || record_or_record_type?.record_type || record_or_record_type;
+        record_id = record_or_record_type?.["@id"] || record_or_record_type?.record_id || record_id;
+        // Error handlling
+        if ((0, $53bcb33ef2023ce8$export$f936470337fdc8d0).isNull(record_type) || (0, $53bcb33ef2023ce8$export$f936470337fdc8d0).isNull(record_id)) return null;
+        // Retrieve cache record
+        let cacheRecord = this._db?.[record_type]?.[record_id] || null;
+        // Error handling
+        if ((0, $53bcb33ef2023ce8$export$f936470337fdc8d0).isNull(cacheRecord)) return null;
+        // Verify duration, delete cache if over duration 
+        let n = new Date();
+        let duration = (n - cacheRecord.lastUpdated) / 1000;
+        if (duration > this._longestDuration) {
+            this.delete(record_type, record_id);
+            return null;
+        }
+        // Set no of accesses
+        cacheRecord.lastAccessed = new Date();
+        cacheRecord.noAccess += 1;
+        // Return 
+        return this._db?.[record_type]?.[record_id]?.["value"];
     }
-    set(value) {
-        return this._engine.set(value);
+    getAll() {
+        /**
+         * Returns all records
+         *
+         */ let results = [];
+        for(let rt in this._db)for(let ri in this._db[rt])results.push(this._db[rt][ri]?.value);
+        // Return 
+        return results;
     }
-    connectedCallback() {
-        this.init();
+    set(record) {
+        /**
+         * Sets a record
+         * 
+         */ // Handle array
+        if ((0, $53bcb33ef2023ce8$export$f936470337fdc8d0).isArray(record)) return record.map((x)=>this.set(x));
+        // Retrieve type and id
+        let record_type = record?.["@type"] || record?.record_type || null;
+        let record_id = record?.["@id"] || record?.record_id || null;
+        // Error handling
+        if ((0, $53bcb33ef2023ce8$export$f936470337fdc8d0).isNull(record_type) || (0, $53bcb33ef2023ce8$export$f936470337fdc8d0).isNull(record_id)) return null;
+        // Retrieve current cacheRecord (if exist)
+        this._db[record_type] = this._db?.[record_type] || {};
+        this._db[record_type][record_id] = this._db?.[record_type]?.[record_id];
+        let cacheRecord = this._db?.[record_type]?.[record_id] || null;
+        // Create cacherecord if not already exist
+        if ((0, $53bcb33ef2023ce8$export$f936470337fdc8d0).isNull(cacheRecord)) {
+            cacheRecord = {
+                date: new Date(),
+                value: record,
+                lastAccessed: new Date(),
+                lastUpdated: new Date(),
+                noAccess: 0
+            };
+            this._db[record_type][record_id] = cacheRecord;
+        }
+        // Set last Updated and value of cacheRecord
+        cacheRecord.lastUpdated = new Date();
+        cacheRecord.value = record;
+        // Increment counter (to avoid recounting every time)
+        this._noOfCacherecords += 1;
+        // Verify size
+        this._verifySize();
+        // Return
+        return;
     }
-    disconnectedCallback() {}
-    adoptedCallback() {}
-    attributeChangedCallback(name, oldValue, newValue) {}
+    delete(record_or_record_type, record_id) {
+        /**
+         * Deletes a record from the cache
+         * @param {String} record_type
+         * @param {String} record_id
+         *
+         */ // Retrieve type and id
+        let record_type = record_or_record_type?.["@type"] || record_or_record_type?.record_type || record_or_record_type;
+        record_id = record_or_record_type?.["@id"] || record_or_record_type?.record_id || record_id;
+        // Error handling
+        if ((0, $53bcb33ef2023ce8$export$f936470337fdc8d0).isNull(record_type) || (0, $53bcb33ef2023ce8$export$f936470337fdc8d0).isNull(record_id)) return null;
+        // Remove record
+        this._db[record_type] = this._db?.[record_type] || {};
+        this._db[record_type][record_id] = null;
+        // Decrement counter (to avoid recounting every time)
+        this._noOfCacherecords = this._noOfCacherecords - 1;
+        // Return
+        return;
+    }
+    clear() {
+        /**
+         * Clears the cache
+         */ this._db = {};
+        // Return
+        return;
+    }
+    // -----------------------------------------------------
+    //  Comment
+    // -----------------------------------------------------
+    _getAllCacheRecords() {
+        /**
+         * Returns all records
+         *
+         */ let results = [];
+        for(let rt in this._db)for(let ri in this._db[rt])results.push(this._db[rt][ri]);
+        results = results.filter((x)=>(0, $53bcb33ef2023ce8$export$f936470337fdc8d0).isNotNull(x));
+        return results;
+    }
+    _getOldestCacheRecord() {
+        /**
+         * Returns the oldest record (accessed, or created)
+         *
+         */ let cacheRecords = this._getAllCacheRecords();
+        if ((0, $53bcb33ef2023ce8$export$f936470337fdc8d0).isNull(cacheRecords)) return null;
+        let minItem = cacheRecords.reduce((minItem, item)=>(minItem.lastAccessed || minItem.lastUpdated) < (item.lastAccessed || item.lastUpdated) ? minItem : item);
+        return minItem;
+    }
+    _verifySize() {
+        /**
+         * Verifies the size of the cache
+         *
+         */ let max = 1000;
+        let count = 0;
+        while(this._noOfCacherecords > this._maxItems && count < max){
+            let oldestCacheRecord = this._getOldestCacheRecord();
+            this.delete(oldestCacheRecord?.value);
+            count += 1;
+        }
+        return;
+    }
 }
-customElements.define("kr-engine", $675103532c00e15f$export$ca3c739adc83f458);
 
 
-const $acbf4d89c8c34bfd$export$ab722c29c933d3f9 = {
-    KrElementList: (0, $0ef250b87a5eb9d9$export$a24f065ae97d3b9d),
-    KrElementInput: (0, $fcaceaa039140c3c$export$4d003f86c0d70530),
-    KrElementCard: (0, $a47487796306864f$export$77c048791dedfa54),
-    KrElementEngine: (0, $675103532c00e15f$export$ca3c739adc83f458)
+
+
+class $d9b56bf44db9acb6$export$c739a053efdbec32 {
+    /**
+     * Kraken data storage
+     */ constructor(collection){
+        this.dataApiUrl = "https://data.krknapi.com/api";
+        //this.cdnApiUrl = 'https://931bba76-1b26-4445-ad26-d2c9d201d0e2-00-lpy51ddmv2p2.janeway.replit.dev' //"https://cdn.krknapi.com/things";
+        this.cdnApiUrl = "https://cdn.krknapi.com/things";
+        this.collection = collection;
+        this.cache = new (0, $56ba4b57196189e3$export$f5bc5036afac6116)();
+    }
+    get cdn() {
+        return {
+            get: this.cdnGet.bind(this),
+            post: this.cdnPost.bind(this),
+            delete: this.cdnDelete.bind(this)
+        };
+    }
+    get data() {
+        return {
+            get: this.dataGet,
+            post: this.dataPost,
+            delete: this.dataDelete
+        };
+    }
+    // -----------------------------------------------------
+    //  CDN 
+    // -----------------------------------------------------
+    async cdnGet(record_or_record_type, record_id, force = false) {
+        /**
+         * Gets a record
+         * @param {String} record_or_record_type
+         * @param {String} record_id
+         * @param {Boolean} force if true, will force a refresh of the record
+         * @returns {Object} The record
+         */ // Error handling
+        // Return
+        let url = this.cdnApiUrl + "/" + this.collection;
+        console.log("url", url);
+        return await $d9b56bf44db9acb6$var$getRecord(record_or_record_type, record_id, url, this.cache, this.force);
+    }
+    async cdnPost(record) {
+        /**
+         * Posts a record
+         * @param {Object} record
+         * @returns {Object} The record
+         * 
+         */ // Return
+        let url = this.cdnApiUrl + "/" + this.collection;
+        return await $d9b56bf44db9acb6$var$postRecord(record, url, this.cache);
+    }
+    async cdnDelete(record_or_record_type, record_id) {
+        /**
+         * Deletes a record
+         * @param {String} record_or_record_type
+         * @param {String} record_id
+         * @returns {Object} The record
+         */ // Error handling
+        let record_type = record_or_record_type["@type"] || record_or_record_type?.record_type || record_or_record_type;
+        record_id = record_or_record_type["@id"] || record_or_record_type?.record_id || record_id;
+        // 
+        let action = await (0, $53bcb33ef2023ce8$export$f936470337fdc8d0).http.api.delete(this.cdnApiUrl + "/" + this.collection, null, records);
+        // Remove from cache
+        this.cache.delete(record_type, record_id);
+        // 
+        Return;
+    }
+    // -----------------------------------------------------
+    //  Data 
+    // -----------------------------------------------------
+    async dataGet(record_or_record_type, record_id, force = false) {
+        /**
+         * Gets a system
+         * @param {String} record_or_record_type
+         * @param {String} record_id
+         * @param {Boolean} force if true, will force a refresh of the record
+         * @returns {Object} The system
+         */ // Error handling
+        let record_type = record_or_record_type["@type"] || record_or_record_type?.record_type || record_or_record_type;
+        record_id = record_or_record_type["@id"] || record_or_record_type?.record_id || record_id;
+        // Verify in cache
+        let record = this.cache.get(record_type, record_id);
+        if ((0, $53bcb33ef2023ce8$export$f936470337fdc8d0).isNotNull(record)) return record;
+        // Define params
+        let params = {
+            "@type": record_type,
+            "@id": record_id
+        };
+        // Get 
+        record = await (0, $53bcb33ef2023ce8$export$f936470337fdc8d0).http.api.get(this.dataApiUrl + "/" + this.collection, null, params);
+        // Store in cache
+        if ((0, $53bcb33ef2023ce8$export$f936470337fdc8d0).isNotNull(record)) // Cache main record
+        this.cache.set(record);
+        // Return
+        return record;
+    }
+    async dataPost(record) {
+        /**
+         * Posts a system record
+         * @param {Object} systemRecord
+         * @returns {Object} The system record
+         *
+         */ // Error handling
+        if ((0, $53bcb33ef2023ce8$export$f936470337fdc8d0).isNull(record)) return null;
+        //
+        let records1 = (0, $53bcb33ef2023ce8$export$f936470337fdc8d0).toArray(record);
+        // transform to system thing
+        records1 = records1.map((x)=>(0, $53bcb33ef2023ce8$export$f936470337fdc8d0).thing.toThing(x));
+        // Post
+        //records = await h.http.api.post(this.dataApiUrl + '/' + this.collection, null, records)
+        // Add records provided back to cache
+        this.cache.set(records1);
+        // Return
+        return records1;
+    }
+    async dataDelete(record_or_record_type, record_id) {
+        /**
+         * Deletes a system record
+         * @param {String} record_or_record_type
+         * @param {String} record_id
+         * @returns {Object} The system record
+         */ // Error handling
+        let record_type = record_or_record_type["@type"] || record_or_record_type?.record_type || record_or_record_type;
+        record_id = record_or_record_type["@id"] || record_or_record_type?.record_id || record_id;
+        // 
+        let action = await (0, $53bcb33ef2023ce8$export$f936470337fdc8d0).http.api.delete(this.dataApiUrl + "/" + this.collection, null, records);
+        // Remove from cache
+        this.cache.delete(record_type, record_id);
+        // 
+        Return;
+    }
+}
+async function $d9b56bf44db9acb6$var$getRecord(record_or_record_type, record_id, url, cache, force) {
+    // Error handling
+    let record_type = record_or_record_type["@type"] || record_or_record_type?.record_type || record_or_record_type;
+    record_id = record_or_record_type["@id"] || record_or_record_type?.record_id || record_id;
+    // Verify in cache
+    if (force != true) {
+        let record = cache.get(record_type, record_id);
+        if ((0, $53bcb33ef2023ce8$export$f936470337fdc8d0).isNotNull(record)) {
+            console.log("get from cache");
+            return record;
+        }
+    }
+    // Define params
+    let params = {
+        "@type": record_type,
+        "@id": record_id
+    };
+    // Get 
+    let record;
+    try {
+        record = await (0, $53bcb33ef2023ce8$export$f936470337fdc8d0).http.api.get(url, null, params);
+    } catch (error) {
+        //console.log(error)
+        record = null;
+    }
+    // Store in cache
+    if ((0, $53bcb33ef2023ce8$export$f936470337fdc8d0).isNotNull(record)) // Cache main record
+    cache.set(record);
+    // Return
+    return record;
+}
+async function $d9b56bf44db9acb6$var$postRecord(record, url, cache) {
+    /**
+     * Posts a system record
+     * @param {Object} systemRecord
+     * @returns {Object} The system record
+     *
+     */ // Error handling
+    if ((0, $53bcb33ef2023ce8$export$f936470337fdc8d0).isNull(record)) return null;
+    //
+    let records1 = (0, $53bcb33ef2023ce8$export$f936470337fdc8d0).toArray(record);
+    // transform to system thing
+    records1 = records1.map((x)=>(0, $53bcb33ef2023ce8$export$f936470337fdc8d0).thing.toThing(x));
+    // Post
+    try {
+        records1 = await (0, $53bcb33ef2023ce8$export$f936470337fdc8d0).http.api.post(url, null, records1);
+    } catch (error) {
+        console.log(error);
+        records1 = null;
+    }
+    // Add records provided back to cache
+    cache.set(records1);
+    // Return
+    return records1;
+}
+
+
+let $3ca879967de4427f$var$apikey1 = "sk-proj-U7IWqJiLbVaTGHZ";
+let $3ca879967de4427f$var$apikey2 = "3U637T3BlbkFJdXJ1xNv2W5U52d9MKijr";
+let $3ca879967de4427f$var$APIKEY = $3ca879967de4427f$var$apikey1 + $3ca879967de4427f$var$apikey2;
+class $3ca879967de4427f$export$e9f7c51c603ef90a {
+    constructor(){}
+    async ask(messages) {
+        const apiKey = $3ca879967de4427f$var$APIKEY;
+        const url = "https://api.openai.com/v1/chat/completions";
+        const headers = {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${apiKey}`
+        };
+        const data = {
+            model: "gpt-4o-mini",
+            messages: messages
+        };
+        try {
+            const response = await fetch(url, {
+                method: "POST",
+                headers: headers,
+                body: JSON.stringify(data)
+            });
+            if (!response.ok) {
+                console.log(response.statusText);
+                throw new Error(`HTTP error! Status: ${response.status}`);
+            }
+            const result = await response.json();
+            return result.choices[0].message.content;
+        } catch (error) {
+            console.error("Error calling OpenAI API:", error);
+            return null;
+        }
+    }
+}
+
+
+const $27aca64046765c2d$export$8ffd1228772c8ae6 = {
+    KrTimer: (0, $72185a15243df046$export$1481e10980f8a723),
+    KrCache: (0, $56ba4b57196189e3$export$f5bc5036afac6116),
+    KrStorage: (0, $d9b56bf44db9acb6$export$c739a053efdbec32),
+    KrChatGPT: (0, $3ca879967de4427f$export$e9f7c51c603ef90a)
 };
+
 
 
 const $cf838c15c8b009ba$export$f936470337fdc8d0 = (0, $53bcb33ef2023ce8$export$f936470337fdc8d0);
 const $cf838c15c8b009ba$export$8ffd1228772c8ae6 = (0, $27aca64046765c2d$export$8ffd1228772c8ae6);
-const $cf838c15c8b009ba$export$4d4e92f9aafe7618 = (0, $3044c528e2aca24b$export$4d4e92f9aafe7618);
-const $cf838c15c8b009ba$export$ab722c29c933d3f9 = (0, $acbf4d89c8c34bfd$export$ab722c29c933d3f9);
+const $cf838c15c8b009ba$export$4d4e92f9aafe7618 = (0, $3044c528e2aca24b$export$4d4e92f9aafe7618 //export const krakenElements = krakenElementsObject
+);
 
 
-export {$cf838c15c8b009ba$export$f936470337fdc8d0 as krakenHelpers, $cf838c15c8b009ba$export$8ffd1228772c8ae6 as krakenTools, $cf838c15c8b009ba$export$4d4e92f9aafe7618 as krakenClasses, $cf838c15c8b009ba$export$ab722c29c933d3f9 as krakenElements};
+export {$cf838c15c8b009ba$export$f936470337fdc8d0 as krakenHelpers, $cf838c15c8b009ba$export$8ffd1228772c8ae6 as krakenTools, $cf838c15c8b009ba$export$4d4e92f9aafe7618 as krakenClasses};
 //# sourceMappingURL=main.js.map

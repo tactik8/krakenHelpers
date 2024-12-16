@@ -5,7 +5,12 @@ import { krakenElementThingObserverHelpers } from './krakenElementThingObserverH
 import { krakenElementTemplateHelpers } from './krakenElementTemplateHelpers.js'
 import { krakenElementOrchestratorHelpers} from './krakenElementOrchestratorHelpers.js'
 
+
+
+
+import { krakenElementCursorHelpers } from './krakenElementCursorHelpers.js'
 export const krakenDomHelpers = {
+    cursor: krakenElementCursorHelpers,
     element: krakenElementHelpers,
     event: krakenElementEventHelpers,
     thing: krakenElementThingHelpers,

@@ -28,6 +28,10 @@ export const krakenElementThingPropertyHelpers = {
         get: getPropertyID,
         set: setPropertyID,
     },
+    valueID: {
+        get: getValueID,
+        set: setValueID,
+    },
     valueHash: {
         get: getValueHash,
         set: setValueHash,
@@ -105,7 +109,7 @@ function setRecordId(element, record_id){
 
     //
     record_id = record_id?.['@id'] || record_id?.record_id || record_id
-    element.setAttribute("data-record-type", record_id);
+    element.setAttribute("data-record-id", record_id);
     return element
 }
 
@@ -138,6 +142,37 @@ function setPropertyID(element, propertyID){
     element.setAttribute("data-propertyID", propertyID);
     return element
 }
+
+function getValueID(element) {
+    /**
+     * Returns the record id of the element
+     * @param {Object} element
+     * @returns {String} The record id
+     */
+    // Error handling
+    if(h.isNull(element)){ return null }
+
+    //
+    let record_id = element.getAttribute("data-valueID");
+    return record_id;
+}
+
+function setValueID(element, valueID){
+    /**
+     * Sets the record type of the element
+     * @param {Object} element
+     * @param {String|Object} record_type of record or ref
+     * @returns {Object} The element
+     */
+
+    // Error handling
+    if(h.isNull(element)){ return null }
+
+    //
+    element.setAttribute("data-valueID", valueID);
+    return element
+}
+
 
 function getValueHash(element) {
     /**
@@ -252,6 +287,7 @@ function getElementType(element) {
     // Error handling
     if(h.isNull(element)){ return null }
 
+    if(h.isNull(element.classList)){ return null }
     //
     if (element.classList.contains("krThing")) {
         return "thing";

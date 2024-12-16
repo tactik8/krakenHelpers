@@ -208,10 +208,15 @@ function getListItems(itemList){
      * @returns {Array} The items of the list
      */
     
-    let listItems = th.values.get(itemList, 'itemListElement')
+    let listItems = th.propertyValues.get(itemList, 'itemListElement')
 
-    
+    // Error handling
+    if(h.isNull(listItems)){ return [] }
+
+    // Retrieve value part of pv
     listItems = h.toArray(listItems)
+
+    listItems = listItems.map(x => x?.object?.value)
     
     listItems = listItems.filter(x => !h.isNull(x))
 
@@ -374,7 +379,6 @@ function insert(itemList, listItem, position, metadata){
 
     let listItems = getListItems(itemList)
 
-    console.log('listItems', listItems)
     // Default position to last item
     let lastItemFlag = false
     if(h.isNull(position)){
@@ -430,12 +434,15 @@ function insert(itemList, listItem, position, metadata){
     itemList = th.value.add(itemList, 'itemListElement', listItem, metadata)
     
     // Recalculate positions (skip if last item)
+   
     if(lastItemFlag == false){
+      
         itemList = resetPositions(itemList, listItem, position, metadata)
     }
+    
 
     //
-    itemList = th.values.set(itemList, 'numberOfItems', listItems.length + 1)
+    itemList = th.values.set(itemList, 'numberOfItems', listItems.length +1)
 
     
     // return
@@ -452,6 +459,8 @@ function deleteItem(itemList, listItem, metadata){
      * @returns {Array} The array
      */
 
+
+    console.log('xxx')
     let listItems = getListItems(itemList)
     
     listItem = lih.search(listItems, th.ref.get(listItem))
@@ -506,11 +515,13 @@ function resetPositions(itemList, startingItem, startingPosition, metadata){
     let listItems = getListItems(itemList)
     let position = startingPosition || 0
 
+   
     // Get first item
     let firstItem = startingItem || lih.first(getListItems(itemList))
 
 
     if(h.isNull(firstItem)){
+        
         return itemList
     }
     
@@ -519,7 +530,7 @@ function resetPositions(itemList, startingItem, startingPosition, metadata){
     let p = position
     while (h.isNotNull(temp)){
 
-        temp = listItems.filter(x => x['id'] == temp?.['@id'])?.[0] || null
+        temp = listItems.filter(x => x['@id'] == temp?.['@id'])?.[0] || null
         
         if(h.isNotNull(temp)){
 

@@ -7,7 +7,6 @@ import { krakenThingPropertyValueHelpers as pvh } from "./krakenThingPropertyVal
 import { krakenHeadingsHelpers } from "../../localization/krakenHeadingsHelpers.js";
 
 
-
 // todo: add fn to delete pv based on conditions
 
 // todo: add conditions to fn to filter only desired pv
@@ -35,6 +34,7 @@ export const krakenThingSystemHelpers = {
     isEmpty: isEmpty,
     keys: keys,
     clone: clone,
+    copy: copy,
     hash: hash,
 
     // Constructor
@@ -352,6 +352,43 @@ function hash(record){
     
 }
 
+function copy(value) {
+    /**
+     * copy a record
+     * @param {Object} record
+     * @returns {Object} The cloned record
+     */
+
+
+    // Error handling
+    if(h.isNull(value)){
+        return null
+    }
+
+
+    if(!isValid(value)){
+        throw new Error('Value provided is not thing');
+    }
+
+
+    //
+    let clone = getNew(value)
+
+
+
+    // Copy values
+    for(let i of h.toArray(value?._propertyValues) || []){
+        
+        clone._propertyValues.push(pvh.clone(i))
+        
+    }
+
+    clone = compileRecord(clone)
+
+    // Return
+    return clone;
+}
+
 function clone(value) {
     /**
      * Clones a record
@@ -364,6 +401,7 @@ function clone(value) {
     if(h.isNull(value)){
         return null
     }
+
     
     if(!isValid(value)){
         throw new Error('Value provided is not thing');
@@ -670,9 +708,10 @@ function getValue(thing, propertyID, db) {
      * @returns {object|string|any} The value
      */
 
+    
     let values = getValues(thing, propertyID, db)
 
-    if(values.length == 0){
+    if(h.isNull(values) || values.length == 0){
         return null
     }
     
@@ -691,7 +730,7 @@ function setValue(thing, propertyID, value, metadata) {
      * @returns {object} The thing
      */
 
-    return replacePropertyValue(thing, propertyID, value, metadata);
+    return replacePropertyValue(thing, propertyID, value, metadata, null);
 }
 
 function addValue(thing, propertyID, value, metadata) {
@@ -742,6 +781,11 @@ function getValues(thing, propertyID, db) {
      * @param {object} db - The database of things
      * @returns {object|string|any} The value
      */
+
+    // If not system, return normal value 
+    if(isThing(thing) && !isValid(thing)){
+        return h.dot.get(propertyID, thing)
+    }
 
     
     let pvs = getPropertyValues(thing, propertyID);
@@ -857,7 +901,7 @@ function getPropertyValues(thing, propertyID, db) {
      * @param {String} propertyID
      * @param {Object} db - array containing thing references
      * @param {Array} db - The array of things
-     * @returns {Array} Array of values in system format
+     * @returns {Array} Array of propertyValues (in system format)
      */
 
     // Error handling
@@ -904,7 +948,7 @@ function getPropertyValues(thing, propertyID, db) {
         
         pvs = pvh.compile(pvs);
 
-        if(propertyID == 'itemListElement'){
+        if(propertyIDElement == 'itemListElement'){
             pvs.sort((a,b) => {
                 if((getValue(a?.object?.value, 'position') || 0 ) < (getValue(b?.object?.value, 'position')|| 0)){
                     return -1
@@ -922,10 +966,6 @@ function getPropertyValues(thing, propertyID, db) {
         // Get values from pvs
         result = pvs.map((pv) => pv?.object?.value);
 
-        // Retrieve content of values from things db
-        if(h.isNotNull(db)){
-            result = result.map((x) => find(db, x) || x )  
-        }
         
         // Get position if one
         if (h.isNotNull(position)) {
@@ -1184,10 +1224,12 @@ function isSame(thing1, thing2) {
     }
 
     if(!isThing(thing1)){
+        
         return false
     }
 
     if(!isThing(thing2)){
+       
         return false
     }
     
@@ -1426,6 +1468,12 @@ function getRecord(thing, parentThings=[]) {
     if(h.isNull(thing)){
         return {}
     }
+
+
+    if(!isValid(thing) && isThing(thing)){
+        return thing
+    }
+
     
     if(!isValid(thing)){
         throw new Error('Value provided is not thing');
@@ -1550,10 +1598,12 @@ function getSystem(thing) {
     if(!h.isValid(thing)){
         throw new Error('Value provided is not thing')
     }
-
+    
     // Get record of thing class object
     if(isThingClass(thing)){
-        return thing?.system
+
+        return thing.system
+       
     } 
     
     
@@ -1931,7 +1981,8 @@ function find(things, record_or_record_type, record_id) {
 
     things = h.toArray(things)
     let ref = getRef(record_or_record_type, record_id)
-  
+
+    
     let filteredRecords = things.filter(x => isSame(x, ref))
    
     let result = filteredRecords?.[0] || null;

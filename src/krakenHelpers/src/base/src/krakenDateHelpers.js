@@ -23,6 +23,9 @@ export const krakenDateHelpers = {
     isDate: isValid,
     isValid: isValid,
     isValidText: isValidText,
+    eq: eq,
+    lt: lt,
+    gt: gt,
     getDuration: getDuration,
     duration: getDuration,
     getDurationRecord: getDurationRecord,
@@ -174,6 +177,50 @@ function toDate(value){
     }
     return null
 
+    
+}
+
+
+function eq(date1, date2){
+    /**
+     * Returns true if two dates are equal
+     * @param {Date} date1
+     * @param {Date} date2
+     * @return {bool} isEqual
+     */
+
+    if(!date1 || !date2){ return false }
+    if(date1 == null || date2 == null){ return false }
+
+    if(date1.getTime() == date2.getTime()){ return true }
+    return false
+}
+
+function lt(date1, date2){
+    /**
+     * Returns true if date1 is greater than date2
+     * @param {Date} date1
+     * @param {Date} date2
+     * @return {bool} isGreater
+     */
+
+    if(!isValid(date1) || !isValid(date2)){ return false }
+
+    return date1 < date2
+
+}
+
+function gt(date1, date2){
+    /**
+     * Returns true if date1 is greater than date2
+     * @param {Date} date1
+     * @param {Date} date2
+     * @return {bool} isGreater
+     */
+
+    if(!isValid(date1) || !isValid(date2)){ return false }
+
+    return date1 > date2
     
 }
 

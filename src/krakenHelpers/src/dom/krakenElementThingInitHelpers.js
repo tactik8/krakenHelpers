@@ -12,7 +12,7 @@ import { krakenElementThingPartHelpers as part} from "./krakenElementThingPartHe
 import { krakenElementThingTraverseHelpers as traverse} from "./krakenElementThingTraverseHelpers.js"
 
 
-import { templateDB } from './krakenElementThingTemplateDatabase.js'
+//import { templateDB } from './krakenElementThingTemplateDatabase.js'
 
 export const krakenElementThingInitHelpers = {
     init: initThingElementAll,
@@ -20,7 +20,7 @@ export const krakenElementThingInitHelpers = {
 
 
 
-function initThingElementAll(element, TEMPLATEDB) {
+function initThingElementAll(element, TEMPLATEDB, force=false) {
     /**
      * Initializes the element as a thing element
      * @param {Object} element (init document if not provided))
@@ -38,7 +38,7 @@ function initThingElementAll(element, TEMPLATEDB) {
     element = element || document.body
 
     if(h.isArray(element)){
-        action.instrument = element.map(x => initThingElementAll(x, TEMPLATEDB))
+        action.instrument = element.map(x => initThingElementAll(x, TEMPLATEDB, force))
         action.close()
         return action
     }
@@ -47,25 +47,28 @@ function initThingElementAll(element, TEMPLATEDB) {
     // Placeholders
     //replacePlaceholders(element)
 
-    // Replace class 
+    // Add missing classes  
     let elements = element.getElementsByTagName("*")
     for (let e of elements) {
         addMissingClasses(e);
     }
 
-    // Init element
-    if (h.isNotNull(property.type.get(element))) {
-        action.instrument = initThingElement(element, TEMPLATEDB);
-    }
-    
-
     // Init childrens
     let item = element.firstElementChild;
     while (item) {
         let nextItem = item.nextElementSibling;
-        action.instrument = initThingElementAll(item, TEMPLATEDB);
+        action.instrument = initThingElementAll(item, TEMPLATEDB, force);
         item = nextItem;
     }
+
+    
+    // Init element
+    if (h.isNotNull(property.type.get(element))) {
+        action.instrument = initThingElement(element, TEMPLATEDB, force);
+    }
+    
+
+    
 
     action.close()
 
@@ -73,7 +76,8 @@ function initThingElementAll(element, TEMPLATEDB) {
     return action;
 }
 
-function initThingElement(element, TEMPLATEDB) {
+
+function initThingElement(element, TEMPLATEDB, force) {
     /**
      * Initialize thing, property and value elements
      * @param {Object} element
@@ -83,6 +87,8 @@ function initThingElement(element, TEMPLATEDB) {
         `Initialize ${property.type.get(element)} element ${element?.id}`,
     )
 
+
+    
     action.object = element
     
     if (h.isNull(element)) {
@@ -90,46 +96,44 @@ function initThingElement(element, TEMPLATEDB) {
         return action;
     }
 
-    //
-    if (h.isNull(property.type.get(element))) {
+
+    // Return if no type
+    if(h.isNull(property.type.get(element))){
         action.close()
         return action;
     }
 
-
     
-    // Set id
+    // Set element id (if missing)
     eh.setId(element);
 
 
-    // Add part main and template if missing. Copy content as template
-    if(property.type.get(element) == 'property' || property.type.get(element) == 'thing') {
-        //action.instrument = addMainIfMissing(element, TEMPLATEDB)
-        action.instrument = retrieveAndSaveTemplate(element, TEMPLATEDB);
-        action.instrument = retrieveInnerContentAsTemplate(element, TEMPLATEDB)
-        let mainPart = part.main.get(element)
-        if(h.isNotNull(mainPart)){
-            mainPart.innerHTML = ''
-        } 
+
+    // Add thing and value element if missing
+    if(property.type.get(element) == 'property'){
+        
+        let addThingAction = addThingToProperty(element)
+    
+        let addValueAction = addValueToProperty(element)
+
         
     }
 
 
-    //element = addThingToProperty(element)
+    // Add part element if missing       
+    let mainAction = addMainIfMissing(element, TEMPLATEDB)
     
-    if(1 ==0) { 
+    let mainPart = part.main.get(element)
 
-       
-        for(let k in TEMPLATEDB){
-            let e = document.querySelector(`[data-templateID="${k}"]`);
+
+    // Set main part content as template 
+    let retrieve3Action = retrieveInnerContentAsTemplate(mainPart, TEMPLATEDB, force)
     
-            
-        }
-       
-    }
-
-   
-    // Return     
+    // Set content as template
+    let retrieve2Action = retrieveInnerContentAsTemplate(element, TEMPLATEDB, force)
+    
+    
+    
     action.close()
     return action
 }
@@ -199,23 +203,36 @@ function retrieveAndSaveTemplate(element, TEMPLATEDB={}){
      * @returns {Object} The element
      */
 
+    
     let action = new h.classes.Action(
         `retrieveAndSaveTemplate ${property.type.get(element)} element ${element?.id}`,
     )
 
     action.object = element
 
-
-    // Skip if template already exists
-    if(!h.isNull(TEMPLATEDB?.[element.getAttribute('data-templateID')])){
-        action.setCompleted()
-        return action
+    // Skip if already has a templateID
+    if(h.isNotNull(element.getAttribute('data-templateID'))){
+        action.close()
+        return action 
     }
-
     
-    // Get templates
+    // Get templates from template
     let preTemplateParts = element.querySelectorAll('TEMPLATE') //getTemplateOfElement(element)
 
+
+    // Return if no templates found
+    if(h.isNull(preTemplateParts)){
+        action.close()
+        return action 
+    }
+
+
+    // Set template id
+    let templateID = 'template_' + h.uuid.new()
+    element.setAttribute('data-templateID', templateID)
+
+    
+    
     let templateParts = []
     for( let t of preTemplateParts){
 
@@ -231,14 +248,12 @@ function retrieveAndSaveTemplate(element, TEMPLATEDB={}){
     
     // Add template parts to TEMPLATEDB
     if(templateParts.length > 0){
-        let templateID = h.uuid.new()
-        element.setAttribute('data-templateID', templateID)
+        
         for(let t of templateParts){
             TEMPLATEDB[templateID] = (TEMPLATEDB?.[templateID] || '') +  t.innerHTML;
 
             
             TEMPLATEDB[templateID] = TEMPLATEDB[templateID].trim()
-            templateDB.set(templateID, TEMPLATEDB?.[templateID])
         }
     } 
 
@@ -247,7 +262,7 @@ function retrieveAndSaveTemplate(element, TEMPLATEDB={}){
 
 }
 
-function retrieveInnerContentAsTemplate(element, TEMPLATEDB){
+function retrieveInnerContentAsTemplate(element, TEMPLATEDB, force=false){
     /**
      * If no template, retrieves inner content to be used as template
      * @param {Object} element
@@ -255,30 +270,38 @@ function retrieveInnerContentAsTemplate(element, TEMPLATEDB){
      * 
      */
 
+
     let action = new h.classes.Action(
         `retrieveInnerContentAsTemplate ${property.type.get(element)} element ${element?.id}`,
     )
     action.object = element
 
-    // Skip if template already exists
-    if(!h.isNull(TEMPLATEDB[element.id])){
-        action.setCompleted()
-        return action
-    }
 
-    let templateID = h.uuid.new()
-    element.setAttribute('data-templateID', templateID)
-
-
-    if(property.type.get(element)=='property' && h.isNotNull(part.main.get(element))){
-        TEMPLATEDB[templateID] = part.main.get(element).innerHTML
-        templateDB.set(templateID, TEMPLATEDB?.[templateID])
-    } else {
-        TEMPLATEDB[templateID] = element.innerHTML;
-        templateDB.set(templateID, TEMPLATEDB?.[templateID])
-    }
+    // Skip if already has a templateID
+    let templateID = element.getAttribute('data-templateID')
 
     
+    if(h.isNotNull(templateID) && h.isNotNull(TEMPLATEDB?.[templateID]) && force!=true){    
+
+        action.close()
+        return action 
+    }
+
+    // Create templateID
+    if(h.isNull(templateID)){
+        templateID = 'template_' + h.uuid.new()
+        element.setAttribute('data-templateID', templateID)
+    }
+        
+    // Get inner content
+    let content = element.innerHTML || ''
+    content = content.replaceAll('\n', '')
+    content = content.replaceAll('  ', ' ')
+    TEMPLATEDB[templateID] = content
+
+
+    // Set content to null
+    element.innerHTML = ''
     
     action.result = element.innerHTML
     
@@ -313,14 +336,22 @@ function addThingToProperty(element) {
         return action
     }
 
-    // Get parent thing element
-    let currentThingElement = traverse.current.thing.get(element);
-
-    // Return if already has a parent
-    if (h.isNotNull(currentThingElement)) {
-        action.close()
-        return action
+    // Verify if it has a parent thing element
+    let item = element.parentElement
+    let hasNoThing = false
+    while(h.isNotNull(item) && hasNoThing == false){
+        if(h.isNotNull(item.classList) && item.classList.contains('krThing')){
+            action.close()
+            return action
+            
+        }
+        if(item.classList.contains('krProperty')){
+            hasNoThing = true
+        }
+        item = item.parentElement
     }
+
+
 
     // Create new parent
     let newThingElement = document.createElement("span");
@@ -345,6 +376,36 @@ function addThingToProperty(element) {
     return action
 }
 
+
+
+function addValueToProperty(element){
+    /**
+     * Addd value element if missing
+     * 
+     */
+
+    let values = traverse.children.values.get(element)
+
+    if(h.isNotNull(values)){
+        return
+    }
+
+    let valueElement = document.createElement("span");
+    property.type.setAsValue(valueElement)
+
+
+    addMainIfMissing(element)
+    let mainPart = part.main.get(element)
+    
+    eh.insert.below(valueElement, mainPart);
+
+    return
+    
+}
+
+
+
+    
 function addMissingClasses(element) {
     /**
      * Adds missing classes to element
