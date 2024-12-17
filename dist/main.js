@@ -5002,7 +5002,7 @@ function $1a629a767d5efe2d$var$convertUriTemplateToSchema(uriTemplate) {
             case "name":
                 value = value.replaceAll('"', "");
                 value = value.replaceAll("'", "");
-                pvs.valueName = value;
+                if ($1a629a767d5efe2d$var$h.isNotNull(value)) pvs.valueName = value;
                 break;
             case "readonly":
                 value = Boolean(value);
@@ -10934,7 +10934,7 @@ function $7273ede3c5ec638c$var$executePotentialAction(action) {
     let isSystemRecordFlag = (0, $7bb8d4569e1a97bb$export$1ef237150243f225).isValid(action);
     // Check if potential action is actionable (criteria is valid)
     action = $7273ede3c5ec638c$var$checkValidity(action);
-    if (action.actionStatus == "FailedActionStatus") return action;
+    if (action?.actionStatus == "FailedActionStatus") return action;
     // Check if action is already executed
     //if(checkIfExecuted(action) == true){
     //return null
@@ -10990,6 +10990,7 @@ function $7273ede3c5ec638c$var$executeAction(action) {
             let value = (0, $2fa9c1db583d4d31$export$439bf78a2cc516f5).dot.get(k, newAction);
             // Convert value to pvs
             let pvs = (0, $2fa9c1db583d4d31$export$439bf78a2cc516f5).uri.uriToPvs(value);
+            if (Object.keys(pvs).length <= 2) pvs.defaultValue = value;
             // Execute pvs template
             value = (0, $2fa9c1db583d4d31$export$439bf78a2cc516f5).template.get(pvs?.defaultValue, action);
             // Convert if json
@@ -13592,7 +13593,7 @@ function $80fcb1b48f652599$export$9a59ac6eee85ea02(record) {
 
 
 
-class $706f18fe777015bf$export$3138a16edeb45799 {
+class $706f18fe777015bf$var$KrThing {
     constructor(record_or_record_type, record_id, metadata){
         // Property that can be used to differentiate from normal objects
         this.id = (0, $53bcb33ef2023ce8$export$f936470337fdc8d0).base.uuid.new();
@@ -13602,13 +13603,36 @@ class $706f18fe777015bf$export$3138a16edeb45799 {
         this._record_id = null;
         if ((0, $53bcb33ef2023ce8$export$f936470337fdc8d0).thing.isThing(record_or_record_type)) this.system = (0, $53bcb33ef2023ce8$export$f936470337fdc8d0).thing.toThing(record_or_record_type);
         else this.system = (0, $53bcb33ef2023ce8$export$f936470337fdc8d0).thing.new(record_or_record_type, record_id);
-        this._thingsDB = [
-            this
-        ];
+        this._thingsDB = null;
         this._callbacks = [];
-        this._eventMonitoringCache = null;
+        this._eventRecordCache = null;
         if ((0, $53bcb33ef2023ce8$export$f936470337fdc8d0).thing.isThing(record_or_record_type)) this.system = (0, $53bcb33ef2023ce8$export$f936470337fdc8d0).thing.toThing(record_or_record_type, record_id, metadata);
     //this._convertChildrenThingsRecordsToThingObjects()
+    }
+    // -----------------------------------------------------
+    //  ThingsDB helpers 
+    // -----------------------------------------------------
+    get thingsDB() {
+        /**
+         * Get the repository of things 
+         */ return this._thingsDB || null;
+    }
+    set thingsDB(value) {
+        /**
+         * Set the repository of things 
+         */ this._thingsDB = value;
+    }
+    get callbacks() {
+        /**
+         * Get the repository of things 
+         */ if ((0, $53bcb33ef2023ce8$export$f936470337fdc8d0).isNotNull(this.thingsDB)) return this._thingsDB.callbacksGet(this.record_type, this.record_id);
+        else return this._callbacks;
+    }
+    set callbacks(value) {
+        /**
+         * Set the repository of things 
+         */ if ((0, $53bcb33ef2023ce8$export$f936470337fdc8d0).isNotNull(this.thingsDB)) this._thingsDB.callbacksSet(this.record_type, this.record_id, value);
+        else this._callbacks.push(value);
     }
     // -----------------------------------------------------
     //  Base 
@@ -13647,17 +13671,52 @@ class $706f18fe777015bf$export$3138a16edeb45799 {
         /**
          * Provides abstraction for event handling and cleanup 
          */ //this._eventMonitoringCache = h.thing.hash(this._system)
-        return this._system;
+        // Returns system record from thingsDB repository if exists, else uses local
+        if ((0, $53bcb33ef2023ce8$export$f936470337fdc8d0).isNotNull(this._thingsDB)) return this._thingsDB.systemGet(this.record_type, this.record_id);
+        else return this._system;
     }
     set system(value) {
         /**
          * Event monitoring
-         */ this._system = value;
+         */ // Write to thingsDB if exists
+        if ((0, $53bcb33ef2023ce8$export$f936470337fdc8d0).isNotNull(this._thingsDB)) this._thingsDB.systemSet(value);
+        else this._system = value;
         this._record_type = (0, $53bcb33ef2023ce8$export$f936470337fdc8d0).thing.record_type.get(value);
         this._record_id = (0, $53bcb33ef2023ce8$export$f936470337fdc8d0).thing.record_id.get(value);
         this._convertChildrenThingsRecordsToThingObjects();
-        if (this._eventMonitoringCache != (0, $53bcb33ef2023ce8$export$f936470337fdc8d0).thing.hash(this._system)) this.broadcastEvent("property", this.ref);
+        // Broadcast event 
+        if (this.recordHasChanged() == true) this.broadcastEvent("thing", this.ref);
     }
+    // -----------------------------------------------------
+    //  Event record cache
+    //  Cache of the record from the last event
+    //  Used to decide if broadcast or not (somehting changed)
+    // -----------------------------------------------------
+    recordHasChanged() {
+        /**
+         * Returns true if the record has changed since last event broadcast
+         */ let hashValue = (0, $53bcb33ef2023ce8$export$f936470337fdc8d0).thing.hash(this.record);
+        if (hashValue != this.eventRecordCache) return true;
+        return false;
+    }
+    get eventRecordCache() {
+        /**
+         * Retrieves the record from the last broadcast
+         * 
+         */ if ((0, $53bcb33ef2023ce8$export$f936470337fdc8d0).isNotNull(this.thingsDB)) return this.thingsDB.eventRecordCacheGet(this.record_type, this.record_id);
+        else return this._eventRecordCache;
+    }
+    set eventRecordCache(value) {
+        /**
+         * Sets the record from the last broadcast
+         * 
+         */ let hashValue = (0, $53bcb33ef2023ce8$export$f936470337fdc8d0).thing.hash(value);
+        if ((0, $53bcb33ef2023ce8$export$f936470337fdc8d0).isNotNull(this.thingsDB)) this.thingsDB.eventRecordCacheSet(hashValue);
+        else this._eventRecordCache = hashValue;
+    }
+    // -----------------------------------------------------
+    //  Comment 
+    // -----------------------------------------------------
     _convertChildrenThingsRecordsToThingObjects() {
         /**
          * Converts the children things records to thing objects
@@ -13668,7 +13727,7 @@ class $706f18fe777015bf$export$3138a16edeb45799 {
         children = children.filter((x)=>(0, $53bcb33ef2023ce8$export$f936470337fdc8d0).thing.isNotSame(x, this._system));
         if ((0, $53bcb33ef2023ce8$export$f936470337fdc8d0).isNull(children)) return;
         // Convert children things to thing objects
-        children = children.map((x)=>$706f18fe777015bf$export$3138a16edeb45799.toThing(x, null, this._thingsDB));
+        children = children.map((x)=>$706f18fe777015bf$var$KrThing.toThing(x, null, this._thingsDB));
         // Replace values in things by equivalent class object
         if ((0, $53bcb33ef2023ce8$export$f936470337fdc8d0).isNotNull(children)) this._system = (0, $53bcb33ef2023ce8$export$f936470337fdc8d0).thing.children.replaceWithRecord(this.system, children);
         return;
@@ -13681,7 +13740,8 @@ class $706f18fe777015bf$export$3138a16edeb45799 {
          * Returns the record type
          * @returns {String} The record type
          * 
-         */ return (0, $53bcb33ef2023ce8$export$f936470337fdc8d0).thing.record_type.get(this.system);
+         */ if ((0, $53bcb33ef2023ce8$export$f936470337fdc8d0).isNull(this._record_id)) this._record_type = (0, $53bcb33ef2023ce8$export$f936470337fdc8d0).thing.record_type.get(this.system);
+        return this._record_type;
     }
     set record_type(value) {
         /**
@@ -13695,7 +13755,8 @@ class $706f18fe777015bf$export$3138a16edeb45799 {
         /**
          * Returns the record id
          * @returns {String} The record id
-         */ return (0, $53bcb33ef2023ce8$export$f936470337fdc8d0).thing.record_id.get(this.system);
+         */ if ((0, $53bcb33ef2023ce8$export$f936470337fdc8d0).isNull(this._record_id)) this._record_id = (0, $53bcb33ef2023ce8$export$f936470337fdc8d0).thing.record_id.get(this.system);
+        return this._record_id;
     }
     set record_id(value) {
         /**
@@ -13983,9 +14044,12 @@ class $706f18fe777015bf$export$3138a16edeb45799 {
             object: this,
             name: message
         };
-        for (let callback of (0, $53bcb33ef2023ce8$export$f936470337fdc8d0).toArray(this._callbacks?.[eventType]))callback(event);
-        for (let callback of (0, $53bcb33ef2023ce8$export$f936470337fdc8d0).toArray(this._callbacks?.["any"]))callback(event);
-        for (let callback of (0, $53bcb33ef2023ce8$export$f936470337fdc8d0).toArray(this._callbacks?.["all"]))callback(event);
+        // Store copy of record in event Cache
+        this.eventRecordCache = this.record;
+        // Execute callbacks
+        for (let callback of (0, $53bcb33ef2023ce8$export$f936470337fdc8d0).toArray(this.callbacks?.[eventType]))callback(event);
+        for (let callback of (0, $53bcb33ef2023ce8$export$f936470337fdc8d0).toArray(this.callbacks?.["any"]))callback(event);
+        for (let callback of (0, $53bcb33ef2023ce8$export$f936470337fdc8d0).toArray(this.callbacks?.["all"]))callback(event);
     }
     // -----------------------------------------------------
     //  Shortcuts 
@@ -14030,9 +14094,9 @@ class $706f18fe777015bf$export$3138a16edeb45799 {
          * @param {String} record_id The record id
          * @returns {Object} The thing
          */ // Error handling
-        if (record_or_record_type instanceof $706f18fe777015bf$export$3138a16edeb45799) return record_or_record_type;
+        if (record_or_record_type instanceof $706f18fe777015bf$var$KrThing) return record_or_record_type;
         // Convert
-        let t = new $706f18fe777015bf$export$3138a16edeb45799(record_or_record_type, record_id);
+        let t = new $706f18fe777015bf$var$KrThing(record_or_record_type, record_id);
         return t;
     }
     static new(record_or_record_type, record_id) {
@@ -14041,36 +14105,146 @@ class $706f18fe777015bf$export$3138a16edeb45799 {
          * @param {Object} record_or_record_type The record type
          * @param {String} record_id The record id
          * @returns {Object} The thing
-         */ if (record_or_record_type instanceof $706f18fe777015bf$export$3138a16edeb45799) return record_or_record_type;
-        else return new $706f18fe777015bf$export$3138a16edeb45799(record_or_record_type, record_id);
+         */ if (record_or_record_type instanceof $706f18fe777015bf$var$KrThing) return record_or_record_type;
+        else return new $706f18fe777015bf$var$KrThing(record_or_record_type, record_id);
     }
 }
+const $706f18fe777015bf$export$dec0bd3589417c35 = {
+    KrThing: $706f18fe777015bf$var$KrThing
+};
 
 
 
 
-class $2cb32bf7096e125e$export$625c98c0044d29a6 {
+let $2cb32bf7096e125e$var$KrThing = (0, $706f18fe777015bf$export$dec0bd3589417c35).KrThing;
+class $2cb32bf7096e125e$var$KrThings {
     /**
      * Database of things or thing records
      * Maintain integrity of first record input in database by merging additional to the first one.
      */ constructor(toThing = true){
         this._toThing = toThing;
-        this._db = [];
+        this._thingDB = {} // _db of things 
+        ;
+        // Replaces local cache of thing objects
+        this._systemDB = {} //  db of system records for things
+        ;
+        this._eventRecordCache = {};
+        this._callbacks = {};
     }
+    // -----------------------------------------------------
+    //  Helpers methods for thing objects  
+    // -----------------------------------------------------
+    registerThing(thing) {
+        /**
+         * Registers a thing in the database
+         */ // Skip if not thing object
+        if (thing?.instanceof != "KrThing") return;
+        // Skip if already done
+        if ((0, $53bcb33ef2023ce8$export$f936470337fdc8d0).isNotNull(thing?.thingsDb)) return;
+        let record_type = thing.record_type;
+        let record_id = thing.record_id;
+        // Retrieve local caches
+        this.systemSet(thing.system);
+        this.eventRecordCacheSet(thing.eventRecordCache);
+        this.callbacksSet(record_type, record_id, thing.callbacks);
+        // Add thingsDB to thing
+        thing.thingsDB = this;
+        // Add thing to thingsDB
+        this.thingSet(thing);
+    }
+    thingGet(record_or_record_type, record_id) {
+        /**
+         * Gets a thing from the database
+         */ let record_type = record_or_record_type?.record_type || record_or_record_type?.["@type"] || record_or_record_type;
+        record_id = record_or_record_type?.record_id || record_or_record_type?.["@id"] || record_id;
+        return this._thingDB?.[record_type]?.[record_id];
+    }
+    thingSet(record, overWrite = false) {
+        /**
+         * Sets thing
+         */ let record_type = record?.record_type || record?.["@type"];
+        let record_id = record?.record_id || record?.["@id"];
+        this._thingDB[record_type] = this._thingDB?.[record_type] || {};
+        // Merge with existing record if one present
+        if (overWrite == false) {
+            if ((0, $53bcb33ef2023ce8$export$f936470337fdc8d0).isNotNull(this.thingGet(record_type, record_id))) record = (0, $53bcb33ef2023ce8$export$f936470337fdc8d0).thing.merge(this.thingGet(record_type, record_id), record);
+        }
+        this._thingDB[record_type][record_id] = record;
+        return;
+    }
+    systemGet(record_or_record_type, record_id) {
+        /**
+         * Returns the official system record of a thing, overrides the local cache of a thing
+         */ let record_type = record_or_record_type?.record_type || record_or_record_type?.["@type"] || record_or_record_type;
+        record_id = record_or_record_type?.record_id || record_or_record_type?.["@id"] || record_id;
+        return this._systemDB?.[record_type]?.[record_id];
+    }
+    systemSet(record, overWrite = false) {
+        /**
+         * Sets the official system record of a thing
+         */ let record_type = record?.record_type || record?.["@type"];
+        let record_id = record?.record_id || record?.["@id"];
+        this._systemDB[record_type] = this._systemDB?.[record_type] || {};
+        // Merge with existing record if one present
+        if (overWrite == false) {
+            if ((0, $53bcb33ef2023ce8$export$f936470337fdc8d0).isNotNull(this.systemGet(record_type, record_id))) record = (0, $53bcb33ef2023ce8$export$f936470337fdc8d0).thing.merge(this.systemGet(record_type, record_id), record);
+        }
+        this._systemDB[record_type][record_id] = record;
+        return;
+    }
+    eventRecordCacheGet(record_or_record_type, record_id) {
+        /**
+         * Returns the official system record of a thing, overrides the local cache of a thing
+         */ let record_type = record_or_record_type?.record_type || record_or_record_type?.["@type"] || record_or_record_type;
+        record_id = record_or_record_type?.record_id || record_or_record_type?.["@id"] || record_id;
+        return this._eventRecordCache?.[record_type]?.[record_id];
+    }
+    eventRecordCacheSet(record) {
+        /**
+         * Sets the official system record of a thing
+         */ let record_type = record?.record_type || record?.["@type"];
+        let record_id = record?.record_id || record?.["@id"];
+        this._eventRecordCache[record_type] = this._eventRecordCache?.[record_type] || {};
+        this._eventRecordCache[record_type][record_id] = record;
+        return;
+    }
+    callbacksGet(record_or_record_type, record_id) {
+        /**
+         * Returns the official system record of a thing, overrides the local cache of a thing
+         */ let record_type = record_or_record_type?.record_type || record_or_record_type?.["@type"] || record_or_record_type;
+        record_id = record_or_record_type?.record_id || record_or_record_type?.["@id"] || record_id;
+        return this._callbacks?.[record_type]?.[record_id];
+    }
+    callbacksSet(record_type, record_id, callback) {
+        /**
+         * Sets the official system record of a thing
+         */ if ((0, $53bcb33ef2023ce8$export$f936470337fdc8d0).isArray(callback)) {
+            callback.map((x)=>this.callbacksSet(record_type, record_id, x));
+            return;
+        }
+        this._callbacks[record_type] = this._callbacks[record_type] || {};
+        this._callbacks[record_type][record_id] = callback;
+        return;
+    }
+    // -----------------------------------------------------
+    //  Comment 
+    // -----------------------------------------------------
     get(record_or_record_type, record_id) {
         /**
          * Gets a record
          * @param {Object} record_or_record_type The record or record
          * @param {String} record_id The record id
          * @returns {Object} The record
-         */ return (0, $53bcb33ef2023ce8$export$f936470337fdc8d0).thing.get(this._db, record_or_record_type, record_id);
+         */ return this.thingGet(record_or_record_type, record_id);
     }
     getAll() {
         /**
-         * Gets all records
+         * Gets all things
          * @returns {Array} The records
          * 
-         */ return this._db;
+         */ let things = [];
+        for (let t of Object.keys(this._thingDB))for (let i of Object.keys(this._thingDB[t]))things.push(this._thingDB[t][i]);
+        return things;
     }
     set(record, depth = 0) {
         /**
@@ -14084,16 +14258,17 @@ class $2cb32bf7096e125e$export$625c98c0044d29a6 {
         // Transform to thing system record
         record = (0, $53bcb33ef2023ce8$export$f936470337fdc8d0).thing.toThing(record);
         // Transform to thing if flag is true
-        if (this._toThing == true) record = (0, $706f18fe777015bf$export$3138a16edeb45799).toThing(record);
+        if (this._toThing == true) record = $2cb32bf7096e125e$var$KrThing.toThing(record);
+        // Add this db to thing 
+        this.registerThing(record);
         // Add to db and get version in db
-        this._db = (0, $53bcb33ef2023ce8$export$f936470337fdc8d0).thing.push(this._db, record);
-        record = (0, $53bcb33ef2023ce8$export$f936470337fdc8d0).thing.get(this._db, record);
+        this.thingSet(record);
         // Add children to db
         let children = (0, $53bcb33ef2023ce8$export$f936470337fdc8d0).thing.children.get(record);
         // change to records
         if ((0, $53bcb33ef2023ce8$export$f936470337fdc8d0).isNotNull(children)) {
-            if (this._toThing == true) children = children.map((x)=>(0, $706f18fe777015bf$export$3138a16edeb45799).toThing(x));
-            this._db = (0, $53bcb33ef2023ce8$export$f936470337fdc8d0).thing.push(this._db, children);
+            if (this._toThing == true) children = children.map((x)=>$2cb32bf7096e125e$var$KrThing.toThing(x));
+            this.set(children, depth + 1);
             //this.set(children, depth+1)
             let cc = this.getAll();
             record = (0, $53bcb33ef2023ce8$export$f936470337fdc8d0).thing.children.replaceWithRecord(record, cc);
@@ -14147,136 +14322,36 @@ class $2cb32bf7096e125e$export$625c98c0044d29a6 {
     // -----------------------------------------------------
     //  Comment 
     // -----------------------------------------------------
-    executeAction(action) {
-    /**
+    execute(action) {
+        /**
          * Executes an action
-         */ }
-}
-
-
-
-
-
-
-class $ccac8dd150ebbe19$export$ca3c739adc83f458 {
-    constructor(element){
-        this._db = new (0, $2cb32bf7096e125e$export$625c98c0044d29a6)(true);
-        this._templateDB = {
-            "a": "aaa"
-        };
-        this.isInitialized = false;
-        this._registeredThings = new (0, $53bcb33ef2023ce8$export$f936470337fdc8d0).base.classes.Cache();
-        this._element = element || document.body;
-    }
-    init() {
-        // Initialize things
-        (0, $53bcb33ef2023ce8$export$f936470337fdc8d0).dom.thing.init(this._element, this._templateDB);
-        // Initialize inputs
-        this.isInitialized = true;
-    }
-    // -----------------------------------------------------
-    //  Comment 
-    // -----------------------------------------------------
-    // -----------------------------------------------------
-    //  Comment 
-    // -----------------------------------------------------
-    get(record_or_record_type, record_id) {
-        /**
-         * Gets a thing
-         * @param {Object} record_or_record_type The record or record type
-         * @param {String} record_id The record id
-         * @returns {Object} The thing
-         */ let thing = this._db.get(record_or_record_type, record_id);
-        // Retrieve from api if missing
-        if ((0, $53bcb33ef2023ce8$export$f936470337fdc8d0).isNull(thing)) {
-            let record = (0, $53bcb33ef2023ce8$export$f936470337fdc8d0).base.storage.get(record);
-            thing = new (0, $706f18fe777015bf$export$3138a16edeb45799)(record);
-        }
-        return thing;
-    }
-    set(record) {
-        // Add to thing db (will convert to thing object if required)
-        // Add thing to thing db
-        let thing = this._db.set(record);
-        // Add thing to storage
-        (0, $53bcb33ef2023ce8$export$f936470337fdc8d0).base.storage.set(thing.system);
-        // Suscribe to thing event listener
-        this.registerThing(this._db.getAll());
-        // Render thing
-        this.renderThing(thing);
+         */ // Retrieve action thing
+        let actionThing = this.thingGet(action);
+        // Get latest things
+        let things = new $2cb32bf7096e125e$var$KrThings();
+        things.set(actionThing.system);
         //
-        return thing;
-    }
-    registerThing(thing) {
-        /**
-         * Registers a thing
-         * @param {Object} thing The thing
-         * @returns {Object} The thing
-         * 
-         */ if ((0, $53bcb33ef2023ce8$export$f936470337fdc8d0).isArray(thing)) {
-            thing.map((x)=>this.registerThing(x));
-            return;
+        for (let t of things.getAll()){
+            let originalThing = this.thingGet(t);
+            things.set(originalThing.system);
         }
-        // Skip if already registered
-        if ((0, $53bcb33ef2023ce8$export$f936470337fdc8d0).isNotNull(this._registeredThings.get(thing))) return;
-        // Configure event listener
-        thing.addEventListener("all", this.thingEventCallback.bind(this));
-        // Add as a registered thing
-        this._registeredThings.set(thing);
-    }
-    render() {
-        /**
-         * Renders the thing
-         * @param {Object} thing The thing
-         * @returns {Object} The thing
-         * 
-         */ let things = this._db.getAll();
-        for (let t of things)if (t) this.renderThing(t);
-    }
-    renderThing(record_or_record_type, record_id) {
-        /**
-         * Renders the thing
-         * @param {Object} thing The thing
-         * @returns {Object} The thing
-         * 
-         */ // Render thing
-        let newThing = this._db.get(record_or_record_type, record_id);
-        let systemRecord = newThing?.system;
-        if ((0, $53bcb33ef2023ce8$export$f936470337fdc8d0).isNotNull(systemRecord)) {
-            (0, $53bcb33ef2023ce8$export$f936470337fdc8d0).dom.thing.renderSystem(this._element, systemRecord, null, this._templateDB);
-            (0, $53bcb33ef2023ce8$export$f936470337fdc8d0).dom.thing.event.register(this._element);
-        }
-    // Render thing childrens
-    //for(let t of newThing?.children || []){
-    // this.renderThing(t)
-    // }
-    }
-    addTemplate(templateID, template, elementKrType = "krThing") {
-        /**
-         * Adds a template
-         * @param {String} templateID The template id
-         * @param {String} template The template
-         */ let force = true;
-        let temp = document.createElement("div");
-        temp.setAttribute("data-templateID", templateID);
-        temp.classList.add(elementKrType);
-        temp.innerHTML = template;
-        (0, $53bcb33ef2023ce8$export$f936470337fdc8d0).dom.thing.init(temp, this._templateDB, force);
-        return;
-    }
-    thingEventCallback(action) {
-        // Store in storage
-        if ((0, $53bcb33ef2023ce8$export$f936470337fdc8d0).isNotNull(action.object?.system)) (0, $53bcb33ef2023ce8$export$f936470337fdc8d0).base.storage.set(action.object?.system);
-        // Render
-        this.renderThing(action.object);
+        // 
+        actionThing = things.get(action);
+        // Execute the action
+        let actionRecord = (0, $53bcb33ef2023ce8$export$f936470337fdc8d0).thing.execute(actionThing.record);
+        // Add back to engine
+        if (actionRecord?.actionStatus == "CompletedActionStatus") this.set(actionRecord);
+        return this.get(actionRecord);
     }
 }
+const $2cb32bf7096e125e$export$46e13c1d9df47f03 = {
+    KrThings: $2cb32bf7096e125e$var$KrThings
+};
 
 
 const $3044c528e2aca24b$export$4d4e92f9aafe7618 = {
-    KrThing: (0, $706f18fe777015bf$export$3138a16edeb45799),
-    KrThings: (0, $2cb32bf7096e125e$export$625c98c0044d29a6),
-    KrElementEngine: (0, $ccac8dd150ebbe19$export$ca3c739adc83f458)
+    KrThing: (0, $706f18fe777015bf$export$dec0bd3589417c35).KrThing,
+    KrThings: (0, $2cb32bf7096e125e$export$46e13c1d9df47f03).KrThings
 };
 
 

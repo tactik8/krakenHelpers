@@ -1,5 +1,9 @@
-import { KrThing } from "../KrThing.js";
+import { krakenThing } from "../KrThing.js";
 import { krakenHelpers as h} from '../../../krakenHelpers/krakenHelpers.js'
+
+
+let KrThing = krakenThing.KrThing
+
 
 describe("KrThing", () => {
   

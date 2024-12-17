@@ -1,7 +1,9 @@
 
 import { krakenHelpers as h} from '../../krakenHelpers/krakenHelpers.js'
 
-export class KrThing{
+
+
+class KrThing{
     constructor(record_or_record_type, record_id, metadata){
 
         // Property that can be used to differentiate from normal objects
@@ -21,11 +23,11 @@ export class KrThing{
 
        
             
-        this._thingsDB = [this]
+        this._thingsDB = null
 
         this._callbacks = []
 
-        this._eventMonitoringCache = null
+        this._eventRecordCache = null
 
         if(h.thing.isThing(record_or_record_type)){
             this.system = h.thing.toThing(record_or_record_type, record_id, metadata)
@@ -35,6 +37,54 @@ export class KrThing{
         
     }
 
+
+
+
+    // -----------------------------------------------------
+    //  ThingsDB helpers 
+    // -----------------------------------------------------
+
+    get thingsDB(){
+        /**
+         * Get the repository of things 
+         */
+        return this._thingsDB || null
+        
+    }
+
+    set thingsDB(value){
+        /**
+         * Set the repository of things 
+         */
+        this._thingsDB = value
+
+    }
+    
+    get callbacks(){
+        /**
+         * Get the repository of things 
+         */
+        if(h.isNotNull(this.thingsDB)){
+            return this._thingsDB.callbacksGet(this.record_type, this.record_id)
+        } else {
+            return this._callbacks
+        }
+      
+
+    }
+
+    set callbacks(value){
+        /**
+         * Set the repository of things 
+         */
+        if(h.isNotNull(this.thingsDB)){
+            this._thingsDB.callbacksSet(this.record_type, this.record_id, value)
+        } else {
+            this._callbacks.push(value)
+        }
+    }
+    
+    
     // -----------------------------------------------------
     //  Base 
     // -----------------------------------------------------
@@ -99,21 +149,14 @@ export class KrThing{
         //this._eventMonitoringCache = h.thing.hash(this._system)
 
 
-        return this._system
-        
-        let clone = h.thing.copy(this._system)
+        // Returns system record from thingsDB repository if exists, else uses local
 
-
-        for(let pv of clone._propertyValues){
-            if(pv?.object?.value instanceof KrThing){
-                pv.object.value = pv.object.value.system
-            }
+        if(h.isNotNull(this._thingsDB)){
+            return this._thingsDB.systemGet(this.record_type, this.record_id)
+        } else {
+            return this._system
+            
         }
-
-        
-        
-        return this.system
-        
         
     }
 
@@ -121,30 +164,90 @@ export class KrThing{
         /**
          * Event monitoring
          */
-        
-        this._system = value
 
+        // Write to thingsDB if exists
+        if(h.isNotNull(this._thingsDB)){
+            this._thingsDB.systemSet(value)
+
+        } else {
+            this._system = value
+        }
+        
+        
         this._record_type = h.thing.record_type.get(value)
         this._record_id = h.thing.record_id.get(value)
 
         this._convertChildrenThingsRecordsToThingObjects()
 
-        
-        if(this._eventMonitoringCache != h.thing.hash(this._system)){
-            this.broadcastEvent('property', this.ref)
-        } else {
-        }
+        // Broadcast event 
+        if(this.recordHasChanged() == true){
+            this.broadcastEvent('thing', this.ref)
+        } 
         
     }
 
+
+    // -----------------------------------------------------
+    //  Event record cache
+    //  Cache of the record from the last event
+    //  Used to decide if broadcast or not (somehting changed)
+    // -----------------------------------------------------
+
+
+    recordHasChanged(){
+        /**
+         * Returns true if the record has changed since last event broadcast
+         */
+
+        let hashValue = h.thing.hash(this.record)
+        if (hashValue != this.eventRecordCache){
+            return true
+        }
+        return false
+    }
+    
+    get eventRecordCache(){
+        /**
+         * Retrieves the record from the last broadcast
+         * 
+         */
+        if(h.isNotNull(this.thingsDB)){
+            return this.thingsDB.eventRecordCacheGet(this.record_type, this.record_id)
+        } else {
+            return this._eventRecordCache
+        }
+        
+        
+    }
+
+    set eventRecordCache(value){
+        /**
+         * Sets the record from the last broadcast
+         * 
+         */
+
+        let hashValue = h.thing.hash(value)
+
+        if(h.isNotNull(this.thingsDB)){
+            this.thingsDB.eventRecordCacheSet(hashValue)
+        } else {
+            this._eventRecordCache = hashValue
+        }
+    }
+
+
+    // -----------------------------------------------------
+    //  Comment 
+    // -----------------------------------------------------
+
+    
+    
     _convertChildrenThingsRecordsToThingObjects(){
         /**
          * Converts the children things records to thing objects
          * @returns {Object} The record
          * 
          */
-
-
 
         // Get children things
         let children = h.thing.children.get(this.system, false)
@@ -179,7 +282,10 @@ export class KrThing{
          * @returns {String} The record type
          * 
          */
-        return h.thing.record_type.get(this.system)
+        if(h.isNull(this._record_id)){
+            this._record_type =  h.thing.record_type.get(this.system)
+        }
+        return this._record_type
     }
     set record_type(value){
         /**
@@ -197,7 +303,12 @@ export class KrThing{
          * Returns the record id
          * @returns {String} The record id
          */
-        return h.thing.record_id.get(this.system)
+
+        if(h.isNull(this._record_id)){
+            this._record_id =  h.thing.record_id.get(this.system)
+        }
+        return this._record_id
+        
     }
     set record_id(value){
         /**
@@ -579,17 +690,21 @@ export class KrThing{
             name: message
         }
 
+
+        // Store copy of record in event Cache
+        this.eventRecordCache = this.record
         
-        
-        for(let callback of h.toArray(this._callbacks?.[eventType])){
+
+        // Execute callbacks
+        for(let callback of h.toArray(this.callbacks?.[eventType])){
             callback(event)
         }
 
-        for(let callback of h.toArray(this._callbacks?.['any'])){
+        for(let callback of h.toArray(this.callbacks?.['any'])){
             callback(event)
         }
 
-        for(let callback of h.toArray(this._callbacks?.['all'])){
+        for(let callback of h.toArray(this.callbacks?.['all'])){
             callback(event)
         }
     }
@@ -683,4 +798,10 @@ export class KrThing{
     }
 
     
+}
+
+
+
+export const krakenThing = {
+    KrThing: KrThing
 }

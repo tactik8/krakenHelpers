@@ -190,7 +190,9 @@ function convertUriTemplateToSchema(uriTemplate) {
             case "name":
                 value=value.replaceAll('"', '')
                 value=value.replaceAll("'", "")
-                pvs.valueName = value
+                if(h.isNotNull(value)){
+                    pvs.valueName = value
+                }
                 break;
 
             case "readonly":

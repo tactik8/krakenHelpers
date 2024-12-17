@@ -1,7 +1,7 @@
-import { KrThings } from "../KrThings.js";
+import { krakenThings } from "../KrThings.js";
 import { krakenHelpers as h} from '../../../krakenHelpers/krakenHelpers.js'
 
-
+let KrThings = krakenThings.KrThings
 
 describe("KrThings", () => {
     test("Base", () => {

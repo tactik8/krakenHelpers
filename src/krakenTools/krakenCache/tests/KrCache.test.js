@@ -41,7 +41,6 @@ describe("KrCache", () => {
         let cache = new KrCache(20)
 
         for(let i=0; i < 30; i++){
-            console.log(i)
             cache.set(h.base.test.getThing(i))
         }
 

@@ -1,7 +1,13 @@
 import { krakenHelpers as h} from '../../krakenHelpers/krakenHelpers.js'
-import { KrThing} from './KrThing.js'
+import { krakenThing } from './KrThing.js'
 
-export class KrThings {
+
+let KrThing = krakenThing.KrThing
+
+
+
+
+class KrThings {
     /**
      * Database of things or thing records
      * Maintain integrity of first record input in database by merging additional to the first one.
@@ -9,10 +15,201 @@ export class KrThings {
     constructor(toThing=true){
 
         this._toThing = toThing
-        this._db = []
+
+        
+        this._thingDB = {} // _db of things 
+
+
+        // Replaces local cache of thing objects
+        this._systemDB = {} //  db of system records for things
+        this._eventRecordCache = {}
+        this._callbacks = {}
+        
     }
 
 
+
+
+    // -----------------------------------------------------
+    //  Helpers methods for thing objects  
+    // -----------------------------------------------------
+
+
+    registerThing(thing){
+        /**
+         * Registers a thing in the database
+         */
+
+
+        // Skip if not thing object
+        if(thing?.instanceof != 'KrThing'){
+            return 
+        }
+        
+        // Skip if already done
+        if(h.isNotNull(thing?.thingsDb)){
+            return
+        }
+
+        
+        let record_type = thing.record_type
+        let record_id = thing.record_id
+
+        // Retrieve local caches
+        this.systemSet(thing.system)
+        this.eventRecordCacheSet(thing.eventRecordCache)
+        this.callbacksSet(record_type, record_id, thing.callbacks)
+
+        // Add thingsDB to thing
+        thing.thingsDB = this
+
+        // Add thing to thingsDB
+        this.thingSet(thing)
+        
+        
+    }
+
+
+    thingGet(record_or_record_type, record_id){
+        /**
+         * Gets a thing from the database
+         */
+     
+
+        let record_type = record_or_record_type?.record_type || record_or_record_type?.['@type'] || record_or_record_type
+        record_id = record_or_record_type?.record_id || record_or_record_type?.['@id'] || record_id
+
+        return this._thingDB?.[record_type]?.[record_id]
+
+        
+        
+    }
+
+    thingSet(record, overWrite = false){
+        /**
+         * Sets thing
+         */
+
+        let record_type = record?.record_type || record?.['@type'] 
+        let record_id = record?.record_id || record?.['@id']
+
+        this._thingDB[record_type] = this._thingDB?.[record_type] || {}
+
+        // Merge with existing record if one present
+        if(overWrite == false){
+            if(h.isNotNull(this.thingGet(record_type, record_id))){
+                record = h.thing.merge(this.thingGet(record_type, record_id), record)
+            }
+        }
+
+        this._thingDB[record_type][record_id] = record
+
+        return 
+
+    }
+
+    
+    systemGet(record_or_record_type, record_id){
+        /**
+         * Returns the official system record of a thing, overrides the local cache of a thing
+         */
+
+        let record_type = record_or_record_type?.record_type || record_or_record_type?.['@type'] || record_or_record_type
+        record_id = record_or_record_type?.record_id || record_or_record_type?.['@id'] || record_id
+        
+        return this._systemDB?.[record_type]?.[record_id]
+        
+    }
+
+    systemSet(record, overWrite = false){
+        /**
+         * Sets the official system record of a thing
+         */
+
+        let record_type = record?.record_type || record?.['@type'] 
+        let record_id = record?.record_id || record?.['@id']
+
+        this._systemDB[record_type] = this._systemDB?.[record_type] || {}
+
+        // Merge with existing record if one present
+        if(overWrite == false){
+            if(h.isNotNull(this.systemGet(record_type, record_id))){
+                record = h.thing.merge(this.systemGet(record_type, record_id), record)
+            }
+        }
+        
+        this._systemDB[record_type][record_id] = record
+        
+        return 
+
+    }
+
+    eventRecordCacheGet(record_or_record_type, record_id){
+        /**
+         * Returns the official system record of a thing, overrides the local cache of a thing
+         */
+
+        let record_type = record_or_record_type?.record_type || record_or_record_type?.['@type'] || record_or_record_type
+        record_id = record_or_record_type?.record_id || record_or_record_type?.['@id'] || record_id
+
+        return this._eventRecordCache?.[record_type]?.[record_id]
+
+    }
+
+    eventRecordCacheSet(record){
+        /**
+         * Sets the official system record of a thing
+         */
+
+        let record_type = record?.record_type || record?.['@type'] 
+        let record_id = record?.record_id || record?.['@id']
+
+        this._eventRecordCache[record_type] = this._eventRecordCache?.[record_type] || {}
+
+        this._eventRecordCache[record_type][record_id] = record
+
+        return 
+
+    }
+
+    callbacksGet(record_or_record_type, record_id){
+        /**
+         * Returns the official system record of a thing, overrides the local cache of a thing
+         */
+
+        let record_type = record_or_record_type?.record_type || record_or_record_type?.['@type'] || record_or_record_type
+        record_id = record_or_record_type?.record_id || record_or_record_type?.['@id'] || record_id
+
+        return this._callbacks?.[record_type]?.[record_id]
+
+    }
+
+    callbacksSet(record_type, record_id, callback){
+        /**
+         * Sets the official system record of a thing
+         */
+
+        if(h.isArray(callback)){
+            callback.map(x => this.callbacksSet(record_type, record_id, x))
+            return
+        }
+
+
+        this._callbacks[record_type] = this._callbacks[record_type] || {}
+
+        this._callbacks[record_type][record_id] = callback
+
+        return 
+
+    }
+
+
+    // -----------------------------------------------------
+    //  Comment 
+    // -----------------------------------------------------
+
+    
+    
     get(record_or_record_type, record_id){
         /**
          * Gets a record
@@ -21,16 +218,23 @@ export class KrThings {
          * @returns {Object} The record
          */
 
-        return h.thing.get(this._db, record_or_record_type, record_id)
+        return this.thingGet(record_or_record_type, record_id)
     }
 
     getAll(){
         /**
-         * Gets all records
+         * Gets all things
          * @returns {Array} The records
          * 
          */
-        return this._db
+
+        let things = []
+        for(let t of Object.keys(this._thingDB)){
+            for(let i of Object.keys(this._thingDB[t])){
+                things.push(this._thingDB[t][i])
+            }
+        }
+        return things
     }
 
     set(record, depth=0){
@@ -62,11 +266,14 @@ export class KrThings {
             record = KrThing.toThing(record)
         }
 
-        // Add to db and get version in db
-        this._db = h.thing.push(this._db, record)
 
+        // Add this db to thing 
+        this.registerThing(record)
+
+
+        // Add to db and get version in db
+        this.thingSet(record)
         
-        record = h.thing.get(this._db, record)
 
         // Add children to db
         let children = h.thing.children.get(record)  
@@ -79,7 +286,7 @@ export class KrThings {
                 children = children.map(x => KrThing.toThing(x))
             }
 
-            this._db = h.thing.push(this._db, children)
+            this.set(children, depth+1)
 
             
             //this.set(children, depth+1)
@@ -158,15 +365,48 @@ export class KrThings {
     //  Comment 
     // -----------------------------------------------------
 
-    executeAction(action){
+    execute(action){
         /**
          * Executes an action
          */
 
-        
+        // Retrieve action thing
+        let actionThing = this.thingGet(action)
 
+
+        // Get latest things
+        let things = new KrThings()
+        things.set(actionThing.system)
+
+        //
+        for(let t of things.getAll()){
+            let originalThing = this.thingGet(t)
+            things.set(originalThing.system)
+        }
+
+        // 
+        actionThing = things.get(action)
+
+
+        // Execute the action
+        let actionRecord = h.thing.execute(actionThing.record)
+
+        
+        // Add back to engine
+        if(actionRecord?.actionStatus == 'CompletedActionStatus'){
+            this.set(actionRecord)
+        }
+
+        
+        return this.get(actionRecord)
         
     }
 
     
+}
+
+
+
+export const krakenThings = {
+    KrThings: KrThings
 }

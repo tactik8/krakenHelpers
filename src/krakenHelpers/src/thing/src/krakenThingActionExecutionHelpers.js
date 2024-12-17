@@ -29,7 +29,7 @@ function executePotentialAction(action){
 
     // Check if potential action is actionable (criteria is valid)
     action = checkValidity(action)
-    if(action.actionStatus == 'FailedActionStatus'){
+    if(action?.actionStatus == 'FailedActionStatus'){
         return action
     }
 
@@ -44,7 +44,6 @@ function executePotentialAction(action){
 
     // Execute action type (updateAction, deleteAction, ...)
     action = executeActionType(action)
-
 
     // Convert from system record if required
     if(isSystemRecordFlag === false){
@@ -137,12 +136,16 @@ function executeAction(action){
         //
         if(k.includes('-output')){
 
+          
             // Retrieve value
             let value = h.dot.get(k, newAction)
 
             // Convert value to pvs
             let pvs = h.uri.uriToPvs(value)
-
+            if(Object.keys(pvs).length <= 2){
+                pvs.defaultValue = value
+            }
+            
             // Execute pvs template
             value = h.template.get(pvs?.defaultValue, action)
 
