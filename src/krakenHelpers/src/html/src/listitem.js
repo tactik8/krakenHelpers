@@ -19,7 +19,7 @@ export function listitem(classlist, itemContent, prefixes){
         prefix = prefix + '.'
     }
     
-    itemContent = itemContent || line(prefixes.concat(['item']))
+  
     
 
     return `
@@ -50,17 +50,30 @@ export function listitem(classlist, itemContent, prefixes){
     
                      <div class="col col-12 col-sm-1 flex-sm-grow-1 order-5 order-sm-3" >
                         
-                        <span class="krProperty" data-propertyID="item">
+                        
                         <main>
-                            ${itemContent}
+                             <span 
+                                class="krThing"
+                                data-record-type="{{item.@type}}"
+                                data-record-id="{{item.@id}}"
+                                data-templateID="line"
+                                >
+                            </span>
                         </main>
-                        </span>
+                       
                     </div>
                 
                     
                     <div class="col col-auto order-3 order-sm-4 ms-auto text-end">
                         
-                        ${actionMenu(prefixes)}
+                        <span 
+                        class="krThing krAction"
+                        data-record-type="{{@type}}"
+                        data-record-id="{{@id}}"
+                        data-templateID="actionMenu"
+                        >
+                        </span>
+                        
                     </div>
         
                 </div> 

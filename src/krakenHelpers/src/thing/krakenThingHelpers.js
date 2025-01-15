@@ -28,6 +28,8 @@ export const krakenThingHelpers = {
     clone: krakenThingSystemHelpers.clone,
     copy: krakenThingSystemHelpers.copy,
     hash: krakenThingSystemHelpers.hash,
+    
+    
 
     // Constructor
     new: krakenThingSystemHelpers.new,

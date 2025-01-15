@@ -1,3 +1,6 @@
+
+import { actionMenu } from './src/actionMenu.js'
+
 import { article } from "./src/article.js";
 
 import { card } from "./src/card.js";
@@ -48,6 +51,7 @@ import { krakenBaseHelpers as h } from "../base/krakenBaseHelpers.js";
 import { krakenClasses } from "../../../krakenClasses/krakenClasses.js";
 
 export const krakenSimpleHtmlHelpers = {
+    actionMenu: actionMenu,
     article: article,
     callToAction: callToAction,
     card: card,

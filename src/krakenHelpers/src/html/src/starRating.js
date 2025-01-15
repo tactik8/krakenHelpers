@@ -4,7 +4,7 @@
 export function starRating(){
 
 
-    let ocntent = `
+    let content = `
     
     <form id="feedbackForm">
             <div class="rating">

@@ -207,7 +207,7 @@ function getListItems(itemList){
      * @param {Object} itemList The list
      * @returns {Array} The items of the list
      */
-    
+    console.log('pp1')
     let listItems = th.propertyValues.get(itemList, 'itemListElement')
 
     // Error handling
@@ -216,7 +216,8 @@ function getListItems(itemList){
     // Retrieve value part of pv
     listItems = h.toArray(listItems)
 
-    listItems = listItems.map(x => x?.object?.value)
+    console.log('pp')
+    listItems = listItems.map(x => x?._system?.object?.value || x?.object?.value )
     
     listItems = listItems.filter(x => !h.isNull(x))
 
@@ -460,16 +461,19 @@ function deleteItem(itemList, listItem, metadata){
      */
 
 
-    console.log('xxx')
+    
     let listItems = getListItems(itemList)
+
     
     listItem = lih.search(listItems, th.ref.get(listItem))
 
+    
     
     // Retrieve previous item
     let previousItemRef = lih.previousItem.get(listItem)
     let previousItem = lih.search(listItems, th.ref.get(previousItemRef))
 
+    
     // Retrieve next item
     let nextItemRef = lih.nextItem.get(listItem)
     let nextItem = lih.search(listItems, th.ref.get(nextItemRef))
@@ -483,19 +487,23 @@ function deleteItem(itemList, listItem, metadata){
         nextItem = lih.previousItem.set(nextItem, previousItemRef)
         
     }
-
+    
+    
     // Remove neighbors from listItem
     listItem = lih.neighbors.clear(listItem)
 
     // Remove item from itemListElement
     itemList = th.values.delete(itemList, 'itemListElement', th.ref.get(listItem), metadata)
 
-
+    
     // Reset positions
     itemList = resetPositions(itemList, null, null, metadata)
 
     
     itemList = th.values.set(itemList, 'numberOfItems', listItems.length - 1)
+
+    
+
     
     return itemList
     
@@ -519,7 +527,9 @@ function resetPositions(itemList, startingItem, startingPosition, metadata){
     // Get first item
     let firstItem = startingItem || lih.first(getListItems(itemList))
 
-
+    
+    
+    
     if(h.isNull(firstItem)){
         
         return itemList
@@ -528,16 +538,23 @@ function resetPositions(itemList, startingItem, startingPosition, metadata){
     // Reset positions
     let temp = firstItem
     let p = position
+
+    let count = 0
+    
     while (h.isNotNull(temp)){
 
-        temp = listItems.filter(x => x['@id'] == temp?.['@id'])?.[0] || null
+        count += 1
+        console.log('tt', temp)
+        if(count > 40){ return }
+        temp = listItems.filter(x => (x?.record_id || x?.['@id'] || x?._system?.['@id']) == (temp?.record_id || temp?._system?.['@id'] || temp?.['@id']))?.[0] || null
         
         if(h.isNotNull(temp)){
-
+            
             if(lih.position.get(temp) != p){
                 lih.position.set(temp, p)
             }
-            temp = lih.nextItem.get(temp)
+            let nextTemp = lih.nextItem.get(temp)
+            if(nextTemp = temp){ temp = null } else { temp = nextTemp }
             p += 1
         }
     }

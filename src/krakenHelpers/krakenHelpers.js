@@ -24,6 +24,7 @@ export const krakenHelpers = {
     thing: krakenThingHelpers,
     http: krakenHttpHelpers,
     element: krakenElementHelpers,
+    
 
 
     // shortcuts
@@ -38,6 +39,8 @@ export const krakenHelpers = {
     isNumber: krakenBaseHelpers.number.isNumber,
     uuid: krakenBaseHelpers.uuid,
     wait: krakenBaseHelpers.wait,
-
+    record_type: krakenThingHelpers.record_type.get,
+    record_id: krakenThingHelpers.record_id.get,
+    ref: krakenThingHelpers.ref.get,
     
 }

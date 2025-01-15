@@ -4,58 +4,51 @@ import { krakenHelpers as h } from "./src/krakenHelpers/krakenHelpers.js"
 import { krakenClasses } from "./src/krakenClasses/krakenClasses.js"
 
 
-function test() {
 
 
-    let r1 = h.base.test.getThing(0)
+function test(){
 
-    let r2 = h.base.test.getThing(0)
-    r2['name2']='testname2'
-
-
-    let t1 = new krakenClasses.KrThing(r1)
-
-
-
-
-    
-    let t2 = new krakenClasses.KrThing(r2)
-
-  
-    console.log('---')
-    console.log(t1.record, t2.record)
 
     let things = new krakenClasses.KrThings()
-
-    things.set(t1)
-
     
-    things.set(t2)
+    
+    let itemlist = h.base.test.itemList(4)
 
-    console.log('---')
-    console.log(t1.record, t2.record)
-
-
-
-    let action00 = {
-        "@type": "Action",
-        "@id": "action_00",
-        "name": "action_00",
-        "object": {
-            "@type": "Thing",
-            "@id": "thing0",
-            "name-output": "New name"
+    let record = h.base.test.thing(10)
+    
+    let actionRecord = {
+            "@type": "InsertAction",
+            "@id": "action_1",
+            "name": "action_1",
+            "object": record, 
+            "targetCollection": itemlist
         }
-    }
-
-    things.set(action00)
 
 
-    let result = things.execute(action00)
+   
 
-    console.log('res', result)
+    things.set(itemlist)
+
+
+    let t = things.get(itemlist)
+  
     
+
+    let ile = t.get('itemListElement')
+
+    console.log('t', ile.length)
+
+    let t1 = ile[0]
+    t = h.thing.list.delete(t, ile[0])
+
     
+    ile = t.get('itemListElement')
+    console.log('t', ile.length)
+
+    t = h.thing.list.insert(t, t1, 0)
+    ile = t.get('itemListElement')
+    console.log('t', ile.length)
+
 }
 
 test()

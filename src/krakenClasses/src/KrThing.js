@@ -8,32 +8,29 @@ class KrThing{
 
         // Property that can be used to differentiate from normal objects
 
-        this.id = h.base.uuid.new()
+        this.id = 'thing_' + h.base.uuid.new()
         this.instanceof = 'KrThing'
         this._system = null
         this._record_type = null
         this._record_id = null
 
 
-        if(h.thing.isThing(record_or_record_type)){
-            this.system = h.thing.toThing(record_or_record_type)
-        } else {
-            this.system = h.thing.new(record_or_record_type, record_id)
-        }
-
-       
-            
         this._thingsDB = null
 
-        this._callbacks = []
+        this._callbacks = {}
 
         this._eventRecordCache = null
 
+
+        
         if(h.thing.isThing(record_or_record_type)){
-            this.system = h.thing.toThing(record_or_record_type, record_id, metadata)
+            this.system = h.thing.toThing(record_or_record_type, null, metadata)
+        } else {
+            this.system = h.thing.new(record_or_record_type, record_id, metadata)
         }
 
-        //this._convertChildrenThingsRecordsToThingObjects()
+       
+        this._convertChildrenThingsRecordsToThingObjects()
         
     }
 
@@ -60,30 +57,40 @@ class KrThing{
 
     }
     
-    get callbacks(){
+    getCallbacks(callbackType){
         /**
          * Get the repository of things 
          */
         if(h.isNotNull(this.thingsDB)){
-            return this._thingsDB.callbacksGet(this.record_type, this.record_id)
+            return this._thingsDB.callbacksGet(this.record_type, this.record_id, callbackType)
         } else {
-            return this._callbacks
+            return this._callbacks?.[callbackType]
         }
       
 
     }
 
-    set callbacks(value){
+    setCallbacks(callback, callbackType){
         /**
          * Set the repository of things 
          */
         if(h.isNotNull(this.thingsDB)){
-            this._thingsDB.callbacksSet(this.record_type, this.record_id, value)
+            this._thingsDB.callbacksSet(this.record_type, this.record_id, callback, callbackType)
         } else {
-            this._callbacks.push(value)
+            this._callbacks[callbackType] = this._callbacks?.[callbackType] || []
+            this._callbacks[callbackType].push(callback)
         }
     }
-    
+
+    updateChildren(){
+        /**
+         * Update children things with most recent object from database
+         * 
+         */
+
+        this.system = h.thing.children.replaceWithRecord(this.system, this._thingsDB.getAll())
+        
+    }
     
     // -----------------------------------------------------
     //  Base 
@@ -177,10 +184,11 @@ class KrThing{
         this._record_type = h.thing.record_type.get(value)
         this._record_id = h.thing.record_id.get(value)
 
+        
         this._convertChildrenThingsRecordsToThingObjects()
 
         // Broadcast event 
-        if(this.recordHasChanged() == true){
+        if(this.recordHasChanged() === true){
             this.broadcastEvent('thing', this.ref)
         } 
         
@@ -199,14 +207,18 @@ class KrThing{
          * Returns true if the record has changed since last event broadcast
          */
 
-        let hashValue = h.thing.hash(this.record)
-        if (hashValue != this.eventRecordCache){
+        
+        let hashValue = h.base.hash.get(this.record)
+
+        let oldValue = this.getEventRecordCache()
+        
+        if (hashValue != oldValue){
             return true
         }
         return false
     }
     
-    get eventRecordCache(){
+    getEventRecordCache(){
         /**
          * Retrieves the record from the last broadcast
          * 
@@ -220,16 +232,17 @@ class KrThing{
         
     }
 
-    set eventRecordCache(value){
+    storeEventRecordCache(){
         /**
          * Sets the record from the last broadcast
          * 
          */
 
-        let hashValue = h.thing.hash(value)
+        
+        let hashValue = h.base.hash.get(this.record)
 
         if(h.isNotNull(this.thingsDB)){
-            this.thingsDB.eventRecordCacheSet(hashValue)
+            this.thingsDB.eventRecordCacheSet(this.record_type, this.record_id, hashValue)
         } else {
             this._eventRecordCache = hashValue
         }
@@ -257,14 +270,14 @@ class KrThing{
         if(h.isNull(children)){ return }
 
         // Convert children things to thing objects
-        children = children.map(x => KrThing.toThing(x, null, this._thingsDB))
+        children = children.map(x => KrThing.toThing(x))
 
 
         // Replace values in things by equivalent class object
         if(h.isNotNull(children)){
            
             this._system = h.thing.children.replaceWithRecord(this.system, children)
-            
+      
         }
         
         return 
@@ -362,8 +375,21 @@ class KrThing{
          * Get sub things
          * 
          */
+        let children = []
+        
+        for(let pv of this._propertyValues || []){
+            if(pv.object.propertyID == 'previousItem'){
+                continue
+            }
+            if(pv.object.propertyID == 'nextItem'){
+                continue
+            }
+            if(h.thing.isThing(pv.object.value)){
+                children.push(pv.object.value)
+            }
+        }
 
-        return h.thing.children.get(this.system)
+        return children
         
     }
 
@@ -544,23 +570,272 @@ class KrThing{
         this.system = h.thing.mergeDeep(this.system, other.system)
     }
 
+    replaceChildren(childrenThings){
+        /**
+         * Replaces the children of a thing
+         */
 
+        // Convert children
+        if(!this._propertyValues){
+            return
+        }
+        for(let pv of this._propertyValues){
+
+            if(pv.object.propertyID == 'previousItem'){
+                continue
+            }
+
+            if(pv.object.propertyID == 'nextItem'){
+                continue
+            }
+
+            let t = KrThing.searchThing(childrenThings, pv.object.value)
+            if(h.isNotNull(t)){
+
+                if(h.isNotNull(t?.id) && t?.id != Object.value?.id){
+                    pv.object.value = t
+                    t.replaceChildren(childrenThings)
+                }
+            }
+           
+        }
+
+    }
 
     // -----------------------------------------------------
     //  List operations 
     // -----------------------------------------------------
 
+    insertBefore(value, position){
+        /**
+         * 
+         */
+        return this.insert(value, position)
+        
+    }
+    insertAfter(value, position){
+        /**
+         * Insert after the given position
+         */
+        return this.insert(value, position + 1)
 
+    }
+
+    prepend(value){
+        /**
+         * Prepend the value
+         */
+        return this.insert(value, 0)
+    }
+
+    append(value){
+        /**
+         * Append the value
+         */
+
+        if(h.isNull(this.itemListElement)){
+            return this.insert(value, 0)
+        }
+        
+        let maxItem = this.itemListElement.reduce((maxItem, item) => item.position > maxItem.position ? item : maxItem );
+        return this.insert(value, maxItem.position + 1)
+    }
+    
     insert(value, position){
         /**
-         * Inserts a value into the list
+         * Inserts a value into the list at the given position
          * @param {Object} value The value
          *    
          */
 
-        console.log('Insert', value, position)
-        this.system = h.thing.list.insert(this.system, value, position)
+        if(h.isNull(position)){
+            return this.append(value) 
+        }
+        
+        // Convert to thing
+        let newItem = KrThing.toThing(value)
+
+        // Add listitem wrapper if missing
+        if(newItem.record_type !="ListItem"){
+            let newListItem = new KrThing('ListItem', h.base.uuid.new())
+            newListItem.item = newItem
+            newItem = newListItem
+        }
+
+        // Get previous and next item
+        let previousItem = null
+        let nextItem = null
+        
+        for(let i of this.getValues('itemListElement')){
+            if(i.position == position - 1){
+                previousItem = i
+            }
+            if(i.position == position){
+                nextItem = i
+            }
+        }
+
+        // Assign position
+        newItem.position = position
+        
+        // Insert new item
+        if(previousItem){
+            previousItem.next = newItem
+            newItem.previous = previousItem
+        }
+        if(nextItem){
+            nextItem.previous = newItem
+            newItem.next = nextItem
+        }
+        
+        // Update positions
+        for(let i of this.itemListElement){
+           
+            if(i.position >= position){
+                i.position += 1
+            }
+        }
+        
+        // Insert new item
+        this.add('itemListElement', newItem)
+        
     }
+
+
+    search(record_or_record_type, record_id){
+        /**
+         * Search for an item
+         */
+
+        let record_type = record_or_record_type?.record_type || record_or_record_type?.['@type'] || record_or_record_type
+        record_id = record_or_record_type?.record_id || record_or_record_type?.['@id'] || record_id
+
+        for(let v of this.getValues('itemListElement')){
+            if(v.record_type == record_type && v.record_id == record_id){
+                return v
+            }
+            if(v?.item?.record_type == record_type && v?.item?.record_id == record_id){
+                return v
+            }
+            
+        }
+        return null
+    }
+
+    searchByPosition(position){
+        /**
+         * Search for an item by position
+         */
+        for(let v of this.getValues('itemListElement')){
+            if(v.position == position){
+                return v
+            }
+           
+        }
+        return null
+    }
+    
+    delete(record_or_record_type, record_id){
+        /**
+         * Deletes a value from the list
+         */
+
+       
+        let itemToRemove = this.search(record_or_record_type, record_id)
+        let previousItem = this.search(itemToRemove.previousItem)
+        let nextItem = this.search(itemToRemove.nextItem)
+        let position = itemToRemove.position
+
+        if(previousItem){
+            previousItem.nextItem = nextItem
+        }
+        if(nextItem){
+            nextItem.previousItem = previousItem
+        }
+        
+        this.deleteValue('itemListElement', itemToRemove)
+
+        // Update positions
+        for(let i of this.itemListElement){
+
+            if(i.position > position){
+                i.position = i.position - 1
+            }
+        }
+
+        // clean up removed item
+        itemToRemove.previousItem = null
+        itemToRemove.nextItem = null
+        itemToRemove.position = null
+
+        
+        return
+    }
+
+    
+
+    prependUnder(value){
+        /**
+         * Prepend the value
+         */
+        return this.moveUnder(value, maxItem.position + 0)
+        
+    }
+
+    appendUnder(value){
+        /**
+         * Append the value
+         */
+
+        let hasPart = this.getValue('hasPart')
+        if(h.isNull(hasPart)){
+            return this.moveUnder(value, 0)
+        }
+
+        let childItemListElement = hasPart.getValues('itemListElement')
+        if(h.isNull(childItemListElement)){
+            return this.moveUnder(value, 0)
+        }
+        
+        let maxItem = childItemListElement.reduce((maxItem, item) => item.position > maxItem.position ? item : maxItem );
+        return this.moveUnder(value, maxItem.position + 1)
+         
+    }
+
+    moveUnder(value, position){
+        /**
+         * Moves the childThing under the parentThing under hasPart
+         */
+
+        this.setHasPart()
+        let hasPart = this.getValue('hasPart')
+
+        return hasPart.insert(value, position)
+        
+    }
+    
+    setHasPart(){
+        /**
+         * Sets the hasPart property as itemList if missing
+         */
+        let hasPart = this.getValue('hasPart')
+
+        // Create hasPart itemList if missing
+        if(h.isNull(hasPart) || hasPart.record_type != 'ItemList'){
+            let newItemList = new KrThing('ItemList', h.base.uuid.new())
+            for(let v of this.getValues('hasPart')){
+                newItemList.append(v)
+            }
+            this.set('hasPart', newItemList)
+
+            hasPart = newItemList
+        }
+        
+    }
+    
+    
+
+    
 
     get position(){
         return h.thing.value.get(this.system, 'position')
@@ -568,6 +843,22 @@ class KrThing{
 
     set position(value){
         return h.thing.value.set(this.system, 'position', value)
+    }
+
+    get previousItem(){
+        return h.thing.value.get(this.system, 'previousItem')
+    }
+
+    set previousItem(value){
+        return h.thing.value.set(this.system, 'previousItem', value)
+    }
+
+    get nextItem(){
+        return h.thing.value.get(this.system, 'nextItem')
+    }
+
+    set nextItem(value){
+        return h.thing.value.set(this.system, 'nextItem', value)
     }
 
     
@@ -672,8 +963,12 @@ class KrThing{
          * @param {Function} callback The callback
          * @returns {Object} The record
          */
-        this._callbacks[eventType] = this._callbacks?.[eventType] || []
-        this._callbacks[eventType].push(callback)
+
+        this.setCallbacks(callback, eventType)
+        if(eventType !='all'){
+             this.setCallbacks(callback, 'all')
+        }
+      
     }
 
     broadcastEvent(eventType, message){
@@ -683,6 +978,9 @@ class KrThing{
          * @param {Object} message The message
          * @returns {Object} The record
          */
+
+
+        //console.log('BROADCAST')
         let event = {
             "@type": "Action",
             "@id": h.uuid.new(),
@@ -692,21 +990,25 @@ class KrThing{
 
 
         // Store copy of record in event Cache
-        this.eventRecordCache = this.record
+        this.storeEventRecordCache()
         
 
         // Execute callbacks
-        for(let callback of h.toArray(this.callbacks?.[eventType])){
+        for(let callback of h.toArray(this.getCallbacks(eventType))){
             callback(event)
         }
 
-        for(let callback of h.toArray(this.callbacks?.['any'])){
+        for(let callback of h.toArray(this.getCallbacks('any'))){
             callback(event)
         }
 
-        for(let callback of h.toArray(this.callbacks?.['all'])){
+        for(let callback of h.toArray(this.getCallbacks('all'))){
+            console.log('broadcast all')
             callback(event)
         }
+
+        
+      
     }
 
     
@@ -758,7 +1060,7 @@ class KrThing{
     // -----------------------------------------------------
 
 
-    static toThing(record_or_record_type, record_id){
+    static toThing(record_or_record_type, record_id, defaultValue=null){
         /**
          * Make a new thing
          * @param {Object} record_or_record_type The record type
@@ -766,20 +1068,35 @@ class KrThing{
          * @returns {Object} The thing
          */
 
-        // Error handling
- 
-        if(record_or_record_type instanceof KrThing){
-            return record_or_record_type
+        
+        
+        let t = record_or_record_type
+        
+        if(!(t instanceof KrThing)){
+            t = new KrThing(record_or_record_type, record_id)
         }  
+
+        // Convert children
+        for(let pv of t._propertyValues || []){
+            if(pv.object.propertyID == 'previousItem'){
+                continue
+            }
+            if(pv.object.propertyID == 'nextItem'){
+                continue
+            }
+
+            if(h.thing.isThing(pv.object.value)){
+                pv.object.value = KrThing.toThing(pv.object.value, null)
+            }
             
-        // Convert
-        let t = new KrThing(record_or_record_type, record_id)
-      
+        }
+        
         return t
         
 
     }
 
+    
     
     static new(record_or_record_type, record_id){
         /**
@@ -797,6 +1114,21 @@ class KrThing{
         
     }
 
+    static searchThing(things, record_or_record_type, record_id){
+        /**
+         * Search a thing in an array of things
+         */
+        let record_type = record_or_record_type?.record_type || record_or_record_type?.["@type"] || record_or_record_type
+        record_id = record_or_record_type?.record_id || record_or_record_type?.["@id"] || record_id
+
+        for(let t of things){
+            if(t.record_type == record_type && t.record_id == record_id){
+                return t
+            }
+        }
+        return null
+        
+    }
     
 }
 

@@ -51,7 +51,14 @@ export function itemlist(classlist, classlistListItem, content, prefixes=[]){
                 </div>
 
                 <div class="col col-auto ms-auto">
-                    ${actionMenu(prefixes)}
+                
+                    <span 
+                    class="krThing krAction"
+                    data-record-type="{{@type}}"
+                    data-record-id="{{@id}}"
+                    data-templateID="actionMenu"
+                    >
+                    </span>
                 </div>
 
             </div>
@@ -59,8 +66,15 @@ export function itemlist(classlist, classlistListItem, content, prefixes=[]){
         
             {{ #itemListElement }}
 
+                    <div 
+                    class="krThing krDraggable krDropzone",
+                    data-record-type="{{itemListElement.@type}}",
+                    data-record-id="{{itemListElement.@id}}",
+                    data-templateID="listitem"
+                    >
+                    </div>
                 
-                   ${ listitem(classlistListItem, content, prefixes.concat(['itemListElement'])) }
+                  
               
                
             {{ /itemListElement }}

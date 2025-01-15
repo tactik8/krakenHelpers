@@ -2,6 +2,8 @@
 import { krakenAnalysisHelpers } from './src/krakenAnalysisHelpers.js'
 import { krakenArrayHelpers } from './src/krakenArrayHelpers.js'
 import { krakenBaseThingHelpers } from './src/krakenBaseThingHelpers.js'
+import { krakenCaretHelpers } from './src/krakenCaretHelpers.js'
+
 import { krakenColorHelpers } from './src/krakenColorHelpers.js'
 
 import { krakenDateHelpers } from './src/krakenDateHelpers.js'
@@ -38,6 +40,7 @@ export const krakenBaseHelpers = {
 
     analysis: krakenAnalysisHelpers,
     array: krakenArrayHelpers,
+    caret: krakenCaretHelpers,
     classes: krakenSimpleThingHelpers,
     color: krakenColorHelpers,
     date: krakenDateHelpers,

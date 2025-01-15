@@ -23,9 +23,24 @@ function executePotentialAction(action){
      */
 
 
+    // Check if action is Thing Object
+    let isThingObjectFlag = false
+    let actionThingObject 
+    if(action?.instanceof == 'KrThing'){       
+        //isThingObjectFlag = true
+        //actionThingObject = action
+        //action = actionThingObject.system
+    }
+
+        
     // Check if action is system record
     let isSystemRecordFlag = th.isValid(action)
-    
+    console.log('srf', isSystemRecordFlag)
+
+
+
+    // Convert to system record (if required)
+    action = th.toThing(action)
 
     // Check if potential action is actionable (criteria is valid)
     action = checkValidity(action)
@@ -38,15 +53,28 @@ function executePotentialAction(action){
         //return null
     //}
 
+    console.log('action 2', action)
     // Execute action (-outputs)
     action = executeAction(action)
 
-
+    console.log('action 3', action)
     // Execute action type (updateAction, deleteAction, ...)
     action = executeActionType(action)
 
+    console.log('action 4', action)
+
+
+    // Check if action is Thing Object
+    if(isThingObjectFlag == true){
+        //console.log('convert backss')
+        //actionThingObject.system = action
+        //action = actionThingObject
+    }
+
+    
     // Convert from system record if required
-    if(isSystemRecordFlag === false){
+    if(isSystemRecordFlag == false){
+        console.log('convert back')
         action = th.record.get(action)
     }
     
@@ -62,7 +90,7 @@ function checkValidity(action){
 
     
     // Convert record to dot record
-    let dotRecord = h.dot.toDot(action)
+    let dotRecord = h.dot.toDot(th.record.get(action))
 
     // Iterate through keys
     let errors = []
@@ -75,7 +103,8 @@ function checkValidity(action){
          if(k.includes('-input')){
 
              // Retrieve value
-             let value = h.dot.get(k, action)
+             //let value = h.dot.get(k, action)
+             let value = th.value.get(action, k)
              
              // convert uri template to pvs
              let pvs = h.uri.uriToPvs(value)
@@ -115,14 +144,11 @@ function executeAction(action){
      * Converts keys ending in '-output' by executing their value is if uri template 
      */
 
-
-    
-
     // Copy record
-    let newAction = JSON.parse(JSON.stringify(action));
+    let newAction = action 
 
     // Convert to dot record
-    let dotRecord = h.dot.toDot(action)
+    let dotRecord = h.dot.toDot(th.record.get(action))
 
     // Iterate through all keys
     for(let k of Object.keys(dotRecord)){
@@ -130,7 +156,8 @@ function executeAction(action){
         // Remove input
         if(k.includes('-input')){
 
-             h.dot.setValue(newAction, k, undefined)
+             //h.dot.setValue(newAction, k, undefined)
+            newAction = th.value.delete(newAction, k)
         }
         
         //
@@ -138,16 +165,19 @@ function executeAction(action){
 
           
             // Retrieve value
-            let value = h.dot.get(k, newAction)
+            //let value = h.dot.get(k, newAction)
+            let value = th.value.get(newAction, k)
 
             // Convert value to pvs
             let pvs = h.uri.uriToPvs(value)
+            
             if(Object.keys(pvs).length <= 2){
                 pvs.defaultValue = value
             }
             
             // Execute pvs template
             value = h.template.get(pvs?.defaultValue, action)
+            
 
             // Convert if json
             try{
@@ -160,16 +190,19 @@ function executeAction(action){
 
             // Set value 
             let newK = k.replace('-output', '')
-            h.dot.setValue(newAction, newK, value)
-
+            newAction = th.value.set(newAction, newK, value)
+         
+            
             // Remove old output key
-            h.dot.setValue(newAction, k, undefined)
+            newAction = th.value.delete(newAction, k)
+
+            
         }
 
     }
 
     // Set action to completed
-    newAction.actionStatus = 'CompletedActionStatus'
+    newAction = th.value.set(newAction, 'actionStatus', 'CompletedActionStatus')
 
     return newAction
 
@@ -399,15 +432,7 @@ function executeActionType(action){
     let action_type = action?.record_type  || action?.["@type"] 
 
     
-    let recordIsThingFlag = false
-    if(th.isValid(action)){
-        recordIsThingFlag = true
-    } else {
-
-        action = th.toThing(action)
-        
-    }
-
+    
     // Init action
     action = th.value.set(action, 'startTime',  new Date())
 
@@ -458,12 +483,6 @@ function executeActionType(action){
     // 
 
     action = th.value.set(action, 'endTime',  new Date())
-
-    
-    // Convert back to record 
-    if(recordIsThingFlag == true){
-        action = th.record.get(action)
-    }
 
     return action
     
@@ -603,14 +622,21 @@ function executeInsertAction(action, toLocation){
 
         let tempToLocation = toLocation 
         for(let object of objects){
+
+            // Delete element from current position
+            
+            result = lh.delete(result, object)
+            
+            // Insert element at new position
             result = lh.insert(result, object, tempToLocation)
+            
             tempToLocation = th.value.get(object, 'position') + 1
         }
-        results.push(result)
+        //results.push(result)
     }
 
     // Execute action
-    action = th.value.set(action, 'result', results)
+    //action = th.value.set(action, 'result', results)
     
     // Set action status
     action = th.value.set(action, 'actionStatus', "CompletedActionStatus")

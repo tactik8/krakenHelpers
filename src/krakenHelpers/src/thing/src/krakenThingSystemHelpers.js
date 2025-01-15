@@ -5,6 +5,7 @@ import { krakenThingPropertyValueHelpers as pvh } from "./krakenThingPropertyVal
 
 
 import { krakenHeadingsHelpers } from "../../localization/krakenHeadingsHelpers.js";
+import { itemlist } from "../../html/src/itemlist.js";
 
 
 // todo: add fn to delete pv based on conditions
@@ -994,6 +995,28 @@ function replacePropertyValue(thing, propertyID, value, metadata, replacee, reco
      *
      */
 
+
+
+    // Handle dot notation
+
+    if(propertyID.includes('.') || propertyID.includes('[')){
+ 
+        let propertyPath = propertyID.split('.')
+        let newPropertyID = propertyPath[propertyPath.length -1]
+        let childThingPropertyPath = propertyPath.slice(0, -1).join('.')     
+        let pv = getPropertyValue(thing, childThingPropertyPath, null)
+
+        let newValue = replacePropertyValue(pv?.object?.value, newPropertyID, value, metadata, replacee, recompileFlag)
+
+        pv.object.value = newValue
+
+        if(recompileFlag==true){
+            thing = compileRecord(thing, newPropertyID)
+        }
+        
+        return thing
+    }
+    
     
     // Error handling
     if(h.isNull(thing)){
@@ -1067,6 +1090,28 @@ function addPropertyValue(thing, propertyID, value, metadata, recompileFlag=true
         throw new Error('Value provided is not thing');
     }
 
+
+    // Handle dot notation
+
+   
+    if(propertyID.includes('.') || propertyID.includes('[')){
+       
+        let propertyPath = propertyID.split('.')
+        let newPropertyID = propertyPath[propertyPath.length -1]
+        
+        let childThingPropertyPath = propertyPath.slice(0, -1).join('.')     
+        let pv = getPropertyValue(thing, childThingPropertyPath, null)
+
+        pv.object.value = addPropertyValue(pv?.object?.value, newPropertyID, value, metadata, recompileFlag)
+
+        if(recompileFlag==true){
+            thing = compileRecord(thing, newPropertyID)
+        }
+        
+        return thing
+
+    }
+
     
     
     // Initialize values
@@ -1122,7 +1167,23 @@ function deletePropertyValue(thing, propertyID, value, metadata, recompileFlag=t
         throw new Error('Value provided is not thing');
     }
 
+    // Handle dot notation
 
+    if(propertyID.includes('.') || propertyID.includes('[')){
+
+        let propertyPath = propertyID.split('.')
+        let newPropertyID = propertyPath[propertyPath.length -1]
+        let childThingPropertyPath = propertyPath.slice(0, -1).join('.')     
+        let pv = getPropertyValue(thing, childThingPropertyPath, null)
+        pv.object.value = deletePropertyValue(pv?.object?.value, newPropertyID, value, metadata, recompileFlag)
+
+        if(recompileFlag==true){
+            thing = compileRecord(thing, newPropertyID)
+        }
+        
+        return thing
+        
+    }
     
     // Initialize values
     let values = h.toArray(value);
@@ -1681,7 +1742,7 @@ function setSystem(thing, record) {
 
 function compileRecord(thing, propertyID, includeHeadings=false) {
     /**
-     * Recompiles the values base don propertyValues
+     * Recompiles the values based on propertyValues
      * @param {Object} thing
      * @returns {Object}
      */

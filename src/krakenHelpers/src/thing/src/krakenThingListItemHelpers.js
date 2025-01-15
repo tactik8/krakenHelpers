@@ -51,8 +51,8 @@ function isValid(value){
      */
 
   
-
-    if((value?.['@type'] || value?.record_type) == 'ListItem'){
+   
+    if((value?.['@type'] || value?._system?.['@type']|| value?.record_type) == 'ListItem'){
         return true
     }
     
@@ -160,9 +160,9 @@ function getPosition(value){
      * @param {Object} thing The thing
      * @returns {Number} The position
      */
-
     if(!isValid(value)){ return null}
 
+    
     let result = th.value.get(value, 'position') 
 
     if(h.isNull(result)){
@@ -179,7 +179,7 @@ function setPosition(value, position){
      * @returns {Number} The position
      */
 
-    if(!isValid(value)){ throw new Error('Invalid thing') }
+    if(!isValid(value)){ throw new Error('Invalid thing', value) }
     return th.value.set(value, 'position', position) 
 
 }

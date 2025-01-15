@@ -2370,6 +2370,31 @@ const $650a87c2d2146f16$export$c43cb89937ee8d5c = {
     get: $650a87c2d2146f16$var$getHash
 };
 function $650a87c2d2146f16$var$getHash(str) {
+    let value = str;
+    if ((0, $41e9b357c493982e$export$f8c0f914c8a0ee10).isNull(value)) value = "null";
+    try {
+        value = JSON.stringify(str);
+    } catch  {
+        return null;
+    }
+    let input = value;
+    const prime1 = 31; // A small prime number
+    const prime2 = 37; // Another small prime number
+    const seed = 0xabcdef; // Initial seed value
+    let hash1 = seed;
+    let hash2 = seed;
+    for(let i = 0; i < input.length; i++){
+        const charCode = input.charCodeAt(i);
+        hash1 = hash1 * prime1 ^ charCode; // Mixing with prime1
+        hash2 = hash2 * prime2 ^ charCode; // Mixing with prime2
+    }
+    // Combine the two hashes into a pseudo 256-bit hash
+    let combinedHash = ((hash1 & 0xffffffff) >>> 0).toString(16).padStart(8, "0") + ((hash2 & 0xffffffff) >>> 0).toString(16).padStart(8, "0");
+    // Repeat the process to generate a 64-character hash
+    while(combinedHash.length < 64)combinedHash += combinedHash; // Repeat pattern
+    return combinedHash.slice(0, 64); // Trim to 256 bits (64 hex chars)
+}
+function $650a87c2d2146f16$var$getHashOLD(str) {
     /**
      * Get a hash value
      * @param {Object} hash The hash
@@ -9049,6 +9074,281 @@ function $3766123d98edc643$var$emptyStar() {
 }
 
 
+function $2daab24e0d2386f8$export$73754b0a4e25f0a4(prefixes) {
+    prefixes = prefixes || [];
+    let prefix = prefixes.join(".");
+    if (prefix != "") prefix = prefix + ".";
+    return `
+
+        
+        <!-- Potential action menu -->
+        <div class="dropdown">
+        
+            <a 
+            class="btn" 
+            href="#" 
+            role="button" 
+            data-bs-toggle="dropdown" 
+            aria-expanded="false"
+            >
+            
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-three-dots-vertical" viewBox="0 0 16 16">
+                
+                    <path d="M9.5 13a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0m0-5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0m0-5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0"/>
+
+                </svg>
+                
+            </a>
+            
+            <ul class="dropdown-menu">
+        
+                <form method="post">
+
+                    <input type="hidden" id="@type" name="@type" value="{{${prefix}@type}}">
+                    <input type="hidden" id="@id" name="@id" value="{{${prefix}@id}}">
+                    
+                    {{#${prefix}potentialAction}}
+
+                        <li>
+    
+                            <button 
+                            type="submit" 
+                            class="dropdown-item" 
+                            formaction="{{${prefix}potentialAction.url}}">
+                            
+                                {{${prefix}potentialAction.name}}
+                            
+                            </button>
+                        
+                        </li>
+    
+                    {{/${prefix}potentialAction}}
+            
+
+                </form>
+
+
+                <li>
+                    <hr class="dropdown-divider">
+                </li>
+
+
+                <form method="post">
+
+                    <input type="hidden" id="@type" name="item.@type" value="{{${prefix}item.@type}}">
+                    <input type="hidden" id="@id" name="@id" value="{{${prefix}item.@id}}">
+                    
+                    {{#${prefix}item.potentialAction}}
+
+                        <li>
+    
+                            <button 
+                            type="submit" 
+                            class="dropdown-item" 
+                            formaction="{{${prefix}item.potentialAction.url}}">
+                            
+                                {{${prefix}item.potentialAction.name}}
+                            
+                            </button>
+                        
+                        </li>
+    
+                    {{/${prefix}item.potentialAction}}
+            
+                </form>
+                
+            </ul>
+                
+        </div>
+        
+        
+        `;
+}
+
+
+
+
+function $f4b33ebb584657d4$export$53f1d5ea8de3d7c(prefixes = []) {
+    prefixes = prefixes || [];
+    let prefix = prefixes.join(".");
+    if (prefix != "") prefix = prefix + ".";
+    return ` <div class="row align-items-center mt-2 mb-2" >
+
+                <div class="col col-12 col-sm-6 col-md-2">
+                   
+                    <img 
+                    src="{{${prefix}_headingImage}}" 
+                    class="img-fluid" 
+                    alt{{${prefix}_headingDescription}} 
+                         
+                    onerror="this.style.display='none'"
+                    >
+                   
+                </div>
+                
+                <div class="col col-12 col-sm-6 col-md-10">
+                    <div class="row d-flex">
+                        <div class="col col-md-auto">
+                            {{ ${prefix}_heading1 }}
+                        </div>
+            
+                        <div class="col col-12 col-md-auto text-truncate ">
+                            {{ ${prefix}_heading2 }}
+                        </div>
+            
+                        <div class="col col-12 col-md-auto ">
+                            {{ ${prefix}_headingStatus }}
+                        </div>
+            
+                        <div class="col col-12 col-md-auto text-truncate">
+                            <a href="{{ ${prefix}url }}">Link</a>
+                        </div>
+                    </div>
+                </div>
+            
+             </div>
+    `;
+}
+
+
+
+function $155333d55623e825$export$f90eb7c4d1fc985e(classlist, itemContent, prefixes) {
+    // Handle classes
+    let classes = (0, $2fa9c1db583d4d31$export$439bf78a2cc516f5).toArray(classlist).join(" ");
+    // Handle prefixes
+    prefixes = prefixes || [];
+    let prefix = prefixes.join(".");
+    if (prefix != "") prefix = prefix + ".";
+    itemContent = itemContent || (0, $f4b33ebb584657d4$export$53f1d5ea8de3d7c)(prefixes.concat([
+        "item"
+    ]));
+    return `
+
+        <div class=" mt-1 mb-1 ${classes || ""}">
+            <nav>
+                <div class="row d-flex align-items-center">
+    
+                    <div class="col col-auto order-1 krSelected justify-content-center text-center" >
+                        <div class="form-check justify-content-center text-center">
+                            <input 
+                            class="form-check-input checkboxes"
+                            type="checkbox" 
+                            value="" 
+                            id="checked_{{${prefix}item.@type}}_{{${prefix}item.@id}}" 
+                            name="checked_{{${prefix}item.@type}}_{{${prefix}item.@id}}" 
+                            >
+                        </div>
+                    </div>
+    
+                        
+                    <div class="col col-auto order-2 order-sm-3 text-center">
+                        <span class="krProperty" data-propertyID="position">
+                        {{ ${prefix}position }}
+                        </span>
+                    </div>
+                    
+    
+                     <div class="col col-12 col-sm-1 flex-sm-grow-1 order-5 order-sm-3" >
+                        
+                        <span class="krProperty" data-propertyID="item">
+                        <main>
+                            ${itemContent}
+                        </main>
+                        </span>
+                    </div>
+                
+                    
+                    <div class="col col-auto order-3 order-sm-4 ms-auto text-end">
+                        
+                        ${(0, $2daab24e0d2386f8$export$73754b0a4e25f0a4)(prefixes)}
+                    </div>
+        
+                </div> 
+        
+                <div class="row">
+        
+                    <div class="col col-sm-3">
+                    </div>
+        
+                    <div class="col col-sm-3">
+                    </div>
+        
+                    <div class="col col-sm-3">
+                    </div>
+        
+                </div> 
+            </nav>
+        </div>
+    
+    
+    `;
+}
+
+
+
+function $03cb398f5a2433c4$export$b97dc3b2d35f8775(classlist, classlistListItem, content, prefixes = []) {
+    // Handle classes
+    let classes = (0, $2fa9c1db583d4d31$export$439bf78a2cc516f5).toArray(classlist).join(" ");
+    //
+    prefixes = prefixes || [];
+    prefixes = prefixes.filter((x)=>x !== undefined && x !== null);
+    let prefix = prefixes.join(".");
+    if (prefix != "") prefix = prefix + ".";
+    let id = "checkbox_" + String(crypto.randomUUID());
+    let result = `
+
+        <div class="container checkboxParent ${classes || ""}">
+
+            <div class="row border-top border-bottom align-items-center" >
+
+
+                <div class="col col-auto ">
+                    <div class="form-check justify-content-center text-center">
+                        <input 
+                        id="${id}"
+                        class="form-check-input" 
+                        type="checkbox" 
+                        value="" 
+                        onClick="console.log('click'); for(let i of this.closest('.checkboxParent').parentElement.querySelectorAll('.checkboxes')){i.checked = this.checked};"
+                        >
+                    </div>
+
+                </div>
+                
+                <div class="col col-auto ">
+                    {{${prefix}name}}
+                </div>
+
+                <div class="col col-auto ms-auto">
+                    ${(0, $2daab24e0d2386f8$export$73754b0a4e25f0a4)(prefixes)}
+                </div>
+
+            </div>
+
+        
+            {{ #itemListElement }}
+
+                
+                   ${(0, $155333d55623e825$export$f90eb7c4d1fc985e)(classlistListItem, content, prefixes.concat([
+        "itemListElement"
+    ]))}
+              
+               
+            {{ /itemListElement }}
+
+                
+            <div class="row mt-2 mb-2 border-bottom align-items-center">
+
+            </div>
+
+        </div>
+
+    
+    `;
+    return result;
+}
+
+
 const $7bb8d4569e1a97bb$export$1ef237150243f225 = {
     /**@constant
      * @type {Object}
@@ -9664,7 +9964,18 @@ function $7bb8d4569e1a97bb$var$replacePropertyValue(thing, propertyID, value, me
      * @param {string|Array|Object} value
      * @returns {Object} The thing
      *
-     */ // Error handling
+     */ // Handle dot notation
+    if (propertyID.includes(".") || propertyID.includes("[")) {
+        let propertyPath = propertyID.split(".");
+        let newPropertyID = propertyPath[propertyPath.length - 1];
+        let childThingPropertyPath = propertyPath.slice(0, -1).join(".");
+        let pv = $7bb8d4569e1a97bb$var$getPropertyValue(thing, childThingPropertyPath, null);
+        let newValue = $7bb8d4569e1a97bb$var$replacePropertyValue(pv?.object?.value, newPropertyID, value, metadata, replacee, recompileFlag);
+        pv.object.value = newValue;
+        if (recompileFlag == true) thing = $7bb8d4569e1a97bb$var$compileRecord(thing, newPropertyID);
+        return thing;
+    }
+    // Error handling
     if ((0, $2fa9c1db583d4d31$export$439bf78a2cc516f5).isNull(thing)) throw new Error("Value provided is not thing");
     if (!$7bb8d4569e1a97bb$var$isValid(thing)) throw new Error("Value provided is not thing");
     // Initialize values
@@ -9698,6 +10009,16 @@ function $7bb8d4569e1a97bb$var$addPropertyValue(thing, propertyID, value, metada
      */ // Error handling
     if ((0, $2fa9c1db583d4d31$export$439bf78a2cc516f5).isNull(thing)) throw new Error("Value provided is not thing");
     if (!$7bb8d4569e1a97bb$var$isValid(thing)) throw new Error("Value provided is not thing");
+    // Handle dot notation
+    if (propertyID.includes(".") || propertyID.includes("[")) {
+        let propertyPath = propertyID.split(".");
+        let newPropertyID = propertyPath[propertyPath.length - 1];
+        let childThingPropertyPath = propertyPath.slice(0, -1).join(".");
+        let pv = $7bb8d4569e1a97bb$var$getPropertyValue(thing, childThingPropertyPath, null);
+        pv.object.value = $7bb8d4569e1a97bb$var$addPropertyValue(pv?.object?.value, newPropertyID, value, metadata, recompileFlag);
+        if (recompileFlag == true) thing = $7bb8d4569e1a97bb$var$compileRecord(thing, newPropertyID);
+        return thing;
+    }
     // Initialize values
     let values = (0, $2fa9c1db583d4d31$export$439bf78a2cc516f5).toArray(value);
     metadata = metadata || {};
@@ -9730,6 +10051,16 @@ function $7bb8d4569e1a97bb$var$deletePropertyValue(thing, propertyID, value, met
      */ // Error handling
     if ((0, $2fa9c1db583d4d31$export$439bf78a2cc516f5).isNull(thing)) throw new Error("Value provided is not thing");
     if (!$7bb8d4569e1a97bb$var$isValid(thing)) throw new Error("Value provided is not thing");
+    // Handle dot notation
+    if (propertyID.includes(".") || propertyID.includes("[")) {
+        let propertyPath = propertyID.split(".");
+        let newPropertyID = propertyPath[propertyPath.length - 1];
+        let childThingPropertyPath = propertyPath.slice(0, -1).join(".");
+        let pv = $7bb8d4569e1a97bb$var$getPropertyValue(thing, childThingPropertyPath, null);
+        pv.object.value = $7bb8d4569e1a97bb$var$deletePropertyValue(pv?.object?.value, newPropertyID, value, metadata, recompileFlag);
+        if (recompileFlag == true) thing = $7bb8d4569e1a97bb$var$compileRecord(thing, newPropertyID);
+        return thing;
+    }
     // Initialize values
     let values = (0, $2fa9c1db583d4d31$export$439bf78a2cc516f5).toArray(value);
     metadata = metadata || {};
@@ -10028,7 +10359,7 @@ function $7bb8d4569e1a97bb$var$setSystem(thing, record) {
 // -----------------------------------------------------
 function $7bb8d4569e1a97bb$var$compileRecord(thing, propertyID, includeHeadings = false) {
     /**
-     * Recompiles the values base don propertyValues
+     * Recompiles the values based on propertyValues
      * @param {Object} thing
      * @returns {Object}
      */ // Error handling
@@ -10932,6 +11263,7 @@ function $7273ede3c5ec638c$var$executePotentialAction(action) {
      * 
      */ // Check if action is system record
     let isSystemRecordFlag = (0, $7bb8d4569e1a97bb$export$1ef237150243f225).isValid(action);
+    action = (0, $7bb8d4569e1a97bb$export$1ef237150243f225).toThing(action);
     // Check if potential action is actionable (criteria is valid)
     action = $7273ede3c5ec638c$var$checkValidity(action);
     if (action?.actionStatus == "FailedActionStatus") return action;
@@ -10952,12 +11284,13 @@ function $7273ede3c5ec638c$var$checkValidity(action) {
      * Checks if action meet validity criteria
      * Validity criteria are the -input properties
      */ // Convert record to dot record
-    let dotRecord = (0, $2fa9c1db583d4d31$export$439bf78a2cc516f5).dot.toDot(action);
+    let dotRecord = (0, $2fa9c1db583d4d31$export$439bf78a2cc516f5).dot.toDot((0, $7bb8d4569e1a97bb$export$1ef237150243f225).record.get(action));
     // Iterate through keys
     let errors = [];
     for(let k in dotRecord)if (k.includes("-input")) {
         // Retrieve value
-        let value = (0, $2fa9c1db583d4d31$export$439bf78a2cc516f5).dot.get(k, action);
+        //let value = h.dot.get(k, action)
+        let value = (0, $7bb8d4569e1a97bb$export$1ef237150243f225).value.get(action, k);
         // convert uri template to pvs
         let pvs = (0, $2fa9c1db583d4d31$export$439bf78a2cc516f5).uri.uriToPvs(value);
         // If pvs has default value and nothing else, assume it is a regex valuePattern
@@ -10977,17 +11310,20 @@ function $7273ede3c5ec638c$var$executeAction(action) {
     /**
      * Converts keys ending in '-output' by executing their value is if uri template 
      */ // Copy record
-    let newAction = JSON.parse(JSON.stringify(action));
+    let newAction = action //JSON.parse(JSON.stringify(action));
+    ;
     // Convert to dot record
-    let dotRecord = (0, $2fa9c1db583d4d31$export$439bf78a2cc516f5).dot.toDot(action);
+    let dotRecord = (0, $2fa9c1db583d4d31$export$439bf78a2cc516f5).dot.toDot((0, $7bb8d4569e1a97bb$export$1ef237150243f225).record.get(action));
     // Iterate through all keys
     for (let k of Object.keys(dotRecord)){
         // Remove input
-        if (k.includes("-input")) (0, $2fa9c1db583d4d31$export$439bf78a2cc516f5).dot.setValue(newAction, k, undefined);
+        if (k.includes("-input")) //h.dot.setValue(newAction, k, undefined)
+        newAction = (0, $7bb8d4569e1a97bb$export$1ef237150243f225).value.delete(newAction, k);
         //
         if (k.includes("-output")) {
             // Retrieve value
-            let value = (0, $2fa9c1db583d4d31$export$439bf78a2cc516f5).dot.get(k, newAction);
+            //let value = h.dot.get(k, newAction)
+            let value = (0, $7bb8d4569e1a97bb$export$1ef237150243f225).value.get(newAction, k);
             // Convert value to pvs
             let pvs = (0, $2fa9c1db583d4d31$export$439bf78a2cc516f5).uri.uriToPvs(value);
             if (Object.keys(pvs).length <= 2) pvs.defaultValue = value;
@@ -10999,13 +11335,13 @@ function $7273ede3c5ec638c$var$executeAction(action) {
             } catch (error) {}
             // Set value 
             let newK = k.replace("-output", "");
-            (0, $2fa9c1db583d4d31$export$439bf78a2cc516f5).dot.setValue(newAction, newK, value);
+            newAction = (0, $7bb8d4569e1a97bb$export$1ef237150243f225).value.set(newAction, newK, value);
             // Remove old output key
-            (0, $2fa9c1db583d4d31$export$439bf78a2cc516f5).dot.setValue(newAction, k, undefined);
+            newAction = (0, $7bb8d4569e1a97bb$export$1ef237150243f225).value.delete(newAction, k);
         }
     }
     // Set action to completed
-    newAction.actionStatus = "CompletedActionStatus";
+    newAction = (0, $7bb8d4569e1a97bb$export$1ef237150243f225).value.set(newAction, "actionStatus", "CompletedActionStatus");
     return newAction;
 }
 function $7273ede3c5ec638c$var$testPVS(record, key, pvs) {
@@ -12991,280 +13327,6 @@ function $7336d3e0ff0b04a2$var$expandOff() {
 }
 
 
-function $2daab24e0d2386f8$export$73754b0a4e25f0a4(prefixes) {
-    prefixes = prefixes || [];
-    let prefix = prefixes.join(".");
-    if (prefix != "") prefix = prefix + ".";
-    return `
-
-        
-        <!-- Potential action menu -->
-        <div class="dropdown">
-        
-            <a 
-            class="btn" 
-            href="#" 
-            role="button" 
-            data-bs-toggle="dropdown" 
-            aria-expanded="false"
-            >
-            
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-three-dots-vertical" viewBox="0 0 16 16">
-                
-                    <path d="M9.5 13a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0m0-5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0m0-5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0"/>
-
-                </svg>
-                
-            </a>
-            
-            <ul class="dropdown-menu">
-        
-                <form method="post">
-
-                    <input type="hidden" id="@type" name="@type" value="{{${prefix}@type}}">
-                    <input type="hidden" id="@id" name="@id" value="{{${prefix}@id}}">
-                    
-                    {{#${prefix}potentialAction}}
-
-                        <li>
-    
-                            <button 
-                            type="submit" 
-                            class="dropdown-item" 
-                            formaction="{{${prefix}potentialAction.url}}">
-                            
-                                {{${prefix}potentialAction.name}}
-                            
-                            </button>
-                        
-                        </li>
-    
-                    {{/${prefix}potentialAction}}
-            
-
-                </form>
-
-
-                <li>
-                    <hr class="dropdown-divider">
-                </li>
-
-
-                <form method="post">
-
-                    <input type="hidden" id="@type" name="item.@type" value="{{${prefix}item.@type}}">
-                    <input type="hidden" id="@id" name="@id" value="{{${prefix}item.@id}}">
-                    
-                    {{#${prefix}item.potentialAction}}
-
-                        <li>
-    
-                            <button 
-                            type="submit" 
-                            class="dropdown-item" 
-                            formaction="{{${prefix}item.potentialAction.url}}">
-                            
-                                {{${prefix}item.potentialAction.name}}
-                            
-                            </button>
-                        
-                        </li>
-    
-                    {{/${prefix}item.potentialAction}}
-            
-                </form>
-                
-            </ul>
-                
-        </div>
-        
-        
-        `;
-}
-
-
-
-
-function $f4b33ebb584657d4$export$53f1d5ea8de3d7c(prefixes = []) {
-    prefixes = prefixes || [];
-    let prefix = prefixes.join(".");
-    if (prefix != "") prefix = prefix + ".";
-    return ` <div class="row align-items-center mt-2 mb-2" >
-
-                <div class="col col-12 col-sm-6 col-md-2">
-                   
-                    <img 
-                    src="{{${prefix}_headingImage}}" 
-                    class="img-fluid" 
-                    alt{{${prefix}_headingDescription}} 
-                         
-                    onerror="this.style.display='none'"
-                    >
-                   
-                </div>
-                
-                <div class="col col-12 col-sm-6 col-md-10">
-                    <div class="row d-flex">
-                        <div class="col col-md-auto">
-                            {{ ${prefix}_heading1 }}
-                        </div>
-            
-                        <div class="col col-12 col-md-auto text-truncate ">
-                            {{ ${prefix}_heading2 }}
-                        </div>
-            
-                        <div class="col col-12 col-md-auto ">
-                            {{ ${prefix}_headingStatus }}
-                        </div>
-            
-                        <div class="col col-12 col-md-auto text-truncate">
-                            <a href="{{ ${prefix}url }}">Link</a>
-                        </div>
-                    </div>
-                </div>
-            
-             </div>
-    `;
-}
-
-
-
-function $155333d55623e825$export$f90eb7c4d1fc985e(classlist, itemContent, prefixes) {
-    // Handle classes
-    let classes = (0, $2fa9c1db583d4d31$export$439bf78a2cc516f5).toArray(classlist).join(" ");
-    // Handle prefixes
-    prefixes = prefixes || [];
-    let prefix = prefixes.join(".");
-    if (prefix != "") prefix = prefix + ".";
-    itemContent = itemContent || (0, $f4b33ebb584657d4$export$53f1d5ea8de3d7c)(prefixes.concat([
-        "item"
-    ]));
-    return `
-
-        <div class=" mt-1 mb-1 ${classes || ""}">
-            <nav>
-                <div class="row d-flex align-items-center">
-    
-                    <div class="col col-auto order-1 krSelected justify-content-center text-center" >
-                        <div class="form-check justify-content-center text-center">
-                            <input 
-                            class="form-check-input checkboxes"
-                            type="checkbox" 
-                            value="" 
-                            id="checked_{{${prefix}item.@type}}_{{${prefix}item.@id}}" 
-                            name="checked_{{${prefix}item.@type}}_{{${prefix}item.@id}}" 
-                            >
-                        </div>
-                    </div>
-    
-                        
-                    <div class="col col-auto order-2 order-sm-3 text-center">
-                        <span class="krProperty" data-propertyID="position">
-                        {{ ${prefix}position }}
-                        </span>
-                    </div>
-                    
-    
-                     <div class="col col-12 col-sm-1 flex-sm-grow-1 order-5 order-sm-3" >
-                        
-                        <span class="krProperty" data-propertyID="item">
-                        <main>
-                            ${itemContent}
-                        </main>
-                        </span>
-                    </div>
-                
-                    
-                    <div class="col col-auto order-3 order-sm-4 ms-auto text-end">
-                        
-                        ${(0, $2daab24e0d2386f8$export$73754b0a4e25f0a4)(prefixes)}
-                    </div>
-        
-                </div> 
-        
-                <div class="row">
-        
-                    <div class="col col-sm-3">
-                    </div>
-        
-                    <div class="col col-sm-3">
-                    </div>
-        
-                    <div class="col col-sm-3">
-                    </div>
-        
-                </div> 
-            </nav>
-        </div>
-    
-    
-    `;
-}
-
-
-
-function $03cb398f5a2433c4$export$b97dc3b2d35f8775(classlist, classlistListItem, content, prefixes = []) {
-    // Handle classes
-    let classes = (0, $2fa9c1db583d4d31$export$439bf78a2cc516f5).toArray(classlist).join(" ");
-    //
-    prefixes = prefixes || [];
-    prefixes = prefixes.filter((x)=>x !== undefined && x !== null);
-    let prefix = prefixes.join(".");
-    if (prefix != "") prefix = prefix + ".";
-    let id = "checkbox_" + String(crypto.randomUUID());
-    let result = `
-
-        <div class="container checkboxParent ${classes || ""}">
-
-            <div class="row border-top border-bottom align-items-center" >
-
-
-                <div class="col col-auto ">
-                    <div class="form-check justify-content-center text-center">
-                        <input 
-                        id="${id}"
-                        class="form-check-input" 
-                        type="checkbox" 
-                        value="" 
-                        onClick="console.log('click'); for(let i of this.closest('.checkboxParent').parentElement.querySelectorAll('.checkboxes')){i.checked = this.checked};"
-                        >
-                    </div>
-
-                </div>
-                
-                <div class="col col-auto ">
-                    {{${prefix}name}}
-                </div>
-
-                <div class="col col-auto ms-auto">
-                    ${(0, $2daab24e0d2386f8$export$73754b0a4e25f0a4)(prefixes)}
-                </div>
-
-            </div>
-
-        
-            {{ #itemListElement }}
-
-                
-                   ${(0, $155333d55623e825$export$f90eb7c4d1fc985e)(classlistListItem, content, prefixes.concat([
-        "itemListElement"
-    ]))}
-              
-               
-            {{ /itemListElement }}
-
-                
-            <div class="row mt-2 mb-2 border-bottom align-items-center">
-
-            </div>
-
-        </div>
-
-    
-    `;
-    return result;
-}
-
 
 function $b22cd3de1d812d2d$export$f8fce98513fdd41a(record) {
     /**
@@ -13601,13 +13663,12 @@ class $706f18fe777015bf$var$KrThing {
         this._system = null;
         this._record_type = null;
         this._record_id = null;
-        if ((0, $53bcb33ef2023ce8$export$f936470337fdc8d0).thing.isThing(record_or_record_type)) this.system = (0, $53bcb33ef2023ce8$export$f936470337fdc8d0).thing.toThing(record_or_record_type);
-        else this.system = (0, $53bcb33ef2023ce8$export$f936470337fdc8d0).thing.new(record_or_record_type, record_id);
         this._thingsDB = null;
-        this._callbacks = [];
+        this._callbacks = {};
         this._eventRecordCache = null;
-        if ((0, $53bcb33ef2023ce8$export$f936470337fdc8d0).thing.isThing(record_or_record_type)) this.system = (0, $53bcb33ef2023ce8$export$f936470337fdc8d0).thing.toThing(record_or_record_type, record_id, metadata);
-    //this._convertChildrenThingsRecordsToThingObjects()
+        if ((0, $53bcb33ef2023ce8$export$f936470337fdc8d0).thing.isThing(record_or_record_type)) this.system = (0, $53bcb33ef2023ce8$export$f936470337fdc8d0).thing.toThing(record_or_record_type, null, metadata);
+        else this.system = (0, $53bcb33ef2023ce8$export$f936470337fdc8d0).thing.new(record_or_record_type, record_id, metadata);
+        this._convertChildrenThingsRecordsToThingObjects();
     }
     // -----------------------------------------------------
     //  ThingsDB helpers 
@@ -13622,17 +13683,20 @@ class $706f18fe777015bf$var$KrThing {
          * Set the repository of things 
          */ this._thingsDB = value;
     }
-    get callbacks() {
+    getCallbacks(callbackType) {
         /**
          * Get the repository of things 
-         */ if ((0, $53bcb33ef2023ce8$export$f936470337fdc8d0).isNotNull(this.thingsDB)) return this._thingsDB.callbacksGet(this.record_type, this.record_id);
-        else return this._callbacks;
+         */ if ((0, $53bcb33ef2023ce8$export$f936470337fdc8d0).isNotNull(this.thingsDB)) return this._thingsDB.callbacksGet(this.record_type, this.record_id, callbackType);
+        else return this._callbacks?.[callbackType];
     }
-    set callbacks(value) {
+    setCallbacks(callback, callbackType) {
         /**
          * Set the repository of things 
-         */ if ((0, $53bcb33ef2023ce8$export$f936470337fdc8d0).isNotNull(this.thingsDB)) this._thingsDB.callbacksSet(this.record_type, this.record_id, value);
-        else this._callbacks.push(value);
+         */ if ((0, $53bcb33ef2023ce8$export$f936470337fdc8d0).isNotNull(this.thingsDB)) this._thingsDB.callbacksSet(this.record_type, this.record_id, callback, callbackType);
+        else {
+            this._callbacks[callbackType] = this._callbacks?.[callbackType] || [];
+            this._callbacks[callbackType].push(callback);
+        }
     }
     // -----------------------------------------------------
     //  Base 
@@ -13685,7 +13749,7 @@ class $706f18fe777015bf$var$KrThing {
         this._record_id = (0, $53bcb33ef2023ce8$export$f936470337fdc8d0).thing.record_id.get(value);
         this._convertChildrenThingsRecordsToThingObjects();
         // Broadcast event 
-        if (this.recordHasChanged() == true) this.broadcastEvent("thing", this.ref);
+        if (this.recordHasChanged() === true) this.broadcastEvent("thing", this.ref);
     }
     // -----------------------------------------------------
     //  Event record cache
@@ -13695,23 +13759,24 @@ class $706f18fe777015bf$var$KrThing {
     recordHasChanged() {
         /**
          * Returns true if the record has changed since last event broadcast
-         */ let hashValue = (0, $53bcb33ef2023ce8$export$f936470337fdc8d0).thing.hash(this.record);
-        if (hashValue != this.eventRecordCache) return true;
+         */ let hashValue = (0, $53bcb33ef2023ce8$export$f936470337fdc8d0).base.hash.get(this.record);
+        let oldValue = this.getEventRecordCache();
+        if (hashValue != oldValue) return true;
         return false;
     }
-    get eventRecordCache() {
+    getEventRecordCache() {
         /**
          * Retrieves the record from the last broadcast
          * 
          */ if ((0, $53bcb33ef2023ce8$export$f936470337fdc8d0).isNotNull(this.thingsDB)) return this.thingsDB.eventRecordCacheGet(this.record_type, this.record_id);
         else return this._eventRecordCache;
     }
-    set eventRecordCache(value) {
+    storeEventRecordCache() {
         /**
          * Sets the record from the last broadcast
          * 
-         */ let hashValue = (0, $53bcb33ef2023ce8$export$f936470337fdc8d0).thing.hash(value);
-        if ((0, $53bcb33ef2023ce8$export$f936470337fdc8d0).isNotNull(this.thingsDB)) this.thingsDB.eventRecordCacheSet(hashValue);
+         */ let hashValue = (0, $53bcb33ef2023ce8$export$f936470337fdc8d0).base.hash.get(this.record);
+        if ((0, $53bcb33ef2023ce8$export$f936470337fdc8d0).isNotNull(this.thingsDB)) this.thingsDB.eventRecordCacheSet(this.record_type, this.record_id, hashValue);
         else this._eventRecordCache = hashValue;
     }
     // -----------------------------------------------------
@@ -14029,8 +14094,8 @@ class $706f18fe777015bf$var$KrThing {
          * @param {String} event The event
          * @param {Function} callback The callback
          * @returns {Object} The record
-         */ this._callbacks[eventType] = this._callbacks?.[eventType] || [];
-        this._callbacks[eventType].push(callback);
+         */ this.setCallbacks(callback, eventType);
+        if (eventType != "all") this.setCallbacks(callback, "all");
     }
     broadcastEvent(eventType, message) {
         /**
@@ -14045,11 +14110,11 @@ class $706f18fe777015bf$var$KrThing {
             name: message
         };
         // Store copy of record in event Cache
-        this.eventRecordCache = this.record;
+        this.storeEventRecordCache();
         // Execute callbacks
-        for (let callback of (0, $53bcb33ef2023ce8$export$f936470337fdc8d0).toArray(this.callbacks?.[eventType]))callback(event);
-        for (let callback of (0, $53bcb33ef2023ce8$export$f936470337fdc8d0).toArray(this.callbacks?.["any"]))callback(event);
-        for (let callback of (0, $53bcb33ef2023ce8$export$f936470337fdc8d0).toArray(this.callbacks?.["all"]))callback(event);
+        for (let callback of (0, $53bcb33ef2023ce8$export$f936470337fdc8d0).toArray(this.getCallbacks(eventType)))callback(event);
+        for (let callback of (0, $53bcb33ef2023ce8$export$f936470337fdc8d0).toArray(this.getCallbacks("any")))callback(event);
+        for (let callback of (0, $53bcb33ef2023ce8$export$f936470337fdc8d0).toArray(this.getCallbacks("all")))callback(event);
     }
     // -----------------------------------------------------
     //  Shortcuts 
@@ -14144,13 +14209,11 @@ class $2cb32bf7096e125e$var$KrThings {
         let record_type = thing.record_type;
         let record_id = thing.record_id;
         // Retrieve local caches
-        this.systemSet(thing.system);
-        this.eventRecordCacheSet(thing.eventRecordCache);
-        this.callbacksSet(record_type, record_id, thing.callbacks);
+        this.systemSet(thing._system);
+        this.eventRecordCacheSet(thing._eventRecordCache);
+        for(let callbackType in thing._callbacks)for (let callback of thing._callbacks[callbackType])this.callbacksSet(record_type, record_id, callback, callbackType);
         // Add thingsDB to thing
         thing.thingsDB = this;
-        // Add thing to thingsDB
-        this.thingSet(thing);
     }
     thingGet(record_or_record_type, record_id) {
         /**
@@ -14159,18 +14222,15 @@ class $2cb32bf7096e125e$var$KrThings {
         record_id = record_or_record_type?.record_id || record_or_record_type?.["@id"] || record_id;
         return this._thingDB?.[record_type]?.[record_id];
     }
-    thingSet(record, overWrite = false) {
+    thingSet(thing, overWrite = false) {
         /**
          * Sets thing
-         */ let record_type = record?.record_type || record?.["@type"];
-        let record_id = record?.record_id || record?.["@id"];
+         */ let record_type = thing?.record_type || thing?.["@type"];
+        let record_id = thing?.record_id || thing?.["@id"];
+        this.systemSet(thing?.system || thing, overWrite);
         this._thingDB[record_type] = this._thingDB?.[record_type] || {};
-        // Merge with existing record if one present
-        if (overWrite == false) {
-            if ((0, $53bcb33ef2023ce8$export$f936470337fdc8d0).isNotNull(this.thingGet(record_type, record_id))) record = (0, $53bcb33ef2023ce8$export$f936470337fdc8d0).thing.merge(this.thingGet(record_type, record_id), record);
-        }
-        this._thingDB[record_type][record_id] = record;
-        return;
+        this._thingDB[record_type][record_id] = this._thingDB?.[record_type]?.[record_id] || thing;
+        return this._thingDB[record_type][record_id];
     }
     systemGet(record_or_record_type, record_id) {
         /**
@@ -14187,7 +14247,8 @@ class $2cb32bf7096e125e$var$KrThings {
         this._systemDB[record_type] = this._systemDB?.[record_type] || {};
         // Merge with existing record if one present
         if (overWrite == false) {
-            if ((0, $53bcb33ef2023ce8$export$f936470337fdc8d0).isNotNull(this.systemGet(record_type, record_id))) record = (0, $53bcb33ef2023ce8$export$f936470337fdc8d0).thing.merge(this.systemGet(record_type, record_id), record);
+            let currentRecord = this.systemGet(record_type, record_id);
+            if ((0, $53bcb33ef2023ce8$export$f936470337fdc8d0).isNotNull(currentRecord)) record = (0, $53bcb33ef2023ce8$export$f936470337fdc8d0).thing.merge(record, currentRecord);
         }
         this._systemDB[record_type][record_id] = record;
         return;
@@ -14199,23 +14260,21 @@ class $2cb32bf7096e125e$var$KrThings {
         record_id = record_or_record_type?.record_id || record_or_record_type?.["@id"] || record_id;
         return this._eventRecordCache?.[record_type]?.[record_id];
     }
-    eventRecordCacheSet(record) {
+    eventRecordCacheSet(record_type, record_id, value) {
         /**
          * Sets the official system record of a thing
-         */ let record_type = record?.record_type || record?.["@type"];
-        let record_id = record?.record_id || record?.["@id"];
-        this._eventRecordCache[record_type] = this._eventRecordCache?.[record_type] || {};
-        this._eventRecordCache[record_type][record_id] = record;
+         */ this._eventRecordCache[record_type] = this._eventRecordCache?.[record_type] || {};
+        this._eventRecordCache[record_type][record_id] = value;
         return;
     }
-    callbacksGet(record_or_record_type, record_id) {
+    callbacksGet(record_or_record_type, record_id, callbackType) {
         /**
          * Returns the official system record of a thing, overrides the local cache of a thing
          */ let record_type = record_or_record_type?.record_type || record_or_record_type?.["@type"] || record_or_record_type;
         record_id = record_or_record_type?.record_id || record_or_record_type?.["@id"] || record_id;
-        return this._callbacks?.[record_type]?.[record_id];
+        return this._callbacks?.[record_type]?.[record_id]?.[callbackType];
     }
-    callbacksSet(record_type, record_id, callback) {
+    callbacksSet(record_type, record_id, callback, callbackType) {
         /**
          * Sets the official system record of a thing
          */ if ((0, $53bcb33ef2023ce8$export$f936470337fdc8d0).isArray(callback)) {
@@ -14223,7 +14282,9 @@ class $2cb32bf7096e125e$var$KrThings {
             return;
         }
         this._callbacks[record_type] = this._callbacks[record_type] || {};
-        this._callbacks[record_type][record_id] = callback;
+        this._callbacks[record_type][record_id] = this._callbacks[record_type]?.[record_id] || {};
+        this._callbacks[record_type][record_id][callbackType] = this._callbacks[record_type]?.[record_id]?.[callbackType] || [];
+        this._callbacks[record_type][record_id][callbackType].push(callback);
         return;
     }
     // -----------------------------------------------------
@@ -14246,7 +14307,7 @@ class $2cb32bf7096e125e$var$KrThings {
         for (let t of Object.keys(this._thingDB))for (let i of Object.keys(this._thingDB[t]))things.push(this._thingDB[t][i]);
         return things;
     }
-    set(record, depth = 0) {
+    set(record, overwrite = false, depth = 0) {
         /**
          * Sets a record
          * @param {Object} record_or_record_type The record or record
@@ -14254,15 +14315,15 @@ class $2cb32bf7096e125e$var$KrThings {
          * @returns {Object} The record
          */ if ((0, $53bcb33ef2023ce8$export$f936470337fdc8d0).isNull(record)) return null;
         if (depth > 10) return null;
-        if ((0, $53bcb33ef2023ce8$export$f936470337fdc8d0).isArray(record)) return record.map((x)=>this.set(x, depth));
+        if ((0, $53bcb33ef2023ce8$export$f936470337fdc8d0).isArray(record)) return record.map((x)=>this.set(x, overwrite, depth));
         // Transform to thing system record
         record = (0, $53bcb33ef2023ce8$export$f936470337fdc8d0).thing.toThing(record);
         // Transform to thing if flag is true
         if (this._toThing == true) record = $2cb32bf7096e125e$var$KrThing.toThing(record);
+        // Add to db and get version in db
+        this.thingSet(record, overwrite);
         // Add this db to thing 
         this.registerThing(record);
-        // Add to db and get version in db
-        this.thingSet(record);
         // Add children to db
         let children = (0, $53bcb33ef2023ce8$export$f936470337fdc8d0).thing.children.get(record);
         // change to records
@@ -14326,21 +14387,23 @@ class $2cb32bf7096e125e$var$KrThings {
         /**
          * Executes an action
          */ // Retrieve action thing
-        let actionThing = this.thingGet(action);
+        this.set(action);
+        let actionThing = this.get(action);
+        console.log("ff", actionThing.system);
         // Get latest things
         let things = new $2cb32bf7096e125e$var$KrThings();
         things.set(actionThing.system);
         //
         for (let t of things.getAll()){
-            let originalThing = this.thingGet(t);
+            let originalThing = this.get(t);
             things.set(originalThing.system);
         }
         // 
         actionThing = things.get(action);
         // Execute the action
-        let actionRecord = (0, $53bcb33ef2023ce8$export$f936470337fdc8d0).thing.execute(actionThing.record);
+        let actionRecord = (0, $53bcb33ef2023ce8$export$f936470337fdc8d0).thing.execute(actionThing.system);
         // Add back to engine
-        if (actionRecord?.actionStatus == "CompletedActionStatus") this.set(actionRecord);
+        if (actionRecord?.actionStatus == "CompletedActionStatus") this.set(actionRecord, true);
         return this.get(actionRecord);
     }
 }

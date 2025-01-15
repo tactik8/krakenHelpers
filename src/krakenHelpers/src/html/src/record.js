@@ -2,11 +2,39 @@
 import { krakenBaseHelpers as h} from '../../base/krakenBaseHelpers.js'
 
 
-export function record(record){
+
+
+export function record(){
+    
+    let content = `
+    <div> 
+
+        {{ #transpose:  }}
+
+            <dl class="row">
+
+                <dt class="col-sm-3">{{propertyID}}</dt>
+
+                {{ #value }}
+                     <dd class="col-sm-9">{{value}}</dd>
+
+                {{/value}}
+
+
+            </dl>
+        {{ / }}
+
+    </div>
+    `
+    return content
+}
+
+
+export function recordOLD(record){
 
     let listRecord = {
-        '@type': record["@type"],
-        '@id': record["@id"],
+        '@type': record?.["@type"],
+        '@id': record?.["@id"],
         itemListElement: []
     }
 
