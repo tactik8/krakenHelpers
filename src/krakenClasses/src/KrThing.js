@@ -1,9 +1,10 @@
 
 import { krakenHelpers as h} from '../../krakenHelpers/krakenHelpers.js'
+import { KrBroadcast } from './KrBroadcast.js'
 
 
 
-class KrThing{
+export class KrThing{
     constructor(record_or_record_type, record_id, metadata){
 
         // Property that can be used to differentiate from normal objects
@@ -17,9 +18,14 @@ class KrThing{
 
         this._thingsDB = null
 
-        this._callbacks = {}
 
-        this._eventRecordCache = null
+
+        this._broadcast = new KrBroadcast()
+
+
+
+        // Cache to determineif if thing should broadcast
+        this._recordChangeMonitoringCache = null 
 
 
         
@@ -36,7 +42,26 @@ class KrThing{
 
 
 
+    // -----------------------------------------------------
+    //  Broadcast 
+    // -----------------------------------------------------
 
+    get broadcast(){
+        return this._broadcast
+    }
+
+    addEventListener(callback){
+        /**
+         * Adds an event listener to the record
+         * @param {Function} callback The callback
+         * @returns {Object} The record
+         */
+
+        this.broadcast.addEventListener(callback, this.record_type, this.record_id)
+
+    }
+
+    
     // -----------------------------------------------------
     //  ThingsDB helpers 
     // -----------------------------------------------------
@@ -57,31 +82,7 @@ class KrThing{
 
     }
     
-    getCallbacks(callbackType){
-        /**
-         * Get the repository of things 
-         */
-        if(h.isNotNull(this.thingsDB)){
-            return this._thingsDB.callbacksGet(this.record_type, this.record_id, callbackType)
-        } else {
-            return this._callbacks?.[callbackType]
-        }
-      
-
-    }
-
-    setCallbacks(callback, callbackType){
-        /**
-         * Set the repository of things 
-         */
-        if(h.isNotNull(this.thingsDB)){
-            this._thingsDB.callbacksSet(this.record_type, this.record_id, callback, callbackType)
-        } else {
-            this._callbacks[callbackType] = this._callbacks?.[callbackType] || []
-            this._callbacks[callbackType].push(callback)
-        }
-    }
-
+    
     updateChildren(){
         /**
          * Update children things with most recent object from database
@@ -153,17 +154,18 @@ class KrThing{
         /**
          * Provides abstraction for event handling and cleanup 
          */
-        //this._eventMonitoringCache = h.thing.hash(this._system)
-
-
         // Returns system record from thingsDB repository if exists, else uses local
 
+        let result
+        
         if(h.isNotNull(this._thingsDB)){
-            return this._thingsDB.systemGet(this.record_type, this.record_id)
+            result = this._thingsDB.systems.get(this.record_type, this.record_id)
         } else {
-            return this._system
-            
+            result = this._system
         }
+
+
+        this._recordChangeMonitoringCache = result
         
     }
 
@@ -174,79 +176,28 @@ class KrThing{
 
         // Write to thingsDB if exists
         if(h.isNotNull(this._thingsDB)){
-            this._thingsDB.systemSet(value)
-
+            this._thingsDB.systems.set(value)
         } else {
             this._system = value
         }
         
         
-        this._record_type = h.thing.record_type.get(value)
-        this._record_id = h.thing.record_id.get(value)
+        this._record_type = h.record_type(value)
+        this._record_id = h.record_id(value)
 
-        
         this._convertChildrenThingsRecordsToThingObjects()
 
-        // Broadcast event 
-        if(this.recordHasChanged() === true){
-            this.broadcastEvent('thing', this.ref)
-        } 
-        
-    }
-
-
-    // -----------------------------------------------------
-    //  Event record cache
-    //  Cache of the record from the last event
-    //  Used to decide if broadcast or not (somehting changed)
-    // -----------------------------------------------------
-
-
-    recordHasChanged(){
-        /**
-         * Returns true if the record has changed since last event broadcast
-         */
-
-        
-        let hashValue = h.base.hash.get(this.record)
-
-        let oldValue = this.getEventRecordCache()
-        
-        if (hashValue != oldValue){
-            return true
-        }
-        return false
-    }
-    
-    getEventRecordCache(){
-        /**
-         * Retrieves the record from the last broadcast
-         * 
-         */
-        if(h.isNotNull(this.thingsDB)){
-            return this.thingsDB.eventRecordCacheGet(this.record_type, this.record_id)
-        } else {
-            return this._eventRecordCache
+        // Broadcast event if record has changed
+        if(JSON.stringify(this._recordChangeMonitoringCache) != JSON.stringify(value)){
+            this.broadcast.newEventUpdate(this.ref)
+            this._recordChangeMonitoringCache = value
         }
         
+      
         
     }
 
-    storeEventRecordCache(){
-        /**
-         * Sets the record from the last broadcast
-         * 
-         */
 
-        
-        let hashValue = h.base.hash.get(this.record)
-
-        if(h.isNotNull(this.thingsDB)){
-            this.thingsDB.eventRecordCacheSet(this.record_type, this.record_id, hashValue)
-        } else {
-            this._eventRecordCache = hashValue
-        }
-    }
 
 
     // -----------------------------------------------------
@@ -271,7 +222,6 @@ class KrThing{
 
         // Convert children things to thing objects
         children = children.map(x => KrThing.toThing(x))
-
 
         // Replace values in things by equivalent class object
         if(h.isNotNull(children)){
@@ -377,7 +327,7 @@ class KrThing{
          */
         let children = []
         
-        for(let pv of this._propertyValues || []){
+        for(let pv of this.system?._propertyValues || []){
             if(pv.object.propertyID == 'previousItem'){
                 continue
             }
@@ -470,6 +420,31 @@ class KrThing{
         this.system = h.thing.value.delete(this.system, propertyID, value, metadata)
     }
 
+    get value(){
+        return {
+            'get': this.getValue.bind(this),
+            'set': this.setValue.bind(this),
+            'add': this.addValue.bind(this),
+            'replace': this.replaceValue.bind(this),
+            'delete': this.deleteValue.bind(this)
+        }
+    }
+
+    get values(){
+        return {
+            'get': this.getValues.bind(this),
+            'set': this.setValue.bind(this),
+            'add': this.addValue.bind(this),
+            'replace': this.replaceValue.bind(this),
+            'delete': this.deleteValue.bind(this)
+        }
+    }
+
+    // -----------------------------------------------------
+    //  Property Values 
+    // -----------------------------------------------------
+
+    
     getPropertyValue(propertyID){
         /**
          * Returns the property value for a given property
@@ -488,6 +463,16 @@ class KrThing{
         return h.thing.propertyValues.get(this.system, propertyID)
     }
 
+    get propertyValues(){
+        return {
+            'get': this.getPropertyValues.bind(this)
+        }
+    }
+    get propertyValue(){
+        return {
+            'get': this.getPropertyValue.bind(this)
+        }
+    }
     
     // -----------------------------------------------------
     //  Comparisons 
@@ -559,6 +544,15 @@ class KrThing{
          * @returns {Object} The record
          */
         this.system = h.thing.merge(this.system, other.system)
+
+
+        // Merge event listeners
+        this.broadcast.followers.set(other.broadcast.followers.get())
+        other.broadcast.followers.drop()
+        
+        // 
+
+        
     }
 
     mergeDeep(other){
@@ -952,66 +946,7 @@ class KrThing{
 
 
    
-    // -----------------------------------------------------
-    //  Event listeners
-    // -----------------------------------------------------
 
-    addEventListener(eventType, callback){
-        /**
-         * Adds an event listener to the record
-         * @param {String} event The event
-         * @param {Function} callback The callback
-         * @returns {Object} The record
-         */
-
-        this.setCallbacks(callback, eventType)
-        if(eventType !='all'){
-             this.setCallbacks(callback, 'all')
-        }
-      
-    }
-
-    broadcastEvent(eventType, message){
-        /**
-         * Broadcasts an event to all listeners
-         * @param {String} event The event
-         * @param {Object} message The message
-         * @returns {Object} The record
-         */
-
-
-        //console.log('BROADCAST')
-        let event = {
-            "@type": "Action",
-            "@id": h.uuid.new(),
-            object: this,
-            name: message
-        }
-
-
-        // Store copy of record in event Cache
-        this.storeEventRecordCache()
-        
-
-        // Execute callbacks
-        for(let callback of h.toArray(this.getCallbacks(eventType))){
-            callback(event)
-        }
-
-        for(let callback of h.toArray(this.getCallbacks('any'))){
-            callback(event)
-        }
-
-        for(let callback of h.toArray(this.getCallbacks('all'))){
-            console.log('broadcast all')
-            callback(event)
-        }
-
-        
-      
-    }
-
-    
 
     // -----------------------------------------------------
     //  Shortcuts 
@@ -1133,7 +1068,3 @@ class KrThing{
 }
 
 
-
-export const krakenThing = {
-    KrThing: KrThing
-}

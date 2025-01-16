@@ -1,13 +1,12 @@
 
 
-import { KrDb  } from './src/KrDb.js'
-import { krakenThing  } from './src/KrThing.js'
-import { krakenThings  } from './src/KrThings.js'
+//import { KrDb  } from './src/KrDb.js'
+import { KrThing  } from './src/KrThing.js'
+import { KrThings  } from './src/KrThings.js'
 //import { KrElementEngine } from './src/KrElementEngine.js'
 
 export const krakenClasses = {
-    KrDb: KrDb,
-    KrThing: krakenThing.KrThing,
-    KrThings: krakenThings.KrThings,
+    KrThing: KrThing,
+    KrThings: KrThings,
     //KrElementEngine: KrElementEngine
 }

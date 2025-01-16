@@ -69,6 +69,44 @@ describe("KrDb", () => {
         
     });
 
+
+   test("test many", () => {
+
+         function getRecord(n){
+
+                 let record = {
+                     "@context": "https://schema.org/",
+                     "@type": "Thing",
+                     "@id": "thing" + String(n),
+                     "name": "thing" + String(n)
+                 }
+                 return record
+             }
+
+
+         let db = new KrDb()
+
+         // Seed db
+         for(let i = 0; i < 100; i++){
+               let r = getRecord(i)
+               db.set(r)
+         }
+
+         // 
+         expect(db.length).toBe(100)
+
+         
+
+         // 
+         for(let i = 0; i < 10; i++){
+                  let r = getRecord(i)
+                  db.delete(r["@type"], r["@id"])
+            }
+          expect(db.length).toBe(90)
+         
+   })
+
+
   })
 
 

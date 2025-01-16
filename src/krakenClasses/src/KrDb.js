@@ -6,24 +6,56 @@ export class KrDb {
 
     constructor(){
 
-        this._db = []
+        this._db = {}
         
     }
 
 
-    length(){
+
+
+    // -----------------------------------------------------
+    //  Internal methods 
+    // -----------------------------------------------------
+
+
+    _getAll(){
+        /**
+         * Returns all records
+         */
+        let records = []
+        for(let t in this._db){
+            for(let i in this._db[t]){
+                records.push(this._db[t][i])
+            }
+        }
+        return records
+    }
+
+    
+    // -----------------------------------------------------
+    //  Base methods 
+    // -----------------------------------------------------
+
+    get length(){
         /**
          * Returns the length of the db
          */
-        return this._db.length
+        return this._getAll().length
         
     }
 
+
+    // -----------------------------------------------------
+    //  CRUD 
+    // -----------------------------------------------------
+
+    
     
     get(filter_or_record_type, record_id){
         /**
          * Gets a thing
          */
+
 
 
         // Get filter
@@ -32,12 +64,24 @@ export class KrDb {
         
         // Return all records if no filters provided
         if(h.isNull(filter)){
-            return this._db
+            return this._getAll()
         }
 
-        // Get things
-        let results = h.thing.filter(this._db, filter)
+        // Get item directly if type and id provided
+        if(h.isNotNull(h.record_type(filter) && h.isNotNull(h.record_id(filter)))){
+            return this._db?.[h.record_type(filter)]?.[h.record_id(filter)]
+        }
 
+        
+        // Get things
+        let records = this._getAll()
+        let results = h.thing.filter(records, filter)
+
+
+
+        // Remove null values
+        results = results.filter(x => h.isNotNull(x))
+        
         // 
         if(h.isNotNull(h.record_id(filter))){
             return results?.[0] || null
@@ -63,16 +107,25 @@ export class KrDb {
             }
         }
         
+        
+        // Get record type and id
+        let record_type = h.record_type(record)
+        let record_id = h.record_id(record)
+
         // Error handling
-        if(h.isNull(record) || !(h.base.isObject(record))){
+        if(h.isNull(record_type) || h.isNull(record_id)){
             return false
         }
 
+        //
+        this._db[record_type] = this._db?.[record_type] || {}
+        
+        
         // Check if record already exists
-        let currentThing = this.get(h.thing.ref(record))
+        let currentThing = this._db?.[record_type]?.[record_id]
 
         if(h.isNull(currentThing)){
-            this._db.push(record)
+            this._db[record_type][record_id] = record
         }
         
     }
@@ -96,9 +149,22 @@ export class KrDb {
         // Get records
         let records = this.get(filter)
 
+        // Return if no records match
+        if(h.isNull(records)){
+            return 
+        }
+        
         // Delete records
-        for(let record of records){
-            this._db = h.thing.delete(this._db, h.ref(record))
+        for(let record of h.base.toArray(records)){
+            let record_type = h.record_type(record)
+            let record_id = h.record_id(record)
+
+            if(h.isNull(this._db?.[record_type])){
+                continue
+            }
+
+            delete this?._db[record_type]?.[record_id]
+            
         }
 
         // Return
@@ -111,7 +177,7 @@ export class KrDb {
          * Drops the db
          * 
          */
-        this._db = []
+        this._db = {}
 
         return true
     }
@@ -128,7 +194,7 @@ export class KrDb {
          * Return a filter from a filter_or_record_type and record_id
          */
 
-        // Return all records if no filters provided
+        // Return 
         if(h.isNull(filter_or_record_type) && h.isNull(record_id)){
             return null
         }
@@ -155,7 +221,3 @@ export class KrDb {
 }
 
 
-
-export const krakenDb = {
-    KrDb: KrDb
-}

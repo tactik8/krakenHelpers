@@ -1,13 +1,16 @@
 import { krakenHelpers as h} from '../../krakenHelpers/krakenHelpers.js'
-import { krakenThing } from './KrThing.js'
+import { KrThing } from './KrThing.js'
+
+import { KrBroadcast } from './KrBroadcast.js'
+import { KrDb } from './KrDb.js'
+import { krakenObjectHelpers } from '../../krakenHelpers/src/base/src/krakenObjectHelpers.js'
 
 
-let KrThing = krakenThing.KrThing
 
 
 
 
-class KrThings {
+export class KrThings {
     /**
      * Database of things or thing records
      * Maintain integrity of first record input in database by merging additional to the first one.
@@ -17,25 +20,34 @@ class KrThings {
         this._toThing = toThing
 
         
-        this._thingDB = {} // _db of things 
-
+        this._thingDB = new KrDb()     // DB of Thing objects
+        this._systemDB = new KrDb()    // DB of systems records
 
         
         // Callbacks
         this._callbacks = {}
 
+        //
+
         // Broadcast
-        this._broadcastPausedFlag = false
-        this._events = []
+        this._broadcast = new KrBroadcast(this)
+        
 
         // Replaces local cache of thing objects
-        this._systemDB = {} //  db of system records for things
+        //this._systemDB = {} //  db of system records for things
         this._eventRecordCache = {}
         this._callbacksCache = {}
         
     }
 
 
+    // -----------------------------------------------------
+    //  Broadcast 
+    // -----------------------------------------------------
+
+    get broadcast(){
+        return this._broadcast
+    }
 
 
     // -----------------------------------------------------
@@ -50,17 +62,10 @@ class KrThings {
          * Gets a thing from the database
          */
      
-
-        let record_type = record_or_record_type?.record_type || record_or_record_type?.['@type'] || record_or_record_type
-        record_id = record_or_record_type?.record_id || record_or_record_type?.['@id'] || record_id
-
-        return this._thingDB?.[record_type]?.[record_id]
-
-        
-        
+        return this.things.get(record_or_record_type, record_id)
     }
 
-    thingSet(thing, overWrite = false){
+    thingSet(thing){
         /**
          * Sets thing in database
          * @param {KrThing} thing
@@ -68,93 +73,66 @@ class KrThings {
          * 
          */
 
+        // Handle arrays
         if(h.isArray(thing)){
             return thing.map(x => this.thingSet(x))
         }
         
-        let broadcastAddFlag = false
-        let broadcastEditFlag = false
-        
-        let record_type = thing?.record_type || thing?.['@type'] 
-        let record_id = thing?.record_id || thing?.['@id'] 
+        // Turn off broadcast
+        let broadcastLockoutKey = this.broadcast.pauseBroadcast()
 
-        
+        // Get type and id
+        let record_type = h.record_type(thing)
+        let record_id = h.record_id(thing)
+        let ref = h.ref(thing)
+
         
         // Ensure it is a thing object
         if(!(thing instanceof KrThing )){
             thing = KrThing.toThing(thing)
         }
 
+        // Get current thing in db (if any)
+        let currentThing = this.things.get(ref)
         
-        // Add to db if nbot already in or not the same
-        let currentT = this.thingGet(thing)
-
-        // Add if doesnt exist
-        if(h.isNull(currentT)){
+        // If not already in db
+        if(h.isNull(currentThing)){
             
-            // Set system record, will merge with existing if exists
-            this.systemSet(thing?.system || thing, overWrite)
+            // Set system record
+            this.systems.set(thing?.system || null)
 
             // Add db to thing object
             thing.thingsDB = this
             
-            // Set eventRecordCache
-            this.eventRecordCacheSet(thing._eventRecordCache)
-
             // Subscribe to event listener
-            thing.addEventListener('all', this.processThingBroadcast.bind(this))
+            thing.addEventListener(this.processThingBroadcast.bind(this))
             
             // Set thing in db
-            this._thingDB[record_type] = this._thingDB?.[record_type] || {}
-            this._thingDB[record_type][record_id] = thing
+            this.things.set(thing)
             
             // Broadcast new thing 
-            broadcastAddFlag = true
+            this.broadcast.newEventAdd(record_type, record_id)
             
         }  
 
         // Add data to existing if exists
-        if(h.isNotNull(currentT) && currentT?.id != thing?.id){
-
-            //console.log('exists')
-            // Set broadcast edit flag
-            if(JSON.stringify(thing?.record) != JSON.stringify(currentT?.record)){
-                broadcastEditFlag = true
-            }
+        if(h.isNotNull(currentThing) && currentThing?.id != thing?.id){
 
             // Set system record, will merge with existing if exists
-            this.systemSet(thing?.system || thing, overWrite)
-
-            // Add listener to thing
-            thing.addEventListener('all', this.processThingBroadcast.bind(this))
-
-
-            // Copy eventListeners
-            for(let k in thing._eventRecordCache){
-                currentT[k] = currentT?.[k] || []
-                for(let e of thing._eventRecordCache[k]){
-                    if(!currentT[k].includes(e)){
-                        currentT[k].push(e)
-                    }
-                }
-            }
+            currentThing.merge(thing)
             
-            // Add db to thing object
-            thing.thingsDB = this
+            // Switch to main thing (the one from db)
+            thing = currentThing
 
-            // Add callbacks from non primary thing
-            for(let callbackType in thing._callbacks){
-                for(let callback of thing._callbacks[callbackType]){
-                    this.callbacksSet(record_type, record_id, callback, callbackType)
-                }
-            }
+            // Broadcast new thing 
+            this.broadcast.newEventUpdate(record_type, record_id)
             
-            thing = currentT
         }
 
         
         // Add children
         let children = thing.children
+        console.log('c', children.length)
         if(h.isNotNull(children)){
             this.thingSet(children)
         }
@@ -163,119 +141,26 @@ class KrThings {
         thing.replaceChildren(this.getAll())
 
        
-        // Broadcast event
-        if(broadcastAddFlag == true){
-            this.broadcastEvent(record_type, record_id, "AddAction")
-        }
-        if(broadcastEditFlag == true){
-            this.broadcastEvent(record_type, record_id, "UpdateAction")
-        }
+        // Resume broadcasts
+        this.broadcast.resumeBroadcast(broadcastLockoutKey)
 
         
-        // Return thing from db
-        return this._thingDB[record_type][record_id]
+        // Return thing 
+        return thing
 
+    }
+
+
+
+    get systems(){
+        return this._systemDB
+    }
+
+    get things(){
+        return this._thingDB
     }
 
     
-    systemGet(record_or_record_type, record_id){
-        /**
-         * Returns the official system record of a thing, overrides the local cache of a thing
-         */
-
-        let record_type = record_or_record_type?.record_type || record_or_record_type?.['@type'] || record_or_record_type
-        record_id = record_or_record_type?.record_id || record_or_record_type?.['@id'] || record_id
-        
-        return this._systemDB?.[record_type]?.[record_id]
-        
-    }
-
-    systemSet(record, overWrite = false){
-        /**
-         * Sets the official system record of a thing
-         */
-
-        let record_type = record?.record_type || record?.['@type'] 
-        let record_id = record?.record_id || record?.['@id']
-
-        this._systemDB[record_type] = this._systemDB?.[record_type] || {}
-
-        // Merge with existing record if one present
-        if(overWrite == false){
-            let currentRecord = this.systemGet(record_type, record_id) 
-            if(h.isNotNull(currentRecord)){
-                record = h.thing.merge(record, currentRecord)
-            }
-        }
-        
-        this._systemDB[record_type][record_id] = record
-        
-        return 
-
-    }
-
-    eventRecordCacheGet(record_or_record_type, record_id){
-        /**
-         * Returns the official system record of a thing, overrides the local cache of a thing
-         */
-
-        let record_type = record_or_record_type?.record_type || record_or_record_type?.['@type'] || record_or_record_type
-        record_id = record_or_record_type?.record_id || record_or_record_type?.['@id'] || record_id
-
-        return this._eventRecordCache?.[record_type]?.[record_id]
-
-    }
-
-    eventRecordCacheSet(record_type, record_id, value){
-        /**
-         * Sets the official system record of a thing
-         */
-
-      
-
-        this._eventRecordCache[record_type] = this._eventRecordCache?.[record_type] || {}
-
-        this._eventRecordCache[record_type][record_id] = value
-
-        return 
-
-    }
-
-    callbacksGet(record_or_record_type, record_id, callbackType){
-        /**
-         * Returns the official system record of a thing, overrides the local cache of a thing
-         */
-
-        let record_type = record_or_record_type?.record_type || record_or_record_type?.['@type'] || record_or_record_type
-        record_id = record_or_record_type?.record_id || record_or_record_type?.['@id'] || record_id
-
-        return this._callbacksCache?.[record_type]?.[record_id]?.[callbackType]
-
-    }
-
-    callbacksSet(record_type, record_id, callback, callbackType){
-        /**
-         * Sets the official system record of a thing
-         */
-
-        if(h.isArray(callback)){
-            callback.map(x => this.callbacksSet(record_type, record_id, x))
-            return
-        }
-
-
-        this._callbacksCache[record_type] = this._callbacksCache[record_type] || {}
-
-         this._callbacksCache[record_type][record_id] =  this._callbacksCache[record_type]?.[record_id] || {}
-
-        this._callbacksCache[record_type][record_id][callbackType] =  this._callbacksCache[record_type]?.[record_id]?.[callbackType] || []
-
-        
-        this._callbacksCache[record_type][record_id][callbackType].push(callback) 
-
-        return 
-
-    }
 
 
     // -----------------------------------------------------
@@ -303,13 +188,7 @@ class KrThings {
          * 
          */
 
-        let things = []
-        for(let t of Object.keys(this._thingDB)){
-            for(let i of Object.keys(this._thingDB[t])){
-                things.push(this._thingDB[t][i])
-            }
-        }
-        return things
+        return this.things.get()
     }
 
     set(record, overwrite=false, depth=0){
@@ -321,7 +200,7 @@ class KrThings {
          */
 
 
-        return this.thingSet(record, overwrite, depth)
+        return this.thingSet(record)
        
         
     }
@@ -333,16 +212,17 @@ class KrThings {
          * @param {String} record_id The record id
          * @returns {Object} The record
          */
-        this._db = h.thing.delete(this._db, record_or_record_type, record_id)
+
+        return this.things.delete(record_or_record_type, record_id)
     }
 
-    length(){
+    get length(){
         /**
          * Gets the length of the things
          * @returns {Number} The length
          * 
          */
-        return this._db.length
+        return this.things.length
     }
 
     
@@ -353,7 +233,7 @@ class KrThings {
          * 
          */
 
-        this._db = {}
+        return this.things.drop()
     }
 
     merge(other){
@@ -362,7 +242,20 @@ class KrThings {
          * @param {Object} other The other things
          * @returns {Array} The things
          */
-        this._db = h.thing.mergeLists(this._db, other)
+
+        for(let t of other.getAll()){
+            this.set(t)
+        }
+
+        // Merge listeners
+        for(let l of this.broadcast.followers.get()){
+            this.broadcast.followers.set(l)
+        }
+
+        // Merge pending events
+        for(let e of this.broadcast.events.get()){
+            this.broadcast.events.set(e)
+        }
         
     }
 
@@ -372,7 +265,7 @@ class KrThings {
          * @param {Object} conditions The conditions
          * @returns {Array} The things
          */
-        return h.thing.filter(this._db, conditions)
+        return h.thing.filter(this.things.get(), conditions)
     }
 
     sort(conditions){
@@ -381,7 +274,7 @@ class KrThings {
          * @param {Object} conditions The conditions
          * @returns {Array} The things
          */
-        return h.thing.sort(this._db, conditions)
+        return h.thing.sort(this.things.get(), conditions)
     }
 
 
@@ -588,192 +481,31 @@ class KrThings {
         let record_id = event?.object?.record_id || event?.object?.['@id'] 
         let thing = this.get(record_type, record_id)
 
-        //console.log('processThingBroadcast', record_type, record_id)
         // Add children things to db
         for(let t of thing.children){
             this.thingSet(t)
         
          }
         
-        return this.broadcastEvent(record_type, record_id, "UpdateAction")
+        return this.broadcast.newEventUpdate(record_type, record_id)
 
         
     }
 
     
-    addEventListener(record_or_record_type, record_id, callback){
+    addEventListener(callback, record_or_record_type, record_id){
         /**
          * Adds an event listener for a specific thing
          * @param {Object} record_or_record_type The record or record
          * 
          */
-        let record_type = record_or_record_type?.record_type || record_or_record_type?.['@type'] || record_or_record_type
-        record_id = record_or_record_type?.record_id || record_or_record_type?.['@id'] || record_id
-
-        if(h.isNull(record_type) || h.isNull(record_id)){
-            return false
-        }
-
-        this._callbacks = this._callbacks || {}
-        this._callbacks[record_type] = this._callbacks[record_type] || {}
-        this._callbacks[record_type][record_id] = this._callbacks[record_type][record_id] || []
-        this._callbacks[record_type][record_id].push(callback)
-        
-        return true
+        this.broadcast.addEventListener(callback, record_or_record_type, record_id)
 
         
     }
 
-
-    pauseBroadcast(){
-        /**
-         * Pauses the broadcast, accumulate in cache
-         */
-
-        this._broadcastPausedFlag = true
-        
-    }
-
-    resumeBroadcast(){
-        /**
-         * Resumes the broadcast
-         */
-        this._broadcastPausedFlag = false
-    }
-
-
-    // -----------------------------------------------------
-    //  Event 
-    // -----------------------------------------------------
-
-    
-    addEvent(eventType, objectRef){
-        /**
-         * 
-         */
-        
-        let event = {
-            "@type": eventType,
-            "@id": h.uuid.new(),
-            object: objectRef,
-        } 
-
-        if(!this._broadcastQueue.contains(event)){
-            this._broadcastQueue.push(event)
-        }
-        
-        return 
-    }
-
-    getEvent(eventType, objectRef){
-        /**
-         * Get an event 
-         */
-        let record_type = h.record_type(record_or_record_type)
-        record_id = h.record_id(record_or_record_type, record_id)
-
-        let events = []
-        
-        for(let event of this._events){
-            if(h.record_type(event.object) == h.record_type(objectRef)){
-                if(h.record_id(event.object) == h.record_id(objectRef)){
-                    if(h.record_type(event) == eventType || h.isNull(eventType)){
-                        events.push(event)
-                    }
-                }
-            }
-        }
-
-        return events
-        
-    }
-
-    getEvents(filter){
-        /**
-         * 
-         */
-        
-        return this._events
-    }
-
-
-    deleteEvent(record_or_record_type, record_id, eventType){
-        /**
-         * Delete an event
-         */
-        
-    }
-
-    get event(){
-        /**
-         * 
-         */
-        return {
-            'get': this.getEvent.bind(this),
-            'getAll': this.getEvents.bind(this),
-            'set': this.addEvent.bind(this),
-            'delete': this.deleteEvent.bind(this),
-        }
-    }
-    
-    
-
-    // -----------------------------------------------------
-    //  Comment 
-    // -----------------------------------------------------
 
     
 
-    broadcastEvent(record_or_record_type, record_id, eventType){
-        /**
-         * Broadcasts an event to all listeners
-         * @param {String} event The event
-         * @param {Object} message The message
-         * @returns {Object} The record
-         */
-
-        let record_type = record_or_record_type?.record_type || record_or_record_type?.['@type'] || record_or_record_type
-        record_id = record_or_record_type?.record_id || record_or_record_type?.['@id'] || record_id
-
-
-        // If paused, add to queue
-
-        if(this._broadcastPausedFlag== true){
-            this._broadcastQueue.push()
-        }
-
-
-        // 
-
-        
-        let record = this.getRecord(record_type, record_id)
-        
-        let event = {
-            "@type": eventType,
-            "@id": h.uuid.new(),
-            object: record,
-            name: 'Record updated'
-        }
-
-
-        let callbacks = this._callbacks?.[record_type]?.[record_id] || []
-
-        // Execute callbacks
-        for(let callback of callbacks){
-            callback(event)
-        }
-
-        return
-
-
-
-    }
-
-    
 }
 
-
-
-export const krakenThings = {
-    KrThings: KrThings
-}

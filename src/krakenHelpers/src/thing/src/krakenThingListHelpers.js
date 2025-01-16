@@ -207,7 +207,6 @@ function getListItems(itemList){
      * @param {Object} itemList The list
      * @returns {Array} The items of the list
      */
-    console.log('pp1')
     let listItems = th.propertyValues.get(itemList, 'itemListElement')
 
     // Error handling
@@ -216,7 +215,6 @@ function getListItems(itemList){
     // Retrieve value part of pv
     listItems = h.toArray(listItems)
 
-    console.log('pp')
     listItems = listItems.map(x => x?._system?.object?.value || x?.object?.value )
     
     listItems = listItems.filter(x => !h.isNull(x))
@@ -544,7 +542,6 @@ function resetPositions(itemList, startingItem, startingPosition, metadata){
     while (h.isNotNull(temp)){
 
         count += 1
-        console.log('tt', temp)
         if(count > 40){ return }
         temp = listItems.filter(x => (x?.record_id || x?.['@id'] || x?._system?.['@id']) == (temp?.record_id || temp?._system?.['@id'] || temp?.['@id']))?.[0] || null
         
